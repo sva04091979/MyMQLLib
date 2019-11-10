@@ -17,12 +17,12 @@ class CRingArray
 public:
          CRingArray(int mSize);
    inline void  Push(T mValue);
-   inline double Max()  {return cArray[cMax];}
-   inline double Min()  {return cArray[cMin];}
-   inline double Med()  {return cSumm/cSize;}
+   inline T Max()  {return cArray[cMax];}
+   inline T Min()  {return cArray[cMin];}
+   inline T Med()  {return cSumm/cSize;}
    inline bool   IsFull()  {return bool(cFlag&ARRAY_FLAG_FULL);}
    inline void   SetLast(T mValue) {cSumm+=mValue-cArray[cLastPos]; cArray[cLastPos]=mValue;}
-   inline double operator [](int mPos) {int pos=cStartPos+mPos; return cArray[pos<cSize?pos:pos-cSize];}
+   inline T operator [](int mPos) {int pos=cStartPos+mPos; return cArray[pos<cSize?pos:pos-cSize];}
 private:
    inline void CheckExtreme(const T &mValue);
    inline void CheckMax(const T &mValue);
