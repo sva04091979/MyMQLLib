@@ -56,12 +56,12 @@ void CRingArray::CheckExtreme(const T &mValue){
 //-----------------------------------------------------
 template<typename T>
 void CRingArray::CheckMax(const T &mValue){
-   if (cStartPos==cMax) cMax=ArrayMaximum(cArray,!(cFlag&ARRAY_FLAG_FULL)?cLastPos:-1);
+   if (cStartPos==cMax) cMax=ArrayMaximum(cArray,#ifdef __MQL5__ 0,#endif !(cFlag&ARRAY_FLAG_FULL)?cLastPos:-1);
    else if (mValue>cArray[cMax]) cMax=cStartPos;}
 //-----------------------------------------------------
 template<typename T>
 void CRingArray::CheckMin(const T &mValue){
-   if (cStartPos==cMin) cMin=ArrayMinimum(cArray,!(cFlag&ARRAY_FLAG_FULL)?cLastPos:-1);
+   if (cStartPos==cMin) cMin=ArrayMinimum(cArray,#ifdef __MQL5__ 0,#endif !(cFlag&ARRAY_FLAG_FULL)?cLastPos:-1);
    else if (mValue<cArray[cMin]) cMin=cStartPos;}
 
 
