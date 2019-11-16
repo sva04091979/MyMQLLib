@@ -3,16 +3,10 @@
 
 #include "..\..\Functions\PriceFunctions.mqh"
 
-enum ENUM_BALLANCE_TYPE
-  {
-   BALLANCE_TYPE_BALLANCE=ACCOUNT_BALANCE,
-   BALLANCE_TYPE_EQITY=ACCOUNT_EQUITY,
-   BALLANCE_TYPE_MARGIN_FREE=ACCOUNT_MARGIN_FREE
-  };
 
 class CConvert
   {
-private:
+protected:
    string            cSymbol;
    string            cAccCurrency;
    string            cCurrency[2];
@@ -23,8 +17,6 @@ private:
 public:
                      CConvert(string mSymbol=NULL);
    double            GetPointPrice(int mCount=1);
-   inline double     GetPoint()  {return cPoint;}
-   inline double     GetTickSize()  {return cTickSize;}
 private:
    void              ComputeParam();
    bool              OneStepCross(string mProfit,string mBase,string mPrefix,string mSuffix);

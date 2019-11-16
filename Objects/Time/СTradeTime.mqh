@@ -3,13 +3,18 @@
 
 #include "..\..\Functions\TimeFunctions.mqh"
 
+#define TRADE_TIME_FLAG_NEW_DAY 0x1
+
 class CTradeTime{
-private:
+protected:
    bool              cIsTrue;
+   int               cFlag;
+   int               cDay;
    datetime          cTimeCurrent;
    datetime          cTradeTime[2];
 public:
                      CTradeTime(string mTimeStart,string mTimeStop);
+   bool              IsNewDay() {bool res=bool(cFlag&TRADE_TIME_FLAG_NEW_DAY); cFlag&=~TRADE_TIME_FLAG_NEW_DAY; return res;}
    bool              IsTrueFormat() {return cIsTrue;}
    bool              IsTradeAlloed(datetime mTime=0);
 private:
@@ -18,11 +23,12 @@ private:
    bool              CheckTime();
   };
 //+------------------------------------------------------------------+
-CTradeTime::CTradeTime(string mTimeStart,string mTimeStop){
+CTradeTime::CTradeTime(string mTimeStart,string mTimeStop):cFlag(TRADE_TIME_FLAG_NEW_DAY){
    MqlDateTime mTimeStruct;
    cTimeCurrent=TimeCurrent();
    cIsTrue=true;
    if (!TimeToStruct(cTimeCurrent,mTimeStruct)) {cTimeCurrent=0; cIsTrue=false; return;}
+   cDay=mTimeStruct.day_of_week;
    for (int i=0;i<2;i++)
       if (!StringToTimeStruct(mTimeStart,mTimeStop,mTimeStruct,i)) {cTimeCurrent=0; cIsTrue=false; return;}
    if (cTradeTime[0]==cTradeTime[1]) return;
@@ -67,6 +73,11 @@ bool CTradeTime::IsTradeAlloed(datetime mTime=0){
 //--------------------------------------------------------------------
 void CTradeTime::Control(datetime mTime){
    cTimeCurrent=!mTime?TimeCurrent():mTime;
+   MqlDateTime time;
+   TimeToStruct(cTimeCurrent,time);
+   if (cDay!=time.day_of_week){
+      cFlag|=TRADE_TIME_FLAG_NEW_DAY;
+      cDay=time.day_of_week;}
    if (!cTimeCurrent) return;
    while (!CheckTime()){
       if (cTimeCurrent>=cTradeTime[0]&&cTradeTime[1]<cTradeTime[0]) cTradeTime[1]+=TIME_DAY;
