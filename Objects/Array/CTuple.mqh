@@ -1,8 +1,8 @@
 #ifndef _C_TUPLE_
 #define _C_TUPLE_
 
-#define tuple(dCount) CTuple##dCount
-#define tuple_value(dCount) STuple##dCount
+#define tuple(dCount) classTuple##dCount
+#define tuple_value(dCount) structTuple##dCount
 
 #define TEMP_LIST2 T1,T2
 #define TEMP_LIST3 TEMP_LIST2,T3
@@ -72,13 +72,21 @@
 #define INIT7 INIT6,Item7(mValue7)
 #define INIT8 INIT7,Item8(mValue8)
 
-#define COPY_TUPLE2 Item1=mTuple.Item1; Item2=mTuple.Item2;
-#define COPY_TUPLE3 COPY_TUPLE2 Item3=mTuple.Item3;
-#define COPY_TUPLE4 COPY_TUPLE3 Item4=mTuple.Item4;
-#define COPY_TUPLE5 COPY_TUPLE4 Item5=mTuple.Item5;
-#define COPY_TUPLE6 COPY_TUPLE5 Item6=mTuple.Item6;
-#define COPY_TUPLE7 COPY_TUPLE6 Item7=mTuple.Item7;
-#define COPY_TUPLE8 COPY_TUPLE7 Item8=mTuple.Item8;
+#define INIT_FIELDSstruct(dCount)
+#define INIT_FIELDSclass(dCount)  \
+   classTuple##dCount():DEFAULT_INIT##dCount{}   \
+   classTuple##dCount(PARAM_LIST##dCount):INIT##dCount{}
+
+#define SET2(dWhereFrom) Item1=dWhereFrom##1;Item2=dWhereFrom##2
+#define SET3(dWhereFrom) SET2(dWhereFrom); Item3=dWhereFrom##3
+#define SET4(dWhereFrom) SET3(dWhereFrom); Item4=dWhereFrom##4
+#define SET5(dWhereFrom) SET4(dWhereFrom); Item5=dWhereFrom##5
+#define SET6(dWhereFrom) SET5(dWhereFrom); Item6=dWhereFrom##6
+#define SET7(dWhereFrom) SET6(dWhereFrom); Item7=dWhereFrom##7
+#define SET8(dWhereFrom) SET7(dWhereFrom); Item8=dWhereFrom##8
+
+#define SET(dCount) SET##dCount(mValue)
+#define COPY(dCount) SET##dCount(mTuple.Item)
 
 #define COMPARE2 return Item1==mTuple.Item1&&Item2==mTuple.Item2
 #define COMPARE3 COMPARE2&&Item3==mTuple.Item3
@@ -88,37 +96,28 @@
 #define COMPARE7 COMPARE6&&Item7==mTuple.Item7
 #define COMPARE8 COMPARE7&&Item8==mTuple.Item8
 
-#define TUPLE_DECL(dCount) \
+#define DECL(dType,dCount) \
    TEMPLATE_DECL(dCount)   \
-   struct STuple##dCount{   \
-      FIELD_DECL##dCount   \
-      void operator =(tuple(##dCount)<TEMP_LIST##dCount> &mTuple){COPY_TUPLE##dCount}   \
-      void operator =(tuple_value(##dCount)<TEMP_LIST##dCount> &mTuple){COPY_TUPLE##dCount}   \
-      tuple(dCount)<TEMP_LIST##dCount>* GetTuple() {return new tuple(dCount)<TEMP_LIST##dCount>(FIELD_LIST##dCount);}   \
-      tuple_value(dCount)<TEMP_LIST##dCount> GetTupleValue(){ \
-         tuple_value(dCount)<TEMP_LIST##dCount> res;  \
-         GET_OUT##dCount   \
-         return res;}   \
-      bool operator ==(tuple(##dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
-      bool operator ==(tuple_value(##dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
-   }; \
-   TEMPLATE_DECL(dCount)   \
-   class CTuple##dCount{   \
+   dType dType##Tuple##dCount{   \
    public:  \
       FIELD_DECL##dCount   \
-      CTuple##dCount():DEFAULT_INIT##dCount{}   \
-      CTuple##dCount(PARAM_LIST##dCount):INIT##dCount{}  \
+      INIT_FIELDS##dType(dCount) \
       tuple(dCount)<TEMP_LIST##dCount>* GetTuple() {return new tuple(dCount)<TEMP_LIST##dCount>(FIELD_LIST##dCount);}   \
       tuple_value(dCount)<TEMP_LIST##dCount> GetTupleValue(){ \
          tuple_value(dCount)<TEMP_LIST##dCount> res;  \
          GET_OUT##dCount   \
          return res;}   \
-      void operator=(STuple##dCount<TEMP_LIST##dCount> &mTuple){COPY_TUPLE##dCount}   \
-      void operator=(CTuple##dCount<TEMP_LIST##dCount> &mTuple){COPY_TUPLE##dCount}   \
-      bool operator ==(tuple(##dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
-      bool operator ==(tuple_value(##dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
+      void Set(PARAM_LIST##dCount) {SET(dCount);}  \
+      void operator =(tuple(dCount)<TEMP_LIST##dCount> &mTuple){COPY(dCount);}   \
+      void operator =(tuple_value(dCount)<TEMP_LIST##dCount> &mTuple){COPY(dCount);}   \
+      bool operator ==(tuple(dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
+      bool operator ==(tuple_value(dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
    }; 
-   
+
+#define TUPLE_DECL(dCount) \
+   DECL(struct,dCount)   \
+   DECL(class,dCount)
+
 TUPLE_DECL(2)
 TUPLE_DECL(3)
 TUPLE_DECL(4)
@@ -195,13 +194,19 @@ TUPLE_DECL(8)
 #undef INIT7
 #undef INIT8
 
-#undef COPY_TUPLE2
-#undef COPY_TUPLE3
-#undef COPY_TUPLE4
-#undef COPY_TUPLE5
-#undef COPY_TUPLE6
-#undef COPY_TUPLE7
-#undef COPY_TUPLE8
+#undef INIT_FIELDSstruct
+#undef INIT_FIELDSclass
+
+#undef SET2
+#undef SET3
+#undef SET4
+#undef SET5
+#undef SET6
+#undef SET7
+#undef SET8
+
+#undef SET
+#undef COPY
 
 #undef COMPARE2
 #undef COMPARE3
@@ -211,6 +216,7 @@ TUPLE_DECL(8)
 #undef COMPARE7
 #undef COMPARE8
 
+#undef DECL
 #undef TUPLE_DECL
 
 #endif

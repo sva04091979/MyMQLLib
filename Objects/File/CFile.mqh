@@ -44,13 +44,12 @@ private:
   };
 //---------------------------------------------------------------------------
 void CFile::CFile(string mName,int mOpenFlag,bool mIsCreate=true,bool mIsOpen=true):
-   cName(mName),cHndl(INVALID_HANDLE),cFlag(0),cOpenFlag(mOpenFlag){
+   cName(mName),cHndl(INVALID_HANDLE),cFlag(mIsCreate?FLAG_MUST_CREATE:0),cOpenFlag(mOpenFlag){
    cPath=GetPath(mName);
    string fullPath=GetFullPath(mOpenFlag);
    cFullPath=fullPath+cPath;
    cFullName=fullPath+cName;
-   if (mIsCreate) cFlag|=FLAG_MUST_CREATE;
-   if (OpenFile(false)&&!mIsOpen) CloseFile();}
+   if (mIsCreate||!CheckExist()) OpenFile();}
 //----------------------------------------------------------------------------
 string CFile::GetPath(string mName){
    string data[];

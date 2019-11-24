@@ -11,6 +11,7 @@ private:
    ENUM_TIMEFRAMES   cFrame;
    datetime          cTime;
 public:
+                     CFrameControl():cSymbol(_Symbol),cDigits(Digits),cFrame(0),cTime(0){}
                      CFrameControl(string mSymbol=NULL,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
    bool              IsNewBar();
    string            GetSymbol()                                        {return cSymbol==NULL?_Symbol:cSymbol;}

@@ -33,5 +33,10 @@ CList<CString>* CString::Split(ushort mSep){
    if (!list.IsEmpty()) return list;
    delete list;
    return NULL;}
+////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+bool _StringToCharArray(string fText,char &fArray[],int fStart=0,int fCount=WHOLE_ARRAY,uint fCodePage=CP_ACP){
+   return StringToCharArray(fText,fArray,fStart,fCount,fCodePage)==StringLen(fText)+1;
+}
 
 #endif
