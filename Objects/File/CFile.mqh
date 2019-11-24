@@ -19,6 +19,7 @@ class CFile
    string            cPath;
    string            cFullName;
    string            cFullPath;
+   long              cSeek;
    int               cHndl;
    int               cFlag;
    int               cOpenFlag;

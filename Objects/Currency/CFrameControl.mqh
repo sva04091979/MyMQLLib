@@ -12,7 +12,7 @@ private:
    datetime          cTime;
 public:
                      CFrameControl():cSymbol(_Symbol),cDigits(Digits),cFrame(0),cTime(0){}
-                     CFrameControl(string mSymbol=NULL,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
+                     CFrameControl(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
    bool              IsNewBar();
    string            GetSymbol()                                        {return cSymbol==NULL?_Symbol:cSymbol;}
    ENUM_TIMEFRAMES   GetFrame()                                         {return cFrame==0?(ENUM_TIMEFRAMES)Period():cFrame;}
@@ -30,7 +30,7 @@ public:
    double            GetPrice(int mShift,ENUM_APPLIED_PRICE mMode);
   };
 //---------------------------------------------------------------------------------------------------
-CFrameControl::CFrameControl(string mSymbol=NULL,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true):
+CFrameControl::CFrameControl(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true):
    cSymbol(mSymbol),cDigits((int)SymbolInfoInteger(mSymbol,SYMBOL_DIGITS)),cFrame(mFrame){
    cTime=mIsFirstTickNewBarTrue?0:TimeCurrent();}
 //-----------------------------------------------------------------------------------------------------
