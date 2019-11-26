@@ -31,7 +31,7 @@
    #define CLOSE_VALUE_INIT            \
       {cCloseTime=OrderCloseTime();    \
       cClosePrice=OrderClosePrice();   \
-      cPositionComission=OrderComission;       \
+      cDealComission=OrderCommission(); \
       CLOSE_TRUE}
    #define _ticket   cOrderTicket
    #define _price    cDealPrice

@@ -66,7 +66,7 @@ ulong CDeal::DealControl(void){
       if (!OrderSelect(_ticket,SELECT_BY_TICKET)) return cFlag;
       cDealTime=OrderOpenTime();
       cDealPrice=OrderOpenPrice();
-      cDealComission=OrderComission();
+      cDealComission=OrderCommission();
    #endif
    cFlag|=DEAL_FULL;
    return cFlag;}
