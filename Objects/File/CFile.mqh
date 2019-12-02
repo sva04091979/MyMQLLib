@@ -61,14 +61,17 @@ string CFile::GetPath(string mName){
    return path;}
 //----------------------------------------------------------------------------
 string CFile::GetFullPath(int mOpenFlag){
+   bool isTester=MQLInfoInteger(MQL_TESTER);
    string data[];
    int size=StringSplit(__PATH__,'\\',data);
-   string stopDirectory=bool(mOpenFlag&FILE_COMMON)?"Terminal":#ifdef __MQL5__ "MQL5" #else "MQL4" #endif;
+   string stopDirectory=bool(mOpenFlag&FILE_COMMON)||isTester?"Terminal":#ifdef __MQL5__ "MQL5" #else "MQL4" #endif;
    string path=NULL;
    for (int i=0;i<size;++i){
       path+=data[i]+"\\";
-      if (data[i]==stopDirectory) break;}
-   path+=bool(mOpenFlag&FILE_COMMON)?"Common\\Files\\":"MQL4\\Files\\";
+      if (data[i]==stopDirectory){
+         if (isTester) path+=data[i+1]+"\\";
+         break;}}
+   path+=bool(mOpenFlag&FILE_COMMON)?"Common\\Files\\":isTester?"tester\\files\\":"Files\\";
    return path;}
 //---------------------------------------------------------------------------
 bool CFile::CheckExist(){
