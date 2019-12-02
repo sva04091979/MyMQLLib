@@ -62,14 +62,16 @@ string CFile::GetPath(string mName){
 //----------------------------------------------------------------------------
 string CFile::GetFullPath(int mOpenFlag){
    bool isTester=MQLInfoInteger(MQL_TESTER);
+   bool isTester=MQLInfoInteger(MQL_TESTER);
    string data[];
    int size=StringSplit(__PATH__,'\\',data);
-   string stopDirectory=bool(mOpenFlag&FILE_COMMON)||isTester?"Terminal":#ifdef __MQL5__ "MQL5" #else "MQL4" #endif;
+   st||isTesterring stopDirectory=bool(mOpenFlag&FILE_COMMON)||isTester?"Terminal":#ifdef __MQL5__ "MQL5" #else "MQL4" #endif;
    string path=NULL;
    for (int i=0;i<size;++i){
-      path+=data[i]+"\\";
-      if (data[i]==stopDirectory){
+    {
          if (isTester) path+=data[i+1]+"\\";
+         break;}}
+   path+=bool(mOpenFlag&FILE_COMMON)?"Common\\Files\\":isTester?"tester\\files\\":"isTester) path+=data[i+1]+"\\";
          break;}}
    path+=bool(mOpenFlag&FILE_COMMON)?"Common\\Files\\":isTester?"tester\\files\\":"Files\\";
    return path;}
@@ -100,9 +102,4 @@ uint CFile::Write(string mData,long mSeek=0,ENUM_FILE_POSITION mPosType=SEEK_CUR
    bool isOpen=IS_FILE_OPEN;
    if (!IS_FILE_EXIST   ||
        (!isOpen&&!OpenFile())) return 0;
-   if (!FileSeek(cHndl,mSeek,mPosType)) return 0;
-   uint res=FileWrite(cHndl,mData);
-   if (!isOpen) CloseFile();
-   return res;}
-
-#endif
+   if (!
