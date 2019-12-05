@@ -3,220 +3,175 @@
 
 #define tuple(dCount) classTuple##dCount
 #define tuple_value(dCount) structTuple##dCount
+#define tuple_pack(dCount,dPack) class##dPack##Tuple##dCount
+#define tuple_value_pack(dCount,dPack) struct##dPack##Tuple##dCount
+#define GetTuple_pack(dPack) GetTuple##dPack()
+#define GetTupleValue_pack(dPack) GetTupleValue##dPack()
 
-#define TEMP_LIST2 T1,T2
-#define TEMP_LIST3 TEMP_LIST2,T3
-#define TEMP_LIST4 TEMP_LIST3,T4
-#define TEMP_LIST5 TEMP_LIST4,T5
-#define TEMP_LIST6 TEMP_LIST5,T6
-#define TEMP_LIST7 TEMP_LIST6,T7
-#define TEMP_LIST8 TEMP_LIST7,T8
+#define D_T(dCount) T##dCount
+#define D_TYPENAME(dCount) typename D_T(dCount)
+#define D_VALUE(dCount) mValue##dCount
+#define D_ITEM(dCount) Item##dCount
+#define D_T_VALUE(dCount) D_T(dCount) D_VALUE(dCount)
+#define D_T_ITEM(dCount) D_T(dCount) D_ITEM(dCount)
+#define D__GET_OUT(dCount) res.Item##dCount=Item##dCount
+#define D_INIT_NULL(dCount) Item##dCount(NULL)
+#define D__INIT(dCount) Item##dCount(mValue##dCount)
+#define D__SET(dCount) Item##dCount=mValue##dCount
+#define D__COPY(dCount) Item##dCount=mTuple.Item##dCount
+#define D_COMPARE(dCount) Item##dCount==mTuple.Item##dCount
+#define D_COMMA ,
+#define D_SEMICOLON ;
+#define D_AND &&
 
-#define PARAM_DECL2 typename T1,typename T2
-#define PARAM_DECL3 PARAM_DECL2,typename T3
-#define PARAM_DECL4 PARAM_DECL3,typename T4
-#define PARAM_DECL5 PARAM_DECL4,typename T5
-#define PARAM_DECL6 PARAM_DECL5,typename T6
-#define PARAM_DECL7 PARAM_DECL6,typename T7
-#define PARAM_DECL8 PARAM_DECL7,typename T8
+#define LIST1(d1) D_##d1(1)
+#define LIST2(d1,dD) LIST1(d1)    D_##dD D_##d1(2)
+#define LIST3(d1,dD) LIST2(d1,dD) D_##dD D_##d1(3)
+#define LIST4(d1,dD) LIST3(d1,dD) D_##dD D_##d1(4)
+#define LIST5(d1,dD) LIST4(d1,dD) D_##dD D_##d1(5)
+#define LIST6(d1,dD) LIST5(d1,dD) D_##dD D_##d1(6)
+#define LIST7(d1,dD) LIST6(d1,dD) D_##dD D_##d1(7)
+#define LIST8(d1,dD) LIST7(d1,dD) D_##dD D_##d1(8)
 
-#define PARAM_LIST2 T1 mValue1, T2 mValue2
-#define PARAM_LIST3 PARAM_LIST2, T3 mValue3
-#define PARAM_LIST4 PARAM_LIST3, T4 mValue4
-#define PARAM_LIST5 PARAM_LIST4, T5 mValue5
-#define PARAM_LIST6 PARAM_LIST5, T6 mValue6
-#define PARAM_LIST7 PARAM_LIST6, T7 mValue7
-#define PARAM_LIST8 PARAM_LIST7, T8 mValue8
+#define TEMP_LIST(dCount) LIST##dCount(T,COMMA)
+#define PARAM_DECL(dCount) LIST##dCount(TYPENAME,COMMA)
+#define PARAM_LIST(dCount) LIST##dCount(T_VALUE,COMMA)
+#define FIELD_DECL(dCount) LIST##dCount(T_ITEM,SEMICOLON)
+#define FIELD_LIST(dCount) LIST##dCount(ITEM,COMMA)
+#define GET_OUT(dCount) LIST##dCount(_GET_OUT,SEMICOLON)
+#define DEFAULT_INIT(dCount) LIST##dCount(INIT_NULL,COMMA)
+#define INIT(dCount) LIST##dCount(_INIT,COMMA)
+#define SET(dCount) LIST##dCount(_SET,SEMICOLON)
+#define COPY(dCount) LIST##dCount(_COPY,SEMICOLON)
+#define COMPARE_LIST(dCount) LIST##dCount(COMPARE,AND)
 
-#define TEMPLATE_DECL(dCount) template<PARAM_DECL##dCount>
+#define TEMPLATE_DECL(dCount) template<PARAM_DECL(dCount)>
 
-#define FIELD_DECL2 T1 Item1; T2 Item2;
-#define FIELD_DECL3 FIELD_DECL2 T3 Item3;
-#define FIELD_DECL4 FIELD_DECL3 T4 Item4;
-#define FIELD_DECL5 FIELD_DECL4 T5 Item5;
-#define FIELD_DECL6 FIELD_DECL5 T6 Item6;
-#define FIELD_DECL7 FIELD_DECL6 T7 Item7;
-#define FIELD_DECL8 FIELD_DECL7 T8 Item8;
+#define INIT_FIELDSstruct(dCount,dPack)
+#define INIT_FIELDSclass(dCount,dPack)  \
+   class##dPack##Tuple##dCount():DEFAULT_INIT(dCount){}   \
+   class##dPack##Tuple##dCount(PARAM_LIST(dCount)):INIT(dCount){}
+#define COMPARE(dCount) return COMPARE_LIST(dCount)
 
-#define FIELD_LIST2 Item1, Item2
-#define FIELD_LIST3 FIELD_LIST2, Item3
-#define FIELD_LIST4 FIELD_LIST3, Item4
-#define FIELD_LIST5 FIELD_LIST4, Item5
-#define FIELD_LIST6 FIELD_LIST5, Item6
-#define FIELD_LIST7 FIELD_LIST6, Item7
-#define FIELD_LIST8 FIELD_LIST7, Item8
+#define _NULL
 
-#define GET_OUT(dCount) res.Item##dCount=Item##dCount
+#define METHODS_DECL_(dCount,dPack)  \
+   class##dPack##Tuple##dCount<TEMP_LIST(dCount)>* GetTuple##dPack() {return new class##dPack##Tuple##dCount<TEMP_LIST(dCount)>(FIELD_LIST(dCount));}   \
+   struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> GetTupleValue##dPack(){ \
+      struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> res;  \
+      GET_OUT(dCount);   \
+      return res;}   \
+   void operator =(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COPY(dCount);}   \
+   void operator =(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COPY(dCount);}  \
+   bool operator ==(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);}  \
+   bool operator ==(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);}
 
-#define GET_OUT2 GET_OUT(1);GET_OUT(2);
-#define GET_OUT3 GET_OUT2 GET_OUT(3);
-#define GET_OUT4 GET_OUT3 GET_OUT(4);
-#define GET_OUT5 GET_OUT4 GET_OUT(5);
-#define GET_OUT6 GET_OUT5 GET_OUT(6);
-#define GET_OUT7 GET_OUT6 GET_OUT(7);
-#define GET_OUT8 GET_OUT7 GET_OUT(8);
+#define METHODS_DECL(dCount)   \
+   METHODS_DECL_(dCount,_NULL)   \
+   METHODS_DECL_(dCount,2) \
+   METHODS_DECL_(dCount,4) \
+   METHODS_DECL_(dCount,8) \
+   METHODS_DECL_(dCount,16) 
 
-#define DEFAULT_INIT2 Item1(NULL),Item2(NULL)
-#define DEFAULT_INIT3 DEFAULT_INIT2,Item3(NULL)
-#define DEFAULT_INIT4 DEFAULT_INIT3,Item4(NULL)
-#define DEFAULT_INIT5 DEFAULT_INIT4,Item5(NULL)
-#define DEFAULT_INIT6 DEFAULT_INIT5,Item6(NULL)
-#define DEFAULT_INIT7 DEFAULT_INIT6,Item7(NULL)
-#define DEFAULT_INIT8 DEFAULT_INIT7,Item8(NULL)
-
-#define INIT2 Item1(mValue1),Item2(mValue2)
-#define INIT3 INIT2,Item3(mValue3)
-#define INIT4 INIT3,Item4(mValue4)
-#define INIT5 INIT4,Item5(mValue5)
-#define INIT6 INIT5,Item6(mValue6)
-#define INIT7 INIT6,Item7(mValue7)
-#define INIT8 INIT7,Item8(mValue8)
-
-#define INIT_FIELDSstruct(dCount)
-#define INIT_FIELDSclass(dCount)  \
-   classTuple##dCount():DEFAULT_INIT##dCount{}   \
-   classTuple##dCount(PARAM_LIST##dCount):INIT##dCount{}
-
-#define SET2(dWhereFrom) Item1=dWhereFrom##1;Item2=dWhereFrom##2
-#define SET3(dWhereFrom) SET2(dWhereFrom); Item3=dWhereFrom##3
-#define SET4(dWhereFrom) SET3(dWhereFrom); Item4=dWhereFrom##4
-#define SET5(dWhereFrom) SET4(dWhereFrom); Item5=dWhereFrom##5
-#define SET6(dWhereFrom) SET5(dWhereFrom); Item6=dWhereFrom##6
-#define SET7(dWhereFrom) SET6(dWhereFrom); Item7=dWhereFrom##7
-#define SET8(dWhereFrom) SET7(dWhereFrom); Item8=dWhereFrom##8
-
-#define SET(dCount) SET##dCount(mValue)
-#define COPY(dCount) SET##dCount(mTuple.Item)
-
-#define COMPARE2 return Item1==mTuple.Item1&&Item2==mTuple.Item2
-#define COMPARE3 COMPARE2&&Item3==mTuple.Item3
-#define COMPARE4 COMPARE3&&Item4==mTuple.Item4
-#define COMPARE5 COMPARE4&&Item5==mTuple.Item5
-#define COMPARE6 COMPARE5&&Item6==mTuple.Item6
-#define COMPARE7 COMPARE6&&Item7==mTuple.Item7
-#define COMPARE8 COMPARE7&&Item8==mTuple.Item8
-
-#define DECL(dType,dCount) \
+#define DECL(dType,dCount,dPack,dPackDecl) \
    TEMPLATE_DECL(dCount)   \
-   dType dType##Tuple##dCount{   \
+   dType dPackDecl dType##dPack##Tuple##dCount{   \
    public:  \
-      FIELD_DECL##dCount   \
-      INIT_FIELDS##dType(dCount) \
-      tuple(dCount)<TEMP_LIST##dCount>* GetTuple() {return new tuple(dCount)<TEMP_LIST##dCount>(FIELD_LIST##dCount);}   \
-      tuple_value(dCount)<TEMP_LIST##dCount> GetTupleValue(){ \
-         tuple_value(dCount)<TEMP_LIST##dCount> res;  \
-         GET_OUT##dCount   \
-         return res;}   \
-      void Set(PARAM_LIST##dCount) {SET(dCount);}  \
-      void operator =(tuple(dCount)<TEMP_LIST##dCount> &mTuple){COPY(dCount);}   \
-      void operator =(tuple_value(dCount)<TEMP_LIST##dCount> &mTuple){COPY(dCount);}   \
-      bool operator ==(tuple(dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
-      bool operator ==(tuple_value(dCount)<TEMP_LIST##dCount> &mTuple){COMPARE##dCount;} \
-   }; 
+      FIELD_DECL(dCount);   \
+      INIT_FIELDS##dType(dCount,dPack) \
+      void Set(PARAM_LIST(dCount)) {SET(dCount);}  \
+      METHODS_DECL(dCount)  \
+   };
+   
+#define TUPLE_DECL(dCount,dPack,dPackDecl) \
+   DECL(struct,dCount,dPack,dPackDecl)   \
+   DECL(class,dCount,dPack,dPackDecl)
 
-#define TUPLE_DECL(dCount) \
-   DECL(struct,dCount)   \
-   DECL(class,dCount)
+#define BLOCK_DECL(dCount) \
+   TUPLE_DECL(dCount,_NULL,_NULL)   \
+   TUPLE_DECL(dCount,1,pack(1)) \
+   TUPLE_DECL(dCount,2,pack(2)) \
+   TUPLE_DECL(dCount,4,pack(4)) \
+   TUPLE_DECL(dCount,8,pack(8)) \
+   TUPLE_DECL(dCount,16,pack(16)) 
 
-TUPLE_DECL(2)
-TUPLE_DECL(3)
-TUPLE_DECL(4)
-TUPLE_DECL(5)
-TUPLE_DECL(6)
-TUPLE_DECL(7)
-TUPLE_DECL(8)
+#define TYPES_DECL_OF(dWich,dCount)   \
+   TEMPLATE_DECL(dCount) dWich dWich##Tuple##dCount;    \
+   TEMPLATE_DECL(dCount) dWich dWich##1##Tuple##dCount; \
+   TEMPLATE_DECL(dCount) dWich dWich##2##Tuple##dCount; \
+   TEMPLATE_DECL(dCount) dWich dWich##4##Tuple##dCount; \
+   TEMPLATE_DECL(dCount) dWich dWich##8##Tuple##dCount; \
+   TEMPLATE_DECL(dCount) dWich dWich##16##Tuple##dCount;
+   
+#define TYPES_DECL(dCount)   \
+   TYPES_DECL_OF(struct,dCount)   \
+   TYPES_DECL_OF(class,dCount)   
 
-#undef TEMP_LIST2
-#undef TEMP_LIST3
-#undef TEMP_LIST4
-#undef TEMP_LIST5
-#undef TEMP_LIST6
-#undef TEMP_LIST7
-#undef TEMP_LIST8
+TYPES_DECL(2)
+TYPES_DECL(3)
+TYPES_DECL(4)
+TYPES_DECL(5)
+TYPES_DECL(6)
+TYPES_DECL(7)
+TYPES_DECL(8)
 
-#undef PARAM_DECL2
-#undef PARAM_DECL3
-#undef PARAM_DECL4
-#undef PARAM_DECL5
-#undef PARAM_DECL6
-#undef PARAM_DECL7
-#undef PARAM_DECL8
+BLOCK_DECL(2)
+BLOCK_DECL(3)
+BLOCK_DECL(4)
+BLOCK_DECL(5)
+BLOCK_DECL(6)
+BLOCK_DECL(7)
+BLOCK_DECL(8)
 
-#undef PARAM_LIST2
-#undef PARAM_LIST3
-#undef PARAM_LIST4
-#undef PARAM_LIST5
-#undef PARAM_LIST6
-#undef PARAM_LIST7
-#undef PARAM_LIST8
+#undef D_T
+#undef D_TYPENAME
+#undef D_VALUE
+#undef D_ITEM
+#undef D_T_VALUE
+#undef D_T_ITEM
+#undef D__GET_OUT
+#undef D_INIT_NULL
+#undef D__INIT
+#undef D__SET
+#undef D__COPY
+#undef D_COMPARE
+#undef D_COMMA
+#undef D_SEMICOLON
+#undef D_AND
 
-#undef TEMPLATE_DECL
+#undef LIST1
+#undef LIST2
+#undef LIST3
+#undef LIST4
+#undef LIST5
+#undef LIST6
+#undef LIST7
+#undef LIST8
 
-#undef FIELD_DECL2
-#undef FIELD_DECL3
-#undef FIELD_DECL4
-#undef FIELD_DECL5
-#undef FIELD_DECL6
-#undef FIELD_DECL7
-#undef FIELD_DECL8
-
-#undef FIELD_LIST2
-#undef FIELD_LIST3
-#undef FIELD_LIST4
-#undef FIELD_LIST5
-#undef FIELD_LIST6
-#undef FIELD_LIST7
-#undef FIELD_LIST8
-
+#undef TEMP_LIST
+#undef PARAM_DECL
+#undef PARAM_LIST
+#undef FIELD_DECL
+#undef FIELD_LIST
 #undef GET_OUT
-
-#undef GET_OUT2
-#undef GET_OUT3
-#undef GET_OUT4
-#undef GET_OUT5
-#undef GET_OUT6
-#undef GET_OUT7
-#undef GET_OUT8
-
-#undef DEFAULT_INIT2
-#undef DEFAULT_INIT3
-#undef DEFAULT_INIT4
-#undef DEFAULT_INIT5
-#undef DEFAULT_INIT6
-#undef DEFAULT_INIT7
-#undef DEFAULT_INIT8
-
-#undef INIT2
-#undef INIT3
-#undef INIT4
-#undef INIT5
-#undef INIT6
-#undef INIT7
-#undef INIT8
-
-#undef INIT_FIELDSstruct
-#undef INIT_FIELDSclass
-
-#undef SET2
-#undef SET3
-#undef SET4
-#undef SET5
-#undef SET6
-#undef SET7
-#undef SET8
-
+#undef DEFAULT_INIT
+#undef INIT
 #undef SET
 #undef COPY
-
-#undef COMPARE2
-#undef COMPARE3
-#undef COMPARE4
-#undef COMPARE5
-#undef COMPARE6
-#undef COMPARE7
-#undef COMPARE8
-
+#undef COMPARE_LIST
+#undef TEMPLATE_DECL
+#undef INIT_FIELDSstruct
+#undef INIT_FIELDSclass
+#undef COMPARE
 #undef DECL
 #undef TUPLE_DECL
+#undef _NULL
+#undef METHODS_DECL_
+#undef METHODS_DECL
+#undef DECL
+#undef TUPLE_DECL
+#undef BLOCK_DECL
+#undef TYPES_DECL_OF
+#undef TYPES_DECL
 
 #endif
