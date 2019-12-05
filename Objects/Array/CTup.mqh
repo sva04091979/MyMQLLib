@@ -5,6 +5,8 @@
 #define tuple_value(dCount) structTuple##dCount
 #define tuple_pack(dCount,dPack) class##dPack##Tuple##dCount
 #define tuple_value_pack(dCount,dPack) struct##dPack##Tuple##dCount
+#define GetTuple_pack(dPack) GetTuple##dPack()
+#define GetTupleValue_pack(dPack) GetTupleValue##dPack()
 
 #define D_T(dCount) T##dCount
 #define D_TYPENAME(dCount) typename D_T(dCount)
@@ -45,19 +47,24 @@
 
 #define TEMPLATE_DECL(dCount) template<PARAM_DECL(dCount)>
 
-#define INIT_FIELDSstruct(dCount)
-#define INIT_FIELDSclass(dCount)  \
-   classTuple##dCount():DEFAULT_INIT(dCount){}   \
-   classTuple##dCount(PARAM_LIST(dCount)):INIT(dCount){}
+#define INIT_FIELDSstruct(dCount,dPack)
+#define INIT_FIELDSclass(dCount,dPack)  \
+   class##dPack##Tuple##dCount():DEFAULT_INIT(dCount){}   \
+   class##dPack##Tuple##dCount(PARAM_LIST(dCount)):INIT(dCount){}
 #define COMPARE(dCount) return COMPARE_LIST(dCount)
 
 #define _NULL
 
 #define METHODS_DECL_(dCount,dPack)  \
-   void operator =(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple);   \
-   void operator =(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple);  \
-   bool operator ==(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple);  \
-   bool operator ==(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple);
+   class##dPack##Tuple##dCount<TEMP_LIST(dCount)>* GetTuple##dPack() {return new class##dPack##Tuple##dCount<TEMP_LIST(dCount)>(FIELD_LIST(dCount));}   \
+   struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> GetTupleValue##dPack(){ \
+      struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> res;  \
+      GET_OUT(dCount);   \
+      return res;}   \
+   void operator =(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COPY(dCount);}   \
+   void operator =(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COPY(dCount);}  \
+   bool operator ==(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);}  \
+   bool operator ==(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);}
 
 #define METHODS_DECL(dCount)   \
    METHODS_DECL_(dCount,_NULL)   \
@@ -71,12 +78,7 @@
    dType dPackDecl dType##dPack##Tuple##dCount{   \
    public:  \
       FIELD_DECL(dCount);   \
-      INIT_FIELDS##dType(dCount) \
-      tuple(dCount)<TEMP_LIST(dCount)>* GetTuple() {return new tuple(dCount)<TEMP_LIST(dCount)>(FIELD_LIST(dCount));}   \
-      tuple_value(dCount)<TEMP_LIST(dCount)> GetTupleValue(){ \
-         tuple_value(dCount)<TEMP_LIST(dCount)> res;  \
-         GET_OUT(dCount);   \
-         return res;}   \
+      INIT_FIELDS##dType(dCount,dPack) \
       void Set(PARAM_LIST(dCount)) {SET(dCount);}  \
       METHODS_DECL(dCount)  \
    };
@@ -92,31 +94,6 @@
    TUPLE_DECL(dCount,4,pack(4)) \
    TUPLE_DECL(dCount,8,pack(8)) \
    TUPLE_DECL(dCount,16,pack(16)) 
-
-#define METHODS_(dWich,dCount,dPack) \
-   TEMPLATE_DECL(dCount) void dWich::operator =(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COPY(dCount);}   \
-   TEMPLATE_DECL(dCount) void dWich::operator =(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COPY(dCount);}   \
-   TEMPLATE_DECL(dCount) bool dWich::operator ==(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);} \
-   TEMPLATE_DECL(dCount) bool dWich::operator ==(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);}
-
-#define METHODS_OF(dType,dCount,dPack)   \
-   METHODS_(dType##dPack##Tuple##dCount,dCount,_NULL)   \
-   METHODS_(dType##dPack##Tuple##dCount,dCount,1)   \
-   METHODS_(dType##dPack##Tuple##dCount,dCount,2)   \
-   METHODS_(dType##dPack##Tuple##dCount,dCount,4)   \
-   METHODS_(dType##dPack##Tuple##dCount,dCount,8)   \
-   METHODS_(dType##dPack##Tuple##dCount,dCount,16)
-   
-#define METHODS_FOR(dCount,dPack)  \
-   METHODS_OF(struct,dCount,dPack)  \
-   METHODS_OF(class,dCount,dPack)
-
-#define METHODS(dCount)   \
-   METHODS_FOR(dCount,_NULL)   \
-   METHODS_FOR(dCount,2) \
-   METHODS_FOR(dCount,4) \
-   METHODS_FOR(dCount,8) \
-   METHODS_FOR(dCount,16) 
 
 #define TYPES_DECL_OF(dWich,dCount)   \
    TEMPLATE_DECL(dCount) dWich dWich##Tuple##dCount;    \
@@ -145,14 +122,6 @@ BLOCK_DECL(5)
 BLOCK_DECL(6)
 BLOCK_DECL(7)
 BLOCK_DECL(8)
-
-METHODS(2)
-METHODS(3)
-METHODS(4)
-METHODS(5)
-METHODS(6)
-METHODS(7)
-METHODS(8)
 
 #undef D_T
 #undef D_TYPENAME
