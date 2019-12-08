@@ -6,6 +6,7 @@
    #property strict
 #endif
 
+#include "Define\MQLDefine.mqh"
 #include "Functions\FunctionsHeader.mqh"
 #include "Objects\ObjectsHeader.mqh"
 

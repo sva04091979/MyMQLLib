@@ -91,11 +91,12 @@ bool CBallanceControl::CheckTral(const double &mEquity){
          cFlag|=BALLANCE_CONTROL_CHANGE_STOP;}
       else if (mEquity>=cTralTrigger){
          cTralStop=cTralType==TRAL_TYPE_CURRENCY?mEquity-cTralSize:mEquity*(1-cTralSize/100.0);
-         cFlag|=BALLANCE_CONTROL_CHANGE_STOP;}
+         cFlag|=BALLANCE_CONTROL_CHANGE_STOP;}}
    if (!cTralStop) return false;
    double temp=cTralType==TRAL_TYPE_CURRENCY?mEquity-cTralSize:mEquity*(1-cTralSize/100.0);
    if (mEquity>cTralStop){
-      if (temp>cTralStop) cTralStop=temp;
+      if (temp>cTralStop){
+         cTralStop=temp;
          cFlag|=BALLANCE_CONTROL_CHANGE_STOP;}
       return false;}
    else return true;}
