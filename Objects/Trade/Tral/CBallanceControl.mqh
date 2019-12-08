@@ -71,7 +71,7 @@ void CBallanceControl::Reset(double mSL,
 //--------------------------------------------------------------
 bool CBallanceControl::Check(){
    cFlag&=~BALLANCE_CONTROL_CHANGE_STOP;
-   if (!cFlag){
+   if (!(bool(cFlag&BALLANCE_STOP))){
       double equity=EQUITY;
       if (cProfitOut!=0.0&&equity>=cProfitOut) cFlag|=BALLANCE_CONTROL_TP;
       if (cStopOut!=0.0&&equity<=cStopOut) cFlag|=BALLANCE_CONTROL_SL;
