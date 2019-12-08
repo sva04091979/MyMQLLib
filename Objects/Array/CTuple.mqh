@@ -3,10 +3,12 @@
 
 #define tuple(dCount) classTuple##dCount
 #define tuple_value(dCount) structTuple##dCount
-#define tuple_pack(dCount,dPack) class##dPack##Tuple##dCount
-#define tuple_value_pack(dCount,dPack) struct##dPack##Tuple##dCount
-#define GetTuple_pack(dPack) GetTuple##dPack()
-#define GetTupleValue_pack(dPack) GetTupleValue##dPack()
+#ifdef __MQL5__
+   #define tuple_pack(dCount,dPack) class##dPack##Tuple##dCount
+   #define tuple_value_pack(dCount,dPack) struct##dPack##Tuple##dCount
+   #define GetTuple_pack(dPack) GetTuple##dPack()
+   #define GetTupleValue_pack(dPack) GetTupleValue##dPack()
+#endif
 
 #define D_T(dCount) T##dCount
 #define D_TYPENAME(dCount) typename D_T(dCount)
@@ -66,12 +68,16 @@
    bool operator ==(class##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);}  \
    bool operator ==(struct##dPack##Tuple##dCount<TEMP_LIST(dCount)> &mTuple){COMPARE(dCount);}
 
-#define METHODS_DECL(dCount)   \
-   METHODS_DECL_(dCount,_NULL)   \
-   METHODS_DECL_(dCount,2) \
-   METHODS_DECL_(dCount,4) \
-   METHODS_DECL_(dCount,8) \
-   METHODS_DECL_(dCount,16) 
+#ifdef __MQL5__
+   #define METHODS_DECL(dCount)   \
+      METHODS_DECL_(dCount,_NULL)   \
+      METHODS_DECL_(dCount,2) \
+      METHODS_DECL_(dCount,4) \
+      METHODS_DECL_(dCount,8) \
+      METHODS_DECL_(dCount,16) 
+#else
+   #define METHODS_DECL(dCount) METHODS_DECL_(dCount,_NULL)
+#endif
 
 #define DECL(dType,dCount,dPack,dPackDecl) \
    TEMPLATE_DECL(dCount)   \
@@ -87,21 +93,29 @@
    DECL(struct,dCount,dPack,dPackDecl)   \
    DECL(class,dCount,dPack,dPackDecl)
 
-#define BLOCK_DECL(dCount) \
-   TUPLE_DECL(dCount,_NULL,_NULL)   \
-   TUPLE_DECL(dCount,1,pack(1)) \
-   TUPLE_DECL(dCount,2,pack(2)) \
-   TUPLE_DECL(dCount,4,pack(4)) \
-   TUPLE_DECL(dCount,8,pack(8)) \
-   TUPLE_DECL(dCount,16,pack(16)) 
+#ifdef __MQL5__
+   #define BLOCK_DECL(dCount) \
+      TUPLE_DECL(dCount,_NULL,_NULL)   \
+      TUPLE_DECL(dCount,1,pack(1)) \
+      TUPLE_DECL(dCount,2,pack(2)) \
+      TUPLE_DECL(dCount,4,pack(4)) \
+      TUPLE_DECL(dCount,8,pack(8)) \
+      TUPLE_DECL(dCount,16,pack(16)) 
+#else 
+   #define BLOCK_DECL(dCount) TUPLE_DECL(dCount,_NULL,_NULL)
+#endif
 
-#define TYPES_DECL_OF(dWich,dCount)   \
-   TEMPLATE_DECL(dCount) dWich dWich##Tuple##dCount;    \
-   TEMPLATE_DECL(dCount) dWich dWich##1##Tuple##dCount; \
-   TEMPLATE_DECL(dCount) dWich dWich##2##Tuple##dCount; \
-   TEMPLATE_DECL(dCount) dWich dWich##4##Tuple##dCount; \
-   TEMPLATE_DECL(dCount) dWich dWich##8##Tuple##dCount; \
-   TEMPLATE_DECL(dCount) dWich dWich##16##Tuple##dCount;
+#ifdef __MQL5__
+   #define TYPES_DECL_OF(dWich,dCount)   \
+      TEMPLATE_DECL(dCount) dWich dWich##Tuple##dCount;    \
+      TEMPLATE_DECL(dCount) dWich dWich##1##Tuple##dCount; \
+      TEMPLATE_DECL(dCount) dWich dWich##2##Tuple##dCount; \
+      TEMPLATE_DECL(dCount) dWich dWich##4##Tuple##dCount; \
+      TEMPLATE_DECL(dCount) dWich dWich##8##Tuple##dCount; \
+      TEMPLATE_DECL(dCount) dWich dWich##16##Tuple##dCount;
+#else
+   #define TYPES_DECL_OF(dWich,dCount) TEMPLATE_DECL(dCount) dWich dWich##Tuple##dCount;
+#endif
    
 #define TYPES_DECL(dCount)   \
    TYPES_DECL_OF(struct,dCount)   \
