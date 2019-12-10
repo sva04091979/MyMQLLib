@@ -48,6 +48,8 @@ public:
    virtual bool   Check();
    bool           Check(int &mFlag);
    bool           CheckTral(const double &mEquity);
+   double         GetProfitStop()   {return cProfitOut;}
+   double         GetStopOut()   {return cStopOut;}   
    double         GetTrigger()   {return cTralTrigger;}
    double         GetStop()      {return cTralStop;}
    string         GetReason();
