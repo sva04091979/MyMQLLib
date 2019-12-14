@@ -2,83 +2,89 @@
 #define _C_ITERATOR_
 
 template<typename T>
-class CIterator
+class IIterator
   {
    T*                cPtr;
+protected:
+                           IIterator(T* mPtr):cPtr(mPtr){}
+   virtual                ~IIterator();
 public:
-                           CIterator(T* mPtr):cPtr(mPtr){}
-   virtual                ~CIterator();
    inline T*               Get()                               {return cPtr;}
    inline void             Set(T* mPtr)                        {cPtr=mPtr;}
    inline T*               Swap(T* mPtr);
    inline T*               Move();
    inline void operator =(T* mPtr)   {cPtr=mPtr;}
-   inline void             Erace();
+   inline void             Erase();
    inline void             Delete() {delete GetPointer(this);}
   };
 //--------------------------------------------------------------------------
 template<typename T>
-CIterator::~CIterator(){
+IIterator::~IIterator(){
    if (cPtr!=NULL) delete cPtr;}
 //--------------------------------------------------------------------------
 template<typename T>
-T* CIterator::Swap(T* mPtr){
+T* IIterator::Swap(T* mPtr){
    T* ptr=cPtr;
    cPtr=mPtr;
    return ptr;}
 //--------------------------------------------------------------------------
 template<typename T>
-T* CIterator::Move(){
+T* IIterator::Move(){
    T* ptr=cPtr;
    cPtr=NULL;
    delete GetPointer(this);
    return ptr;}
 //--------------------------------------------------------------------------
 template<typename T>
-void CIterator::Erace(){
+void IIterator::Erase(){
    cPtr=NULL;
    delete GetPointer(this);}
 //--------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////
 template<typename T>
-class CIteratorQueue:public CIterator<T>
+class CIteratorForward:public IIterator<T>
 {
-   CIteratorQueue<T>*   cNext;
+   CIteratorForward<T>*   cNext;
 public:
-                              CIteratorQueue(T* mPtr):CIterator<T>(mPtr){}
-   inline void                SetNext(CIteratorQueue<T>* mPtr)   {cNext=mPtr;}
-   inline CIteratorQueue<T>*  Next()  {return cNext;}
+                              CIteratorForward(T* mPtr,CIteratorForward<T>* mNext):IIterator<T>(mPtr),cNext(mNext){}
+   inline void                SetNext(CIteratorForward<T>* mPtr)   {cNext=mPtr;}
+   inline CIteratorForward<T>*  Next()  {return cNext;}
 };
 //--------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////
 template<typename T>
-class CIteratorStack:public CIterator<T>
+class CIteratorBack:public IIterator<T>
 {
-   CIteratorStack<T>*   cPrev;
+   CIteratorBack<T>*   cPrev;
 public:
-                              CIteratorQueue(T* mPtr):CIterator<T>(mPtr){}
-   inline void                SetPrev(CIteratorStack<T>* mPtr)   {cPrev=mPtr;}
-   inline CIteratorStack<T>*  Prev();  {return cPrev;}
+                              CIteratorBack(T* mPtr,CIteratorBack<T>* mPrev):IIterator<T>(mPtr),cPrev(mPrev){}
+   inline void                SetPrev(CIteratorBack<T>* mPtr)   {cPrev=mPtr;}
+   inline CIteratorBack<T>*  Prev() {return cPrev;}
 };
 //--------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////
 template<typename T>
-class CIteratorList:public CIterator<T>
+class CIterator:public IIterator<T>
 {
-   CIteratorList<T>*   cNext;
-   CIteratorList<T>*   cPrev;
+   CIterator<T>*   cNext;
+   CIterator<T>*   cPrev;
 public:
-                              CIteratorQueue(T* mPtr):CIterator<T>(mPtr){}
-   inline void                SetNext(CIteratorList<T>* mPtr)   {cNext=mPtr;}
-   inline void                SetPrev(CIteratorList<T>* mPtr)   {cPrev=mPtr;}
-   inline CIteratorList<T>*   Next();  {return cNext;}
-   inline CIteratorList<T>*   Prev();  {return cPrev;}
+                              CIterator(T* mPtr,CIterator<T>* mNext,CIterator<T>* mPrev);
+                             ~CIterator() {ReBind();}
+   inline void                SetNext(CIterator<T>* mPtr)   {cNext=mPtr;}
+   inline void                SetPrev(CIterator<T>* mPtr)   {cPrev=mPtr;}
+   inline CIterator<T>*   Next() {return cNext;}
+   inline CIterator<T>*   Prev() {return cPrev;}
 private:
    void                       ReBind();
 };
 //-------------------------------------------------------------------------------
 template<typename T>
-void CIteratorList::ReBind(){
+CIterator::CIterator(T* mPtr,CIterator<T>* mNext,CIterator<T>* mPrev):
+   IIterator<T>(mPtr),cNext(mNext),cPrev(mPrev){}
+//-------------------------------------------------------------------------------
+template<typename T>
+void CIterator::ReBind(){
    if (cNext!=NULL) cNext.SetPrev(cPrev);
    if (cPrev!=NULL) cPrev.SetNext(cNext);}
 

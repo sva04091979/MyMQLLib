@@ -1,16 +1,16 @@
-#ifndef _C_QUEUE_
-#define _C_QUEUE_
+#ifndef _C_STACK_
+#define _C_STACK_
 
 #include "CListBase.mqh"
 
-#define Iterator CIteratorForward<T>
+#define Iterator CIteratorBack<T>
 
 template<typename T>
-class CQueue:public CListBase<T,Iterator>
+class CStack:public CListBase<T,Iterator>
   {
 public:
-            ~CQueue() {if (cSize>0) for (T* it=cFront.Get();it!=NULL;it=cFlag.Check(_LIST_NO_DELETABLE_)?Erase():Delete());}
-   inline T* Peek()  {return !cFront?NULL:cFront.Get();}
+            ~CStack() {if (cSize>0) for (T* it=cLast.Get();it!=NULL;it=cFlag.Check(_LIST_NO_DELETABLE_)?Erase():Delete());}
+   inline T* Peek()  {return !cLast?NULL:cLast.Get();}
    inline T* Pop();
    inline T* Delete();
    inline T* Erase();
@@ -20,15 +20,14 @@ protected:
   };
 //--------------------------------------------------------
 template<typename T>
-T* CQueue::InsertPtr(T* mPtr){
-   Iterator* it=new Iterator(mPtr,NULL);
+T* CStack::InsertPtr(T* mPtr){
+   Iterator* it=new Iterator(mPtr,cLast);
    if (!cFront) cFront=it;
-   if (cLast!=NULL) cLast.SetNext(it);
    cLast=it;
    return mPtr;}
 //---------------------------------------------------------------
 template<typename T>
-T* CQueue::Pop(){
+T* CStack::Pop(){
    Iterator* it=Remove();
    if (!it) return NULL;
    T* ptr=it.Get();
@@ -36,26 +35,26 @@ T* CQueue::Pop(){
    return ptr;}
 //----------------------------------------------------------------
 template<typename T>
-T* CQueue::Delete(){
+T* CStack::Delete(){
    Iterator* it=Remove();
    if (!it) return NULL;
    it.Delete();
-   return !cFront?NULL:cFront.Get();}
+   return !cLast?NULL:cLast.Get();}
 //-----------------------------------------------------------------
 template<typename T>
-T* CQueue::Erase(){
+T* CStack::Erase(){
    Iterator* it=Remove();
    if (!it) return NULL;
    it.Erase();
-   return !cFront?NULL:cFront.Get();}
+   return !cLast?NULL:cLast.Get();}
 //---------------------------------------------------------------------
 template<typename T>
-Iterator* CQueue::Remove(){
+Iterator* CStack::Remove(){
    if (!cSize) return NULL;
    else --cSize;
-   Iterator* it=cFront;
-   cFront=cFront.Next();
-   if (!cFront) cLast=NULL;
+   Iterator* it=cLast;
+   cLast=cLast.Prev();
+   if (!cLast) cFront=NULL;
    return it;}
 
 #undef Iterator
