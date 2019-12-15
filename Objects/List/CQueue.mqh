@@ -9,7 +9,7 @@ template<typename T>
 class CQueue:public CListBase<T,Iterator>
   {
 public:
-            ~CQueue() {if (cSize>0) for (T* it=cFront.Get();it!=NULL;it=cFlag.Check(_LIST_NO_DELETABLE_)?Erase():Delete());}
+            ~CQueue() {while(NULL!=(cFlag.Check(_LIST_NO_DELETABLE_)?Erase():Delete()));}
    inline T* Peek()  {return !cFront?NULL:cFront.Get();}
    inline T* Pop();
    inline T* Delete();
@@ -23,8 +23,8 @@ template<typename T>
 T* CQueue::InsertPtr(T* mPtr){
    Iterator* it=new Iterator(mPtr,NULL);
    if (!cFront) cFront=it;
-   if (cLast!=NULL) cLast.SetNext(it);
-   cLast=it;
+   if (cBack!=NULL) cBack.SetNext(it);
+   cBack=it;
    return mPtr;}
 //---------------------------------------------------------------
 template<typename T>
@@ -55,7 +55,7 @@ Iterator* CQueue::Remove(){
    else --cSize;
    Iterator* it=cFront;
    cFront=cFront.Next();
-   if (!cFront) cLast=NULL;
+   if (!cFront) cBack=NULL;
    return it;}
 
 #undef Iterator

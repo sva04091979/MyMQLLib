@@ -9,8 +9,8 @@ template<typename T>
 class CStack:public CListBase<T,Iterator>
   {
 public:
-            ~CStack() {if (cSize>0) for (T* it=cLast.Get();it!=NULL;it=cFlag.Check(_LIST_NO_DELETABLE_)?Erase():Delete());}
-   inline T* Peek()  {return !cLast?NULL:cLast.Get();}
+            ~CStack() {while(NULL!=(cFlag.Check(_LIST_NO_DELETABLE_)?Erase():Delete()));}
+   inline T* Peek()  {return !cBack?NULL:cBack.Get();}
    inline T* Pop();
    inline T* Delete();
    inline T* Erase();
@@ -21,9 +21,9 @@ protected:
 //--------------------------------------------------------
 template<typename T>
 T* CStack::InsertPtr(T* mPtr){
-   Iterator* it=new Iterator(mPtr,cLast);
+   Iterator* it=new Iterator(mPtr,cBack);
    if (!cFront) cFront=it;
-   cLast=it;
+   cBack=it;
    return mPtr;}
 //---------------------------------------------------------------
 template<typename T>
@@ -39,22 +39,22 @@ T* CStack::Delete(){
    Iterator* it=Remove();
    if (!it) return NULL;
    it.Delete();
-   return !cLast?NULL:cLast.Get();}
+   return !cBack?NULL:cBack.Get();}
 //-----------------------------------------------------------------
 template<typename T>
 T* CStack::Erase(){
    Iterator* it=Remove();
    if (!it) return NULL;
    it.Erase();
-   return !cLast?NULL:cLast.Get();}
+   return !cBack?NULL:cBack.Get();}
 //---------------------------------------------------------------------
 template<typename T>
 Iterator* CStack::Remove(){
    if (!cSize) return NULL;
    else --cSize;
-   Iterator* it=cLast;
-   cLast=cLast.Prev();
-   if (!cLast) cFront=NULL;
+   Iterator* it=cBack;
+   cBack=cBack.Prev();
+   if (!cBack) cFront=NULL;
    return it;}
 
 #undef Iterator
