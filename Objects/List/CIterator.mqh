@@ -1,12 +1,15 @@
 #ifndef _C_ITERATOR_
 #define _C_ITERATOR_
 
+#include <MyMQLLib\Objects\Wrapers\CWrape.mqh>
+
 template<typename T>
 class IIterator
   {
-   T*                cPtr;
+   CWrapersControl<T>      cWrapesControl;
+   CWrape<T>*              cPtr;
 protected:
-                           IIterator(T* mPtr):cPtr(mPtr){}
+                           IIterator(T mPtr):cPtr(mPtr){}
    virtual                ~IIterator() {if (cPtr!=NULL) delete cPtr;}
 public:
    inline T*               Get()                               {return cPtr;}
