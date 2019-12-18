@@ -1,20 +1,18 @@
 #ifndef _C_ITERATOR_
 #define _C_ITERATOR_
 
-#include <MyMQLLib\Objects\Wrapers\CWrape.mqh>
-
 template<typename T>
 class IIterator
   {
-   CWrapersControl<T>      cWrapesControl;
-   CWrape<T>*              cPtr;
+   T*                      cPtr;
 protected:
-                           IIterator(T mPtr):cPtr(mPtr){}
+                           IIterator(T* mPtr):cPtr(mPtr){}
    virtual                ~IIterator() {if (cPtr!=NULL) delete cPtr;}
 public:
    inline T*               Get()                               {return cPtr;}
    inline void             Set(T* mPtr)                        {cPtr=mPtr;}
    inline T*               Swap(T* mPtr);
+   inline T*               Move();
    inline void operator =(T* mPtr)   {cPtr=mPtr;}
    inline void             Erase();
    inline void             Delete() {delete GetPointer(this);}
@@ -24,6 +22,13 @@ template<typename T>
 T* IIterator::Swap(T* mPtr){
    T* ptr=cPtr;
    cPtr=mPtr;
+   return ptr;}
+//--------------------------------------------------------------------------
+template<typename T>
+T* IIterator::Move(){
+   T* ptr=cPtr;
+   cPtr=NULL;
+   delete GetPointer(this);
    return ptr;}
 //--------------------------------------------------------------------------
 template<typename T>
@@ -37,6 +42,7 @@ class CIteratorForward:public IIterator<T>
 {
    CIteratorForward<T>*   cNext;
 public:
+                              CIteratorForward():IItrator(),cNext(NULL){}
                               CIteratorForward(T* mPtr,CIteratorForward<T>* mNext):IIterator<T>(mPtr),cNext(mNext){}
    inline void                SetNext(CIteratorForward<T>* mPtr)   {cNext=mPtr;}
    inline CIteratorForward<T>*  Next()  {return cNext;}
@@ -66,7 +72,6 @@ public:
    inline void                SetPrev(CIterator<T>* mPtr)   {cPrev=mPtr;}
    inline CIterator<T>*   Next() {return cNext;}
    inline CIterator<T>*   Prev() {return cPrev;}
-   inline T*              Move();
 private:
    void                       ReBind();
 };
@@ -74,13 +79,6 @@ private:
 template<typename T>
 CIterator::CIterator(T* mPtr,CIterator<T>* mNext,CIterator<T>* mPrev):
    IIterator<T>(mPtr),cNext(mNext),cPrev(mPrev){}
-//--------------------------------------------------------------------------
-template<typename T>
-T* IIterator::Move(){
-   T* ptr=cPtr;
-   cPtr=NULL;
-   delete GetPointer(this);
-   return ptr;}
 //-------------------------------------------------------------------------------
 template<typename T>
 void CIterator::ReBind(){

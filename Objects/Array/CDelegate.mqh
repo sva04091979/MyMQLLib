@@ -1,7 +1,7 @@
 #ifndef _C_DELEGATE_
 #define _C_DELEGATE_
 
-#include "CArray.mqh"
+#include "CVector.mqh"
 
 #define delegate(dType,dCount) C##dType##Delegate##dCount
 
@@ -78,7 +78,7 @@
    dType##_TEMPLATE_DECL##dCount   \
    class C##dType##Delegate##dCount{  \
       typedef OUT_TYPE##dType (*InvokeDelegateFunction)(PARAM_INPUT##dCount); \
-      CArray<InvokeDelegateFunction>  cInvokeList; \
+      CVector<InvokeDelegateFunction>  cInvokeList; \
    public:  \
       void operator =(InvokeDelegateFunction mInvokeFunction) {if (cInvokeList.IsEmpty()) cInvokeList.PushBack(mInvokeFunction);    \
                                                                else {cInvokeList.Set(mInvokeFunction,0); cInvokeList.Resize(1);}} \
