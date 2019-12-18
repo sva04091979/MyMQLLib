@@ -27,7 +27,7 @@ public:
    bool              IsDeletable()  {return !cFlag.Check(_LIST_NO_DELETABLE_);}
    void              SetDestructMode(bool mIsDeletable) {if (mIsDeletable) cFlag-=_LIST_NO_DELETABLE_; else cFlag+=_LIST_NO_DELETABLE_;}
 protected:
-                     CListBase(void);
+                     CListBase(int mBlockSize);
    inline virtual T* InsertPtr(T* mPtr)=0;
   };
 //--------------------------------------------------

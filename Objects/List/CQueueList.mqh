@@ -13,7 +13,8 @@ class CQueueList:public CListBase<T,Iterator>
    CQueueList<Block>  cArray;
    Iterator* cEnd;
 public:
-             CQueueList();
+             CQueueList():CQueueList(256);
+             CQueueList(int mBlockSize);
             ~CQueueList();
    inline T* Peek()  {return cFront.Get();}
    inline T* Pop();
@@ -24,8 +25,8 @@ protected:
   };
 //--------------------------------------------------------
 template<typename T>
-CQueueList::CQueueList():
-   CListBase(),
+CQueueList::CQueueList(int mBlockSize):
+   CListBase(mBlockSize),
    cEnd(new Iterator(NULL,NULL)){
    cFront=cBack=cEnd;}
 //--------------------------------------------------------
