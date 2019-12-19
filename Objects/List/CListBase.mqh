@@ -5,6 +5,7 @@
 #include "CIterator.mqh"
 
 #define _LIST_NO_DELETABLE_   0x1
+#define _LIST_SIZE_NOT_VALID_ 0x2
 
 template<typename T,typename Iter>
 class CListBase
@@ -22,12 +23,13 @@ public:
    inline virtual T* Peek()=0;
    inline virtual T* Front()  {return cFront.Get();}
    inline virtual T* Back()  {return cBack.Get();}
-   ulong             GetSize()   {return cSize;}
-   inline bool       IsEmpty()   {return !cSize;}       
+   ulong             GetSize()   {return cFlag.Check(_LIST_SIZE_NOT_VALID_)?ComputeSize():cSize;}
+   inline bool       IsEmpty()   {return !GetSize();}       
    bool              IsDeletable()  {return !cFlag.Check(_LIST_NO_DELETABLE_);}
    void              SetDestructMode(bool mIsDeletable) {if (mIsDeletable) cFlag-=_LIST_NO_DELETABLE_; else cFlag+=_LIST_NO_DELETABLE_;}
 protected:
                      CListBase(int mBlockSize);
+   virtual ulong     ComputeSize()=0;
    inline virtual T* InsertPtr(T* mPtr)=0;
   };
 //--------------------------------------------------

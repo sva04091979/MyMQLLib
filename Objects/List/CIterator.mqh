@@ -4,18 +4,15 @@
 template<typename T>
 class IIterator
   {
-   T*                      cPtr;
 protected:
+   T*                      cPtr;
                            IIterator(T* mPtr):cPtr(mPtr){}
-   virtual                ~IIterator() {if (cPtr!=NULL) delete cPtr;}
 public:
    inline T*               Get()                               {return cPtr;}
    inline void             Set(T* mPtr)                        {cPtr=mPtr;}
    inline T*               Swap(T* mPtr);
    inline T*               Move();
    inline void operator =(T* mPtr)   {cPtr=mPtr;}
-   inline void             Erase();
-   inline void             Delete() {delete GetPointer(this);}
   };
 //--------------------------------------------------------------------------
 template<typename T>
@@ -31,23 +28,50 @@ T* IIterator::Move(){
    delete GetPointer(this);
    return ptr;}
 //--------------------------------------------------------------------------
-template<typename T>
-void IIterator::Erase(){
-   cPtr=NULL;
-   delete GetPointer(this);}
-//--------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////////////////
 template<typename T>
 class CIteratorForward:public IIterator<T>
 {
    CIteratorForward<T>*   cNext;
 public:
-                              CIteratorForward():IItrator(),cNext(NULL){}
                               CIteratorForward(T* mPtr,CIteratorForward<T>* mNext):IIterator<T>(mPtr),cNext(mNext){}
    inline void                SetNext(CIteratorForward<T>* mPtr)   {cNext=mPtr;}
-   inline CIteratorForward<T>*  Next()  {return cNext;}
+   inline bool                   Kill(bool mIsDelete);
+   inline bool                   Delete();  
+   inline bool                   Erase();
+   inline bool                   IsValid()   {return cNext!=NULL;}
+   inline CIteratorForward<T>*   Next()  {return cNext;}
+   inline CIteratorForward<T>*   operator ++() {&this=cNext; return &this;}
+   inline CIteratorForward<T>*   operator ++(int);
 };
+//---------------------------------------------------------------------------
+template<typename T>
+bool CIteratorForward::Kill(bool mIsDelete){
+   if (mIsDelete) delete cPtr;
+   CIteratorForward<T>* it=&this;
+   &this=cNext;
+   delete it;
+   return &this!=NULL;}
+//---------------------------------------------------------------------------
+template<typename T>
+bool CIteratorForward::Delete(){
+   delete cPtr;
+   return Erase();}
+//---------------------------------------------------------------------------
+template<typename T>
+bool CIteratorForward::Erase(){
+   if (!cNext) return false;
+   CIteratorForward<T>* it=&this;
+   &this=cNext;
+   delete it;
+   return &this!=NULL;}
 //--------------------------------------------------------------------------
+template<typename T>
+CIteratorForward<T>* CIteratorForward::operator ++(int){
+   CIteratorForward<T>* it=&this;
+   &this=cNext;
+   return it;}
+/////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 template<typename T>
 class CIteratorBack:public IIterator<T>
