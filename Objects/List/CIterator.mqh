@@ -3,7 +3,7 @@
 
 #include <MyMQLLib\Objects\Wrapers\CWrape.mqh>
 
-#define _size CWrape<ulong>
+#define _size CWrapeS<ulong>
 
 template<typename T>
 class IIterator
@@ -11,7 +11,7 @@ class IIterator
 protected:
    T*                      cPtr;
    _size*                  cSize;
-                           IIterator(T* mPtr,_size* mSize):cPtr(mPtr):cSize(mSize){}
+                           IIterator(T* mPtr,_size* mSize):cPtr(mPtr),cSize(mSize){}
 public:
    inline T*               Get()                               {return cPtr;}
    inline void             Push(T* mPtr)                       {cPtr=mPtr;++cSize;}
@@ -30,6 +30,7 @@ template<typename T>
 T* IIterator::Move(){
    T* ptr=cPtr;
    cPtr=NULL;
+   --cSize;
    delete GetPointer(this);
    return ptr;}
 //--------------------------------------------------------------------------
@@ -39,7 +40,7 @@ class CIteratorForward:public IIterator<T>
 {
    CIteratorForward<T>*   cNext;
 public:
-                              CIteratorForward(T* mPtr,CIteratorForward<T>* mNext):IIterator<T>(mPtr),cNext(mNext){}
+                              CIteratorForward(T* mPtr,CIteratorForward<T>* mNext,_size* mSize):IIterator<T>(mPtr,mSize),cNext(mNext){}
    inline void                SetNext(CIteratorForward<T>* mPtr)   {cNext=mPtr;}
    inline bool                   Kill(bool mIsDelete);
    inline bool                   Delete();  
@@ -54,6 +55,7 @@ template<typename T>
 bool CIteratorForward::Kill(bool mIsDelete){
    if (mIsDelete) delete cPtr;
    CIteratorForward<T>* it=&this;
+   if (cNext!=NULL) --cSize;
    &this=cNext;
    delete it;
    return &this!=NULL;}
@@ -67,6 +69,7 @@ template<typename T>
 bool CIteratorForward::Erase(){
    if (!cNext) return false;
    CIteratorForward<T>* it=&this;
+   if (cNext!=NULL) --cSize;
    &this=cNext;
    delete it;
    return &this!=NULL;}

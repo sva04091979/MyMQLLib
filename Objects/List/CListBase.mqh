@@ -12,7 +12,7 @@ class CListBase
   {
 protected:
    CFlag             cFlag;
-   CWrapeS<ulong>    cSize;
+   CWrapeS<ulong>*   cSize;
 //   ulong             cSize;
    Iter*             cFront;
    Iter*             cBack;

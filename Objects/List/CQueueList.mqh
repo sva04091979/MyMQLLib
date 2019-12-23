@@ -23,27 +23,27 @@ protected:
 template<typename T>
 CQueueList::CQueueList():
    CListBase(),
-   cEnd(new Iterator(NULL,NULL)){
+   cEnd(new Iterator(NULL,NULL,cSize)){
    cFront=cBack=cEnd;}
 //--------------------------------------------------------
 template<typename T>
 T* CQueueList::InsertPtr(T* mPtr){
-   cEnd.Set(mPtr);
-   cEnd.SetNext(new Iterator(NULL,NULL));
+   cEnd.Push(mPtr);
+   cEnd.SetNext(new Iterator(NULL,NULL,cSize));
    cBack=cEnd;
    cEnd=cEnd.Next();
    return mPtr;}
 //---------------------------------------------------------------
 template<typename T>
 T* CQueueList::Pop(){
-   if (!cSize) return NULL; else --cSize;
+   if (!cSize) return NULL;
    Iterator* it=cFront;
    cFront=cFront.Next();
    return it.Move();}
 //----------------------------------------------------------------
 template<typename T>
 T* CQueueList::Delete(){
-   if (!cSize) return NULL; else --cSize;
+   if (!cSize) return NULL;
    Iterator* it=cFront;
    cFront=cFront.Next();
    it.Delete();
@@ -51,7 +51,7 @@ T* CQueueList::Delete(){
 //-----------------------------------------------------------------
 template<typename T>
 T* CQueueList::Erase(){
-   if (!cSize) return NULL; else --cSize;
+   if (!cSize) return NULL;
    Iterator* it=cFront;
    cFront=cFront.Next();
    it.Erase();
