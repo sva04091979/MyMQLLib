@@ -18,7 +18,6 @@ public:
    inline T* Erase();
 protected:
    inline T* InsertPtr(T* mPtr);
-   ulong     ComputeSize();
   };
 //--------------------------------------------------------
 template<typename T>
@@ -57,13 +56,6 @@ T* CQueueList::Erase(){
    cFront=cFront.Next();
    it.Erase();
    return cFront.Get();}
-//-----------------------------------------------------------------
-template<typename T>
-ulong CQueueList::ComputeSize(){
-   cSize=0;
-   Iterator* it=cFront;
-   while(it++.IsValid()) ++cSize;
-   return cSize;}
 
 #undef Iterator
 

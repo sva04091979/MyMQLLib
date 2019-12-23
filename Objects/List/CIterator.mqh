@@ -1,15 +1,20 @@
 #ifndef _C_ITERATOR_
 #define _C_ITERATOR_
 
+#include <MyMQLLib\Objects\Wrapers\CWrape.mqh>
+
+#define _size CWrape<ulong>
+
 template<typename T>
 class IIterator
   {
 protected:
    T*                      cPtr;
-                           IIterator(T* mPtr):cPtr(mPtr){}
+   _size*                  cSize;
+                           IIterator(T* mPtr,_size* mSize):cPtr(mPtr):cSize(mSize){}
 public:
    inline T*               Get()                               {return cPtr;}
-   inline void             Set(T* mPtr)                        {cPtr=mPtr;}
+   inline void             Push(T* mPtr)                       {cPtr=mPtr;++cSize;}
    inline T*               Swap(T* mPtr);
    inline T*               Move();
    inline void operator =(T* mPtr)   {cPtr=mPtr;}
@@ -108,5 +113,7 @@ template<typename T>
 void CIterator::ReBind(){
    if (cNext!=NULL) cNext.SetPrev(cPrev);
    if (cPrev!=NULL) cPrev.SetNext(cNext);}
+
+#undef _size;
 
 #endif

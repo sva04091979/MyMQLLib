@@ -1,8 +1,6 @@
 #ifndef _C_WRAPE_
 #define _C_WRAPE_
 
-#include "IWrape.mqh"
-
 template<typename T>
 class CWrape{
 public:
@@ -17,5 +15,20 @@ public:
    template<typename T1>
    void operator =(CWrape<T1> &mWrape) {cValue=mWrape.Get();}
 };
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+template<typename T>
+class CWrapeS:public CWrape<T>
+{
+public:
+   bool operator <(T mValue) {return cValue<mValue;}
+   bool operator !() {return !cValue;}
+   T operator ++()   {return ++cValue;}
+   T operator ++(int){return cValue++;}
+   T operator --()   {return --cValue;}
+   T operator --(int){return cValue--;}
+   
+};
+
 
 #endif
