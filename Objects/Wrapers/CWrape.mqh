@@ -22,6 +22,7 @@ class CWrapeS:public CWrape<T>
 {
 public:
    bool operator <(T mValue) {return cValue<mValue;}
+   bool operator >=(T mValue) {return cValue>=mValue;}
    bool operator !() {return !cValue;}
    T operator ++()   {return ++cValue;}
    T operator ++(int){return cValue++;}
