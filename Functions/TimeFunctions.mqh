@@ -36,5 +36,9 @@ MqlDateTime TextToTimeStruct(string fTextTime){
 datetime TextToTime(string fTextTime){
    MqlDateTime time=TextToTimeStruct(fTextTime);
    return StructToTime(time);}
+//-------------------------------------------------------------------------------------------
+uint TextToSecons(string fTextTime){
+   MqlDateTime time=TextToTimeStruct(fTextTime);
+   return time.hour*3600+time.min*60+time.sec;}
 
 #endif
