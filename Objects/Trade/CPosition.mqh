@@ -70,10 +70,10 @@ protected:
    #endif
 public:
                      CPosition(SET);
-                    ~CPosition() {if (CheckPointer(cTral)) delete cTral;
-                                  #ifdef __MQL5__
-                                    if (CheckPointer(cCloseOrder)) delete cCloseOrder;
-                                  #endif}
+                  ~CPosition() {if (CheckPointer(cTral)) delete cTral;
+                                #ifdef __MQL5__
+                                 if (CheckPointer(cCloseOrder)) delete cCloseOrder;
+                                #endif}
    ulong             Control();
    bool              Closing();
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(TRADE_CONST,cOrderDirect);}
@@ -90,8 +90,6 @@ public:
    void              NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true);
    void              NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true);
    bool              SetBreakEven(int mBE);
-   bool              IsSLClosed()   {return bool(cCloseFlag&CLOSE_BY_SL);}
-   bool              IsTPClosed()   {return bool(cCloseFlag&CLOSE_BY_TP);}
 protected:
    bool              SelectPosition()  {return #ifdef __MQL5__ cIsNetting?SelectNettingPosition():SelectHedgePosition();
                                                #else OrderSelect(_ticket,SELECT_BY_TICKET); #endif}
@@ -103,6 +101,8 @@ protected:
       bool           TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
+      bool           IsSLClosed()   {return bool(cCloseFlag&CLOSE_BY_SL);}
+      bool           IsTPClosed()   {return bool(cCloseFlag&CLOSE_BY_TP);}
    protected:
       bool           SelectNettingPosition();
       bool           SelectHedgePosition();
