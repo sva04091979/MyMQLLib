@@ -100,7 +100,8 @@ ulong CDeal::DealControl(void){
       cDealTime(OrderOpenTime()),
       cDealPrice(OrderOpenPrice()),
       cDealComission(OrderCommission())
-      {}
+      {if (!cDealTime) return;
+      else cFlag|=DEAL_FULL;}
 #endif
 
 

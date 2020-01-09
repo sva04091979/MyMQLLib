@@ -373,7 +373,9 @@ bool CPosition::CheckClosePosition(void){
       cPositionSwap(OrderSwap()),
       cTral(NULL),
       cSLPips(0),
-      cTPPips(0){}
+      cTPPips(0)
+      {if (!cCloseTime) return;
+      else cFlag|=ORDER_REMOVED;}
 #endif
 //-------------------------------------------------------------------------------
 bool CheckEndTrade(ulong fFlag){
