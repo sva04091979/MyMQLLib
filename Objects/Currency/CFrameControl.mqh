@@ -1,6 +1,7 @@
 #ifndef _C_FRAME_CONTROL_
 #define _C_FRAME_CONTROL_
 
+#include <MyMQLLib\Objects\Array\CTuple.mqh>
 #include "..\..\Functions\MathFunctions.mqh"
 
 class CFrameControl
