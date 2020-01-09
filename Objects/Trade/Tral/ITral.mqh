@@ -5,7 +5,7 @@
 
 interface ITral{
    double      GetSL(double mPrice,double mSL,double mPriceOpen);
-   ITral*      Init(TRADE_CONST_PUSH,int mDirection);
+   ITral*      Init(CTradeConst* mTradeConst,int mDirection);
   };
 
 #endif 

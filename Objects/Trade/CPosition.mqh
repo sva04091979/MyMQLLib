@@ -76,7 +76,7 @@ public:
                                 #endif}
    ulong             Control();
    bool              Closing();
-   void              SetTral(ITral *mTral)   {cTral=mTral.Init(TRADE_CONST,cOrderDirect);}
+   void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
@@ -112,6 +112,8 @@ protected:
       void           SetNewData();
       void           FindNewDeals();
       void           ActiveOrdersControl();
+   #else
+                     CPosition(CTradeConst* mTradeConst);
    #endif
   };
 //------------------------------------------------------
@@ -362,9 +364,18 @@ bool CPosition::CheckClosePosition(void){
       for (CDeal* it=cActiveOrder.Begine();it!=NULL;it=cActiveOrder.Next())
          if (it.TradeTransaction(trans,request,result)) return true;
       return cCloseOrder!=NULL&&cCloseOrder.TradeTransaction(trans,request,result);}
-      
+#else
+   CPosition::CPosition(CTradeConst* mTradeConst):
+      CDeal(mTradeConst),
+      cCloseTime(OrderCloseTime()),
+      cClosePrice(OrderClosePrice()),
+      cProfit(OrderProfit()),
+      cPositionSwap(OrderSwap()),
+      cTral(NULL),
+      cSLPips(0),
+      cTPPips(0){}
 #endif
-
+//-------------------------------------------------------------------------------
 bool CheckEndTrade(ulong fFlag){
    return !fFlag||bool(fFlag&(POSITION_CLOSED|TRADE_ERROR));}
 

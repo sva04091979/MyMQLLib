@@ -1,12 +1,6 @@
 #ifndef _C_TRADE_CONST_
 #define _C_TRADE_CONST_
 
-#define TRADE_CONST_DECL CTradeConst* cTradeConst
-#define TRADE_CONST_PUSH CTradeConst* mTradeConst
-#define TRADE_CONST cTradeConst
-#define M_TRADE_CONST   mTradeConst
-#define TRADE_CONST_INIT   TRADE_CONST
-#define DELETE_CONST delete cTradeConst
 #define TRADE_CONST_GET_PTR (!CheckPointer(cTradeConst)?NULL:GetPointer(cTradeConst))
 #define _symbol      cTradeConst.symbol
 #define _lotDigits   cTradeConst.lotDigits
@@ -47,7 +41,7 @@ public:
    int                           orderMode;
 #endif   
 public:
-                     CTradeConst(string mSymbol):symbol(mSymbol==NULL?_Symbol:mSymbol){if (!Init()) delete GetPointer(this);}
+                     CTradeConst(string mSymbol=NULL):symbol(mSymbol==NULL?_Symbol:mSymbol){if (!Init()) delete GetPointer(this);}
 private:
    bool              Init();
   };

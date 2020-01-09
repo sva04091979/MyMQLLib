@@ -15,8 +15,8 @@ protected:
    datetime          cDealTime;
    double            cDealPrice;
    double            cDealComission;
-   double            cDealSwap;
    #ifdef __MQL5__
+      double            cDealSwap;
       long_type         cDealTicket;
       double            cDealVolume;
    #endif
@@ -27,20 +27,23 @@ public:
    double            GetDealPrice() {return cDealPrice;}
    bool              IsOpen() {return bool(cFlag&DEAL_FULL);}
    double            GetDealComission()   {return cDealComission;}
-   double            GetDealSwap()     {return cDealSwap;}
    #ifdef __MQL5__
                      CDeal(ulong mTicket,TRADE_CONST_PUSH);
       long_type      GetDealTicket()   {return cDealTicket;}
+      double         GetDealSwap()     {return cDealSwap;}
       virtual bool   TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
+   #else
+                     CDeal(CTradeConst* mTradeConst);
    #endif 
   };
 //------------------------------------------------------------------------
 CDeal::CDeal(SET):
-   COrder(SET_IN),cDealTime(0),cDealPrice(0.0),cDealComission(0.0),cDealSwap(0.0)
+   COrder(SET_IN),cDealTime(0),cDealPrice(0.0),cDealComission(0.0)
    #ifdef __MQL5__
-      ,cDealTicket(0)
+      ,cDealSwap(0.0)
+      cDealTicket(0)
    #endif
    {}
 //-----------------------------------------------------------------------------
@@ -91,7 +94,13 @@ ulong CDeal::DealControl(void){
       if (cIsMain) cIdent=HistoryDealGetInteger(cDealTicket,DEAL_POSITION_ID);
       if (cDealTicket) cFlag|=DEAL_FULL;
       return true;}
-
+#else
+   CDeal::CDeal(CTradeConst* mTradeConst):
+      COrder(mTradeConst),
+      cDealTime(OrderOpenTime()),
+      cDealPrice(OrderOpenPrice()),
+      cDealComission(OrderCommission())
+      {}
 #endif
 
 
