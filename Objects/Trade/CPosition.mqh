@@ -150,7 +150,7 @@ bool CPosition::Closing(){
          if (bool(cCloseOrder.DealControl()|DEAL_FULL)) CLOSE_VALUE_INIT
          else return false;
       if (!SelectPosition()) return CheckClosePosition();
-      cCloseOrder=new CDeal(_symbol,ENUM_ORDER_TYPE(1-_type),_volume,0.0,0.0,0.0,0,0,0,NULL,TRADE_CONST,0,0,false);
+      cCloseOrder=new CDeal(_symbol,ENUM_ORDER_TYPE(1-_type),_volume,0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
       cCloseOrder.SetClosePositionTicket(_ticket);
       if (bool(cCloseOrder.DealControl()&DEAL_FULL)) CLOSE_VALUE_INIT
    #else
@@ -274,7 +274,7 @@ bool CPosition::CheckClosePosition(void){
          if (!ticket) continue;
          ENUM_DEAL_ENTRY deal=(ENUM_DEAL_ENTRY)HistoryDealGetInteger(ticket,DEAL_ENTRY);
          if (deal==DEAL_ENTRY_OUT||deal==DEAL_ENTRY_OUT_BY){
-            cCloseOrder=new CDeal(ticket,TRADE_CONST);
+            cCloseOrder=new CDeal(ticket,cTradeConst);
             cPositionSwap=cCloseOrder.GetDealSwap();
             CLOSE_VALUE_INIT}}
    #else
@@ -350,9 +350,9 @@ bool CPosition::CheckClosePosition(void){
          ulong dealTicket=HistoryDealGetTicket(i);
          if (!dealTicket) continue;
          if (dealTicket==cDealTicket) break;
-         if (pos<0) cOrder.PushBack(new CDeal(dealTicket,TRADE_CONST));
+         if (pos<0) cOrder.PushBack(new CDeal(dealTicket,cTradeConst));
          else if (dealTicket==cOrder[pos].GetDealTicket()) break;
-         else cOrder.PushNext(new CDeal(dealTicket,TRADE_CONST));}}
+         else cOrder.PushNext(new CDeal(dealTicket,cTradeConst));}}
 //----------------------------------------------------------------------------
    bool CPosition::TradeTransaction(const MqlTradeTransaction &trans,const MqlTradeRequest &request,const MqlTradeResult &result){
       if (trans.type!=TRADE_TRANSACTION_DEAL_ADD) return false;

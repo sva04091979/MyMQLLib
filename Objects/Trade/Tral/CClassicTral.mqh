@@ -15,12 +15,12 @@ private:
    double            cBreakEvenTrigger;
    double            cBreakEven;
 protected:
-   TRADE_CONST_DECL;
+   CTradeConst*      cTradeConst;
    int               cDirection;
 public:
                      CClassicTral(int mTral,int mTralStep=0,int mBreakEvenTrigger=INT_MIN,int mBrekEven=INT_MIN);
    double            GetSL(double mPrice,double mSL,double mPriceOpen);
-   CClassicTral*     Init(TRADE_CONST_PUSH,int mDirection);
+   CClassicTral*     Init(CTradeConst* mTradeConst,int mDirection);
 private:
    double            BreackEvenControl(double mPrice,double mSL);
    double            TralControl(double mPrice,double mSL);
@@ -29,8 +29,8 @@ private:
 CClassicTral::CClassicTral(int mTral,int mTralStep=0,int mBreakEvenTrigger=INT_MIN,int mBreakEven=INT_MIN):
    cTralPips(mTral<0?0:mTral),cTralStepPips(mTralStep<0?0:mTralStep),cBreakEvenTriggerPips(mBreakEvenTrigger),cBreakEvenPips(mBreakEven),cBreakEvenTrigger(EMPTY_VALUE),cBreakEven(EMPTY_VALUE){}
 //-------------------------------------------------------------------------------------------
-CClassicTral* CClassicTral::Init(TRADE_CONST_PUSH,int mDirection){
-   TRADE_CONST=M_TRADE_CONST;
+CClassicTral* CClassicTral::Init(CTradeConst* mTradeConst,int mDirection){
+   cTradeConst=mTradeConst;
    cDirection=mDirection;
    cTral=NormalizePrice(cTralPips*_point);
    cTralStep=NormalizePrice(cTralStepPips*_point);
