@@ -95,8 +95,8 @@ bool CBallanceControl::CheckTral(const double &mEquity){
          cTralStop=cTralType==TRAL_TYPE_CURRENCY?mEquity-cTralSize:mEquity*(1-cTralSize/100.0);
          cFlag|=BALLANCE_CONTROL_CHANGE_STOP;}}
    if (!cTralStop) return false;
-   double temp=cTralType==TRAL_TYPE_CURRENCY?mEquity-cTralSize:mEquity*(1-cTralSize/100.0);
    if (mEquity>cTralStop){
+      double temp=cTralType==TRAL_TYPE_CURRENCY?mEquity-cTralSize:mEquity*(1-cTralSize/100.0);
       if (temp>cTralStop){
          cTralStop=temp;
          cFlag|=BALLANCE_CONTROL_CHANGE_STOP;}
