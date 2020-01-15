@@ -5,17 +5,23 @@
    namespace STD{
 #endif
 
+#include <MyMQLLib\Objects\Wrapers\CWrape.mqh>
 #include "IAllocator.mqh"
 
 class IContainer
   {
    STD::IAllocator*  cAllocator;
-   uint              cSize;
+   STD::IIterator*   cIt;
+   STD::IIterator*   cBegine;
+   STD::IIterator*   cFirst;
+   STD::IIterator*   cLast;
+   STD::IIterator*   cEnd;
+   STD::CWrape<uint> cSize;
 public:
-                     IContainer():cAllocator(NULL),cSize(0){}
+                     IContainer():cAllocator(NULL),cIt(NULL),cBegine(NULL),cFirst(NULL),cLast(NULL),cEnd(NULL),cSize(0){}
                      IContainer(uint mSize,STD::IAllocator* mAllocator):cAllocator(mAllocator),cSize(mSize){}
    uint              GetSize();
-   uint              GetMemSize()   {return !cAllocator?cSize:cAllocator.GetSize();}
+   uint              GetMemSize()   {return !cAllocator?cSize.Get():cAllocator.GetSize();}
   };
 
 #ifndef USING_STD
