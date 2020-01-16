@@ -10,6 +10,7 @@
 
 #define  BALLANCE_STOP           (BALLANCE_CONTROL_TP|BALLANCE_CONTROL_SL|BALLANCE_CONTROL_TRAL)
 
+
 enum ENUM_TRAL_START_BALLANCE_TYPE{
    TRAL_BALLANCE,    //Ballance
    TRAL_EQUITY       //Equity
@@ -45,6 +46,7 @@ public:
                         double mBallance=0.0,
                         ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
                         ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY);
+   void           NewSettings(ENUM_TRAL_TYPE mTralType,double mSL,double mTP,double mTralTrigger,double mTralSize);
    virtual bool   Check();
    bool           Check(int &mFlag);
    bool           CheckTral(const double &mEquity);
@@ -69,6 +71,15 @@ void CBallanceControl::Reset(double mSL,
    cTralTrigger=mTralTrigger<=0.0||mTralSize<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance+mTralTrigger:cStartBallance*(1+mTralTrigger/100.0);
    cTralSize=mTralSize<=0.0?0.0:mTralSize;
    cFlag=0;
+   cTralType=mTralType;}
+//--------------------------------------------------------------------------------------------------------------------------------
+void CBallanceControl::NewSettings(ENUM_TRAL_TYPE mTralType,double mSL,double mTP,double mTralTrigger,double mTralSize){
+   cTralStop=0.0;
+   cProfitOut=mTP<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance+mTP:cStartBallance*(1+mTP/100.0);
+   cStopOut=mSL<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance-mSL:cStartBallance*(1-mSL/100.0);
+   cTralTrigger=mTralTrigger<=0.0||mTralSize<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance+mTralTrigger:cStartBallance*(1+mTralTrigger/100.0);
+   cTralSize=mTralSize<=0.0?0.0:mTralSize;
+   cFlag&=~BALLANCE_CONTROL_CHANGE_STOP;
    cTralType=mTralType;}
 //--------------------------------------------------------------
 bool CBallanceControl::Check(){
