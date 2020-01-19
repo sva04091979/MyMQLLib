@@ -12,8 +12,10 @@ private:
    ENUM_TIMEFRAMES   cFrame;
    datetime          cTime;
 public:
-                     CFrameControl():cSymbol(_Symbol),cDigits(Digits),cFrame(0),cTime(0){}
+                     CFrameControl():cSymbol(NULL),cDigits(Digits),cFrame(0),cTime(0){}
                      CFrameControl(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
+   void              Reset();
+   void              Reset(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
    bool              IsNewBar();
    string            GetSymbol()                                        {return cSymbol==NULL?_Symbol:cSymbol;}
    ENUM_TIMEFRAMES   GetFrame()                                         {return cFrame==0?(ENUM_TIMEFRAMES)Period():cFrame;}
@@ -32,7 +34,18 @@ public:
   };
 //---------------------------------------------------------------------------------------------------
 CFrameControl::CFrameControl(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true):
-   cSymbol(mSymbol),cDigits((int)SymbolInfoInteger(mSymbol,SYMBOL_DIGITS)),cFrame(mFrame){
+   cSymbol(mSymbol),cDigits((int)SymbolInfoInteger(mSymbol,SYMBOL_DIGITS)),cFrame(mFrame),cTime(mIsFirstTickNewBarTrue?0:TimeCurrent()){}
+//-----------------------------------------------------------------------------------------------------
+void CFrameControl::Reset(){
+   cSymbol=NULL;
+   cDigits=_Digits;
+   cFrame=0;
+   cTime=0;}
+//------------------------------------------------------------------------------------------------------
+void CFrameControl::Reset(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true){
+   cSymbol=mSymbol;
+   cDigits=(int)SymbolInfoInteger(mSymbol,SYMBOL_DIGITS);
+   cFrame=mFrame;
    cTime=mIsFirstTickNewBarTrue?0:TimeCurrent();}
 //-----------------------------------------------------------------------------------------------------
 bool CFrameControl::IsNewBar(void){

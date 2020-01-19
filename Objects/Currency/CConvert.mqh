@@ -16,6 +16,7 @@ protected:
    double            cPoint;
 public:
                      CConvert(string mSymbol=NULL);
+   void              Reset(string mSymbol=NULL);
    double            GetPointPrice(int mCount=1);
 private:
    void              ComputeParam();
@@ -27,6 +28,14 @@ CConvert::CConvert(string mSymbol=NULL):cSymbol(mSymbol==NULL?_Symbol:mSymbol),c
                                         cLotSize(SymbolInfoDouble(mSymbol,SYMBOL_TRADE_CONTRACT_SIZE)),
                                         cTickSize(SymbolInfoDouble(mSymbol,SYMBOL_TRADE_TICK_SIZE)),
                                         cPoint(SymbolInfoDouble(mSymbol,SYMBOL_POINT)){
+   ComputeParam();}
+//-------------------------------------------------------------
+void CConvert::Reset(string mSymbol=NULL){
+   cSymbol=mSymbol==NULL?_Symbol:mSymbol;
+   cAccCurrency=AccountInfoString(ACCOUNT_CURRENCY);
+   cLotSize=SymbolInfoDouble(mSymbol,SYMBOL_TRADE_CONTRACT_SIZE);
+   cTickSize=SymbolInfoDouble(mSymbol,SYMBOL_TRADE_TICK_SIZE);
+   cPoint=SymbolInfoDouble(mSymbol,SYMBOL_POINT);
    ComputeParam();}
 //-------------------------------------------------------------
 double CConvert::GetPointPrice(int mCount=1){
