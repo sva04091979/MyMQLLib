@@ -20,7 +20,7 @@ enum ENUM_START_FLAG{
 };
 
 string gChartSymbol;
-ENUM_TIMEFRAMES gTimeFrame;
+ENUM_TIMEFRAMES gChartTimeFrame;
 double gChartLotStep,gChartLotMax,gChartLotMin,gChartTickSize,gChartStopLevel,gChartFreezeLevel,gChartLotSize;
 int gChartLotDigits;
 
@@ -33,33 +33,36 @@ ENUM_INIT_RETCODE Start(ENUM_START_FLAG fFlag=START_FLAG_NONE){
       case START_FLAG_CHANGE_PARAM: flag+=INIT_FLAG_CHANGE_PARAM; break;
       case START_FLAG_CHARTCHANGE:  flag+=INIT_FLAG_CHANGE_CHART; break;}
    if (!flag) return INIT_SUCCEEDED;
-   if (flag.Check(INIT_FLAG_CHANGE_CHART)) CheckChart(flag);
-   if (flag.Check(INIT_FLAG_CHANGE_SYMBOL)) Restart(res);
-   else if (flag.Check(INIT_FLAG_START)) Start(res);
-   else if (flag.Check(INIT_FLAG_CHANGE_PARAM)) ChangeParam(res);
-   else if (flag.Check(INIT_FLAG_CHANGE_FRAME)) ChangeFrame(res);
+   if (flag.Check(INIT_FLAG_CHANGE_CHART)) CheckChartOnInit(flag);
+   if (flag.Check(INIT_FLAG_CHANGE_SYMBOL)) RestartOnInit(res);
+   else if (flag.Check(INIT_FLAG_START)) StartOnInit(res);
+   else{
+      if (flag.Check(INIT_FLAG_CHANGE_PARAM)) ChangeParamOnInit(res);
+      if (flag.Check(INIT_FLAG_CHANGE_FRAME)) ChangeFrameOnInit(res);}
    flag=0;
    return res;}
 //-------------------------------------------------------------------------------
-void CheckChart(CFlag &mFlag){
-   if (gChartSymbol!=_Symbol)
-}
-/*
-   
-   if (fFlag==START_FLAG_CONTROL_SYMBOL&&gChartSymbol!=_Symbol) {Stop(); fIsStart=(true);}
-   if (fFlag==START_FLAG_RESTART) {fIsStart=true;return(INIT_SUCCEEDED);}
-   if (fFlag==START_FLAG_CHANGE_PARAM) {fIsChangeParam=true;return(INIT_SUCCEEDED);}
-   if (!fIsStart&&!fIsChangeParam) return(INIT_SUCCEEDED);
-   if (fIsChangeParam){
-      fIsChangeParam=false;
-      return(fRes);}
-   InitChartValues();
-   fIsStart=false;
-   return(fRes);}*/
+void CheckChartOnInit(CFlag &mFlag){
+   if (gChartSymbol!=_Symbol) mFlag+=INIT_FLAG_CHANGE_SYMBOL;
+   else if (gChartTimeFrame!=_Period) mFlag+=INIT_FLAG_CHANGE_FRAME;}
+//-------------------------------------------------------------------------------
+void RestartOnInit(ENUM_INIT_RETCODE &fRes){
+   StopOnInit(fRes);
+   if (fRes==INIT_SUCCEEDED) StartOnInit(fRes);}
+//-------------------------------------------------------------------------------
+void StartOnInit(ENUM_INIT_RETCODE &fRes){
+   InitChartValues();}
+//-------------------------------------------------------------------------------
+void ChangeParamOnInit(ENUM_INIT_RETCODE &fRes);
+//-------------------------------------------------------------------------------
+void ChangeFrameOnInit(ENUM_INIT_RETCODE &fRes){
+   gChartTimeFrame=_Period;}
+//--------------------------------------------------------------------------------
+void StopOnInit(ENUM_INIT_RETCODE &fRes);
 //--------------------------------------------------------------------
 void InitChartValues(){
    gChartSymbol=_Symbol;
-   gTimeFrame=_Period;
+   gChartTimeFrame=_Period;
    gChartLotSize=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE);
    gChartLotStep=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
    gChartLotDigits=MathMax(-(int)MathFloor(MathLog10(gChartLotStep)),0);
