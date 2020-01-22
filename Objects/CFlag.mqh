@@ -14,6 +14,8 @@ public:
    inline bool CheckAdd(long mFlag)    {bool res=bool(cFlag&mFlag); cFlag|=mFlag; return res;}
    inline bool CheckStrongRemove(long mFlag) {bool res=(cFlag&mFlag)==mFlag; cFlag&=~mFlag; return res;}
    inline bool CheckStrongAdd(long mFlag)    {bool res=(cFlag&mFlag)==mFlag; cFlag|=mFlag; return res;}
+   inline bool operator !() {return !cFlag;}
+   inline bool operator ==(long mFlag) {return cFlag==mFlag;}
    inline void operator =(long mFlag) {cFlag=mFlag;}
    inline void operator |=(long mFlag) {cFlag|=mFlag;}
    inline void operator &=(long mFlag) {cFlag&=mFlag;}
