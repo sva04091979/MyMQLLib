@@ -23,10 +23,9 @@ private:
    bool              CheckTime();
   };
 //+------------------------------------------------------------------+
-CTradeTime::CTradeTime(string mTimeStart,string mTimeStop):cFlag(TRADE_TIME_FLAG_NEW_DAY){
+CTradeTime::CTradeTime(string mTimeStart,string mTimeStop):
+   cFlag(TRADE_TIME_FLAG_NEW_DAY),cIsTrue(true),cTimeCurrent(TimeCurrent()){
    MqlDateTime mTimeStruct;
-   cTimeCurrent=TimeCurrent();
-   cIsTrue=true;
    if (!TimeToStruct(cTimeCurrent,mTimeStruct)) {cTimeCurrent=0; cIsTrue=false; return;}
    cDay=mTimeStruct.day_of_week;
    for (int i=0;i<2;i++)

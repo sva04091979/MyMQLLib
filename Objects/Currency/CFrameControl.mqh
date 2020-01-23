@@ -12,7 +12,7 @@ private:
    ENUM_TIMEFRAMES   cFrame;
    datetime          cTime;
 public:
-                     CFrameControl():cSymbol(NULL),cDigits(Digits),cFrame(0),cTime(0){}
+                     CFrameControl():cSymbol(NULL),cDigits(_Digits),cFrame(0),cTime(0){}
                      CFrameControl(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
    void              Reset();
    void              Reset(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
@@ -27,7 +27,9 @@ public:
    double            GetClose(int mPos=0)                               {return iClose(cSymbol,cFrame,mPos);}
    datetime          GetTime(int mPos=0)                                {return iTime(cSymbol,cFrame,mPos);}
    int               GetBars()                                          {return iBars(cSymbol,cFrame);}
-   int               GetBarShift(datetime mTime,bool mExact=false)      {return iBarShift(cSymbol,cFrame,mTime,mExact);}
+   int               GetBarShift(datetime mTime,bool mExact)            {return iBarShift(cSymbol,cFrame,mTime,mExact);}
+   int               GetBarShiftN(datetime mTime);
+   int               GetBarShiftP(datetime mTime)                       {return GetBarShift(mTime,false);}
    int               GetDirection(int mPos)                             {return CompareDouble(GetClose(mPos),GetOpen(mPos),cDigits);}
    int               GetDigits()                                        {return cDigits;}
    double            GetPrice(int mShift,ENUM_APPLIED_PRICE mMode);
@@ -53,6 +55,10 @@ bool CFrameControl::IsNewBar(void){
    if (!time) return false;
    if (cTime<time) {cTime=time; return true;}
    return false;}
+//---------------------------------------------------------------------------------------------------
+int CFrameControl::GetBarShiftN(datetime mTime){
+   int res=GetBarShift(mTime,true);
+   return res<0?GetBarShift(mTime,false)+1:res;}
 //---------------------------------------------------------------------------------------------------
 double CFrameControl::GetPrice(int mShift,ENUM_APPLIED_PRICE mMode){
    switch(mMode){
