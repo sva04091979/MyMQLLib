@@ -17,6 +17,7 @@ public:
    bool              IsNewDay() {bool res=bool(cFlag&TRADE_TIME_FLAG_NEW_DAY); cFlag&=~TRADE_TIME_FLAG_NEW_DAY; return res;}
    bool              IsTrueFormat() {return cIsTrue;}
    bool              IsTradeAlloed(datetime mTime=0);
+   datetime          GetT
 private:
    bool              StringToTimeStruct(string mTimeStart,string mTimeStop,MqlDateTime &mTimeCurStruct,int mId);
    void              Control(datetime mTime);
