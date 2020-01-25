@@ -1,6 +1,7 @@
 #ifndef _C_WIN_API_MAP_FILE_
 #define _C_WIN_API_MAP_FILE_
 
+#include <MyMQLLib\Define\MQLDefine.mqh>
 #include "..\..\Define\WinApiDefine\WinApiHeader.mqh"
 #include "..\Sinchro\WinApi\CWinApiMutex.mqh"
 #include "..\DataExchange\CBytesMessage.mqh"
