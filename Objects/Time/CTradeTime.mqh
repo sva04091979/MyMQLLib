@@ -13,7 +13,7 @@ protected:
    datetime          cTimeCurrent;
    datetime          cTradeTime[2];
 public:
-                     CTradeTime(string mTimeStart,string mTimeStop);
+                     CTradeTime(string mTimeStart,string mTimeStop,bool isFirstNewDayRequestTrue=false);
    bool              IsNewDay() {bool res=bool(cFlag&TRADE_TIME_FLAG_NEW_DAY); cFlag&=~TRADE_TIME_FLAG_NEW_DAY; return res;}
    bool              IsTrueFormat() {return cIsTrue;}
    bool              IsTradeAlloed(datetime mTime=0);
@@ -23,8 +23,8 @@ private:
    bool              CheckTime();
   };
 //+------------------------------------------------------------------+
-CTradeTime::CTradeTime(string mTimeStart,string mTimeStop):
-   cFlag(TRADE_TIME_FLAG_NEW_DAY),cIsTrue(true),cTimeCurrent(TimeCurrent()){
+CTradeTime::CTradeTime(string mTimeStart,string mTimeStop,bool isFirstNewDayRequestTrue=false):
+   cFlag(isFirstNewDayRequestTrue?TRADE_TIME_FLAG_NEW_DAY:0),cIsTrue(true),cTimeCurrent(TimeCurrent()){
    MqlDateTime mTimeStruct;
    if (!TimeToStruct(cTimeCurrent,mTimeStruct)) {cTimeCurrent=0; cIsTrue=false; return;}
    cDay=mTimeStruct.day_of_week;

@@ -28,6 +28,7 @@ public:
    datetime          GetTime(int mPos=0)                                {return iTime(cSymbol,cFrame,mPos);}
    int               GetBars()                                          {return iBars(cSymbol,cFrame);}
    int               GetBarShift(datetime mTime,bool mExact)            {return iBarShift(cSymbol,cFrame,mTime,mExact);}
+   int               GetBarShift(datetime mTime)                        {return iBarShift(cSymbol,cFrame,mTime,true);}
    int               GetBarShiftN(datetime mTime);
    int               GetBarShiftP(datetime mTime)                       {return GetBarShift(mTime,false);}
    int               GetDirection(int mPos)                             {return CompareDouble(GetClose(mPos),GetOpen(mPos),cDigits);}
