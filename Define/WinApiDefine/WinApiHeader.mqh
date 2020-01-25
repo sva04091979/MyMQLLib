@@ -12,10 +12,10 @@
 
 #import "Ntdll.dll"
    long memcpy(   char  &Destination[],
-                  const uint Source,
+                  const VOID_PTR Source,
                   uint Length);
    //------------------------------------------------------------------------------
-   long memcpy(   uint  Destination,
+   long memcpy(   VOID_PTR  Destination,
                   const char &Source[],
                   uint Length);
 #import
