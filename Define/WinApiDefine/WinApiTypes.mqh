@@ -1,6 +1,12 @@
 #ifndef _WIN_API_TYPES_
 #define _WIN_API_TYPES_
 
+#ifdef __MQL5__
+   #define VOID_PTR ulong
+#else
+   #define VOID_PTR uint
+#endif
+
 #define BOOL int
 #define BYTE uchar
 #define DWORD uint

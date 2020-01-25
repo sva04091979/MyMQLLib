@@ -1,6 +1,7 @@
 #ifndef _C_WIN_API_MAP_FILE_
 #define _C_WIN_API_MAP_FILE_
 
+#include <MyMQLLib\Define\MQLDefine.mqh>
 #include "..\..\Define\WinApiDefine\WinApiHeader.mqh"
 #include "..\Sinchro\WinApi\CWinApiMutex.mqh"
 #include "..\DataExchange\CBytesMessage.mqh"
@@ -27,7 +28,7 @@ enum ENUM_MAP_OPEN{
                               bool    bInheritHandle,
                               LPCWSTR lpName);
    //------------------------------------------------------------------------------
-   uint MapViewOfFile(  HANDLE hFileMappingObject,
+   VOID_PTR MapViewOfFile(  HANDLE hFileMappingObject,
                         DWORD  dwDesiredAccess,
                         DWORD  dwFileOffsetHigh,
                         DWORD  dwFileOffsetLow,
@@ -45,7 +46,7 @@ class CWinApiMapFile
    HANDLE            cHndl;
    int               cFlag;
    DWORD             cSize;
-   uint              cPtr;
+   VOID_PTR          cPtr;
    DWORD             cLastError;
 public:
                      CWinApiMapFile(LPCWSTR mName,DWORD mSize,ENUM_MAP_OPEN mOpenFlag):
@@ -89,9 +90,9 @@ bool CWinApiMapFile::GetMessageBytes(char &mMessage[],int fSize,uint mShift=0){
 //   return GetMapFileMessage(cHndl,mMessage,mShift,fSize);}
 //-----------------------------------------------------------------
 template<typename T>
-CBytesMessage<T>* CWinApiMapFile::GetMessage(int &mPos){
+CBytesMessage<T>* CWinApiMapFile::GetMessage(uint &mPos){
    CBytesMessage<T>* mess=new CBytesMessage<T>;
-   int pos=mPos;
+   uint pos=mPos;
    mPos+=mess.GetBytesSize();
    char array[];
    if (!GetMessageBytes(array,mess.GetBytesSize(),pos)) return NULL;
@@ -99,7 +100,7 @@ CBytesMessage<T>* CWinApiMapFile::GetMessage(int &mPos){
    return mess;}
 //-----------------------------------------------------------------
 template<typename T>
-CBytesMessage<T>* CWinApiMapFile::GetMessage(int &mPos,CWinApiMutex* mMutex){
+CBytesMessage<T>* CWinApiMapFile::GetMessage(uint &mPos,CWinApiMutex* mMutex){
    mMutex.Lock();
    CBytesMessage<T>* mess=GetMessage<T>(mPos);
    mMutex.UnLock();
