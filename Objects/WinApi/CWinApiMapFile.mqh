@@ -56,9 +56,9 @@ public:
    bool              Start(LPCWSTR mName,DWORD mSize,ENUM_MAP_OPEN mOpenFlag);
    bool              GetMessageBytes(char &mMessage[],int fSize,uint mShift=0);
    template<typename T>
-   CBytesMessage<T>* GetMessage(int &mPos);
+   CBytesMessage<T>* GetMessage(uint &mPos);
    template<typename T>
-   CBytesMessage<T>* GetMessage(int &mPos,CWinApiMutex* mMutex);
+   CBytesMessage<T>* GetMessage(uint &mPos,CWinApiMutex* mMutex);
 //   CStringMessage*   GetMessageString(int &mPos);
 //   CStringMessage*   GetMessageString(int &mPos,CWinApiMutex* mMutex);
    bool              SendMessage(IBytesMessage &mMessage,CWinApiMutex &mMutex,uint mShift=0);
