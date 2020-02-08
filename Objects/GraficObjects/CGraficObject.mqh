@@ -1,12 +1,13 @@
 #ifndef _C_GRAFIC_OBJECT_
 #define _C_GRAFIC_OBJECT_
 
-#define OBJECT_FLAG_CREATE 0x1
-#define BUTTON_FLAG_PRESS  0x2
+#include <MyMQLLib\Objects\CFlag.mqh>
 
-#define SET_INTEGER(dOBJPROP,dValue) ObjectSetInteger(cChartId,cName,dOBJPROP,dValue)
+#define OBJECT_FLAG_CREATE 0x1
+#define OBJECT_FLAG_SELECTABLE 0x2
+#define BUTTON_FLAG_PRESS  0x4
+
 #define SET_STRING(dOBJPROP,dValue) ObjectSetString(cChartId,cName,dOBJPROP,dValue)
-#define GET_INTEGER(dOBJPROP) ObjectGetInteger(cChartId,cName,dOBJPROP)
 #define GET_STRING(dOBJPROP) ObjectGetString(cChartId,cName,dOBJPROP)
 
 class CGraficObject
@@ -17,7 +18,7 @@ protected:
    long              cChartId;
    int               cSubWindow;
    color             cColor;
-   int               cFlag;
+   CFlag             _Flag;
                      CGraficObject(string mName,
                                    ENUM_OBJECT mType,
                                    long mChartId,
@@ -25,18 +26,26 @@ protected:
                                    datetime mTime,
                                    double mPrice,
                                    int mFlag);
-                    ~CGraficObject(void)  {if (bool(cFlag&OBJECT_FLAG_CREATE)) ObjectDelete(cChartId,cName);}
+                    ~CGraficObject(void)  {if (_Flag.Check(OBJECT_FLAG_CREATE)) ObjectDelete(cChartId,cName);}
 public:
-   bool              SetColor(color mColor) {if (SET_INTEGER(OBJPROP_COLOR,cColor=mColor)) return true; else {cColor=(color)GET_INTEGER(OBJPROP_COLOR); return false;}}
-   bool              Equal(string mName) {return mName==cName;}
+   inline bool       SetInt(int mSet,long mVal) {return ObjectSetInteger(cChartId,cName,mSet,mVal);}
+   bool              SetColor(color mColor) {if (SetInt(OBJPROP_COLOR,cColor=mColor)) return true; else {cColor=(color)GetInt(OBJPROP_COLOR); return false;}}
+   inline bool       SetSelectable(bool isSelectable);
+   inline long       GetInt(int mSet)     {return ObjectGetInteger(cChartId,cName,mSet);}
+   bool              Equal(string mName)  {return mName==cName;}
   };
 //----------------------------------------------------------------
 void CGraficObject::CGraficObject(string mName,ENUM_OBJECT mType,long mChartId,int mSubWindow,datetime mTime,double mPrice,int mFlag):
    cName(mName),cType(mType),cChartId(mChartId),cSubWindow(mSubWindow),
-   cFlag(mFlag){
-   if (ObjectCreate(mChartId,mName,mType,mSubWindow,mTime,mPrice)) cFlag|=OBJECT_FLAG_CREATE;
-   ObjectSetInteger(cChartId,cName,OBJPROP_SELECTABLE,true);
-   cColor=(color)GET_INTEGER(OBJPROP_COLOR);}
-
+   _Flag(mFlag){
+   if (ObjectCreate(mChartId,mName,mType,mSubWindow,mTime,mPrice)) _Flag+=OBJECT_FLAG_CREATE;
+   ObjectSetInteger(cChartId,cName,OBJPROP_SELECTABLE,false);
+   cColor=(color)GetInt(OBJPROP_COLOR);}
+//-----------------------------------------------------------------
+bool CGraficObject::SetSelectable(bool isSelectable){
+   bool res=SetInt(OBJPROP_COLOR,isSelectable);
+   if (!res) isSelectable=(bool)GetInt(OBJPROP_COLOR);
+   if (isSelectable) _Flag+=OBJECT_FLAG_SELECTABLE; else _Flag-=OBJECT_FLAG_SELECTABLE;
+   return res;}
 
 #endif 
