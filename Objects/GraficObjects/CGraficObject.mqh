@@ -28,10 +28,10 @@ protected:
                                    int mFlag);
                     ~CGraficObject(void)  {if (_Flag.Check(OBJECT_FLAG_CREATE)) ObjectDelete(cChartId,cName);}
 public:
-   inline bool       SetInt(int mSet,long mVal) {return ObjectSetInteger(cChartId,cName,mSet,mVal);}
+   inline bool       SetInt(ENUM_OBJECT_PROPERTY_INTEGER mSet,long mVal) {return ObjectSetInteger(cChartId,cName,mSet,mVal);}
    bool              SetColor(color mColor) {if (SetInt(OBJPROP_COLOR,cColor=mColor)) return true; else {cColor=(color)GetInt(OBJPROP_COLOR); return false;}}
    inline bool       SetSelectable(bool isSelectable);
-   inline long       GetInt(int mSet)     {return ObjectGetInteger(cChartId,cName,mSet);}
+   inline long       GetInt(ENUM_OBJECT_PROPERTY_INTEGER mSet)     {return ObjectGetInteger(cChartId,cName,mSet);}
    bool              Equal(string mName)  {return mName==cName;}
   };
 //----------------------------------------------------------------
