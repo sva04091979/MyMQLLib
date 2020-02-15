@@ -13,7 +13,7 @@
 
 enum ENUM_TRAL_START_BALLANCE_TYPE{
    TRAL_BALLANCE,    //Ballance
-   TRAL_EQUITY       //Equity
+   TRAL_EQUITY      //Equity
 };
 
 enum ENUM_TRAL_TYPE {TRAL_TYPE_CURRENCY,TRAL_TYPE_PERCENT};
@@ -55,6 +55,8 @@ public:
    double         GetTrigger()   {return cTralTrigger;}
    double         GetStop()      {return cTralStop;}
    string         GetReason();
+private:
+   double         SetGetBallance(ENUM_TRAL_START_BALLANCE_TYPE mType);
 };
 //--------------------------------------------------------------
 void CBallanceControl::Reset(double mSL,
@@ -62,7 +64,7 @@ void CBallanceControl::Reset(double mSL,
                              double mTralTrigger,
                              double mTralSize,
                              double mBallance=0.000000,
-                             ENUM_TRAL_START_BALLANCE_TYPE mType=1,
+                             ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
                              ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY){
    cStartBallance=mBallance<=0.0?mType==TRAL_BALLANCE?AccountInfoDouble(ACCOUNT_BALANCE):AccountInfoDouble(ACCOUNT_EQUITY):mBallance;
    cTralStop=0.0;
@@ -119,5 +121,6 @@ string CBallanceControl::GetReason(){
    else if (bool(cFlag&BALLANCE_CONTROL_SL)) return "loss";
    else if (bool(cFlag&BALLANCE_CONTROL_TRAL)) return "tral";
    else return NULL;}
+
 
 #endif
