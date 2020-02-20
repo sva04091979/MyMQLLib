@@ -17,6 +17,7 @@ public:
                         CMA(string mSymbol,ENUM_TIMEFRAMES mFrame,int mPeriod,int mShift,ENUM_MA_METHOD mMethod,ENUM_APPLIED_PRICE mAppliedPrice):
                            cSymbol(mSymbol),cPeriod(mPeriod),cShift(mShift),cFrame(mFrame),cMethod(mMethod),cAppliedPrice(mAppliedPrice),
                            cFlag(!mPeriod?CMA_FLAG_PERIOD_CURRENT:0){}
+   void                 Restart(string mSymbol,ENUM_TIMEFRAMES mFrame,int mPeriod,int mShift,ENUM_MA_METHOD mMethod,ENUM_APPLIED_PRICE mAppliedPrice);
    string               GetSymbol() {return cSymbol==NULL?_Symbol:cSymbol;}
    int                  GetPeriod() {return cPeriod;}
    int                  GetShift()  {return cShift;}
@@ -36,6 +37,16 @@ private:
    inline double        _GetWhithCheck(int mShift);
    inline double        _iMA(int mShift) {return iMA(cSymbol,cFrame,cPeriod,cShift,cMethod,cAppliedPrice,mShift);}
 };
+//----------------------------------------------------------------------------------------------
+void CMA::Restart(string mSymbol,ENUM_TIMEFRAMES mFrame,int mPeriod,int mShift,ENUM_MA_METHOD mMethod,ENUM_APPLIED_PRICE mAppliedPrice){
+   cSymbol=mSymbol;
+   cPeriod=mPeriod;
+   cShift=mShift;
+   cFrame=mFrame;
+   cMethod=mMethod;
+   cAppliedPrice=mAppliedPrice;
+   if (mPeriod) cFlag-=CMA_FLAG_PERIOD_CURRENT;
+   else cFlag+=CMA_FLAG_PERIOD_CURRENT;}
 //----------------------------------------------------------------------------------------------
 double CMA::_GetWhithCheck(int mShift){
    ResetLastError();
