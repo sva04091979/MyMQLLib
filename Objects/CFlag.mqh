@@ -18,12 +18,12 @@ public:
    inline bool CheckStrongSwitch(long mFlag) {bool res=bool(cFlag&mFlag)==mFlag; cFlag^=mFlag; return res;}
    inline bool operator !() {return !cFlag;}
    inline bool operator ==(long mFlag) {return cFlag==mFlag;}
-   inline void operator =(long mFlag) {cFlag=mFlag;}
-   inline void operator |=(long mFlag) {cFlag|=mFlag;}
-   inline void operator &=(long mFlag) {cFlag&=mFlag;}
-   inline void operator ^=(long mFlag) {cFlag^=mFlag;}
-   inline void operator +=(long mFlag) {cFlag|=mFlag;}
-   inline void operator -=(long mFlag) {cFlag&=~mFlag;}
+   inline ulong operator =(long mFlag) {return cFlag=mFlag;}
+   inline ulong operator |=(long mFlag) {return cFlag|=mFlag;}
+   inline ulong operator &=(long mFlag) {return cFlag&=mFlag;}
+   inline ulong operator ^=(long mFlag) {return cFlag^=mFlag;}
+   inline ulong operator +=(long mFlag) {return cFlag|=mFlag;}
+   inline ulong operator -=(long mFlag) {return cFlag&=~mFlag;}
    inline ulong operator |(long mFlag)  {return cFlag|mFlag;}
    inline ulong operator &(long mFlag)  {return cFlag&mFlag;}
   };

@@ -77,6 +77,7 @@ public:
    ulong             Control();
    bool              Closing();
    bool              IsTralOn()              {return cTral!=NULL;}
+   bool              IsClosed()              {return cClosePrice!=0.0;}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    order_type        CheckType();
