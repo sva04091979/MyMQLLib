@@ -1,8 +1,7 @@
 #ifndef _MQL_HEADER_
 #define _MQL_HEADER_
 
-#ifdef __MQL5__
-#else
+#ifdef __MQL4__
    #property strict
 #endif
 

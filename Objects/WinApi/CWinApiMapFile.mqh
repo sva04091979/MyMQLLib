@@ -34,12 +34,7 @@ enum ENUM_MAP_OPEN{
                         DWORD  dwFileOffsetLow,
                         SIZE_T dwNumberOfBytesToMap);
 #import
-/*
-#import "MQLLib.dll"
-   bool GetMapFileMessage(int fHndl,char &fMess[],uint fShift,uint fSize);
-   bool SendMapFileMessage(int fHndl,char &fMess[],uint fShift,uint fSize);
-#import
-*/
+
 class CWinApiMapFile
   {
    string            cName;
@@ -59,8 +54,6 @@ public:
    CBytesMessage<T>* GetMessage(uint &mPos);
    template<typename T>
    CBytesMessage<T>* GetMessage(uint &mPos,CWinApiMutex* mMutex);
-//   CStringMessage*   GetMessageString(int &mPos);
-//   CStringMessage*   GetMessageString(int &mPos,CWinApiMutex* mMutex);
    bool              SendMessage(IBytesMessage &mMessage,CWinApiMutex &mMutex,uint mShift=0);
    bool              SendMessage(IBytesMessage &mMessage,uint mShift=0);
    bool              SendMessageList(CMessageList &mMessage,CWinApiMutex &mMutex,uint mShift=0);
@@ -87,7 +80,6 @@ bool CWinApiMapFile::GetMessageBytes(char &mMessage[],int fSize,uint mShift=0){
    if (ArrayResize(mMessage,fSize)!=fSize) return false;
    CopyMemory(mMessage,cPtr+mShift,fSize);
    return true;}
-//   return GetMapFileMessage(cHndl,mMessage,mShift,fSize);}
 //-----------------------------------------------------------------
 template<typename T>
 CBytesMessage<T>* CWinApiMapFile::GetMessage(uint &mPos){
@@ -112,10 +104,8 @@ bool CWinApiMapFile::SendMessage(IBytesMessage &mMessage,CWinApiMutex &mMutex,ui
    int size=mMessage.CreateBytesMessage(array); 
    mMutex.Lock();
    CopyMemory(cPtr+mShift,array,size);
-//   bool res=SendMapFileMessage(cHndl,array,mShift,size);
    mMutex.UnLock();
    return true;}
-//   return res;}
 //---------------------------------------------------------------
 bool CWinApiMapFile::SendMessage(IBytesMessage &mMessage,uint mShift=0){
    if (!(cFlag&MAP_FILE_OPEN)) return false;
@@ -123,8 +113,6 @@ bool CWinApiMapFile::SendMessage(IBytesMessage &mMessage,uint mShift=0){
    int size=mMessage.CreateBytesMessage(array); 
    CopyMemory(cPtr+mShift,array,size);
    return true;}
-//   bool res=SendMapFileMessage(cHndl,array,mShift,size);
-//   return res;}
 //------------------------------------------------------------------------
 bool CWinApiMapFile::SendMessageList(CMessageList &mMessage,CWinApiMutex &mMutex,uint mShift=0){
    int pos=0;

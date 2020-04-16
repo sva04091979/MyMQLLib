@@ -1,5 +1,5 @@
-#ifndef _C_WIMN_API_PROCESS_
-#define _C_WIMN_API_PROCESS_
+#ifndef _C_WIN_API_PROCESS_
+#define _C_WIN_API_PROCESS_
 
 #include "..\..\Define\WinApiDefine\WinApiHeader.mqh"
 
