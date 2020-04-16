@@ -3,14 +3,15 @@
 
 #ifdef __MQL5__
    #define VOID_PTR ulong
+   #define HANDLE ulong
 #else
    #define VOID_PTR uint
+   #define HANDLE uint
 #endif
 
 #define BOOL int
 #define BYTE uchar
 #define DWORD uint
-#define HANDLE int
 #define HRESULT int
 #define ULONG uint
 #define UINT uint
