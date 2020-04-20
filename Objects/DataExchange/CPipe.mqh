@@ -3,22 +3,21 @@
 
 #include <MyMQLLib\Objects\CFlag.mqh>
 
-#ifdef _DEBUG
-
-#else
-
-#endif
-
 #define _FLAG_PIPE_OK 0x1
 #define _FLAG_PIPE_CONNECT 0x2
 
+#ifndef PIPE_CHECK_MESS
+   #define PIPE_CHECK_MESS 0xff,0xff,0xff,0xff
+#endif
 
 class CPipe{
    CFlag       cFlag;
+   uchar       cCheck[];
    string      cName;
    int         cHndl;
    int         cOpenFlag;
    int         cLastError;
+   int         cCheckSize;
 public:
    CPipe(string mName,int flag);
    int   LastError() {return cLastError;}
@@ -26,10 +25,11 @@ public:
    bool  OpenPipe();
    bool  IsConnect() {return cFlag.Check(_FLAG_PIPE_CONNECT);}
    bool  CheckConnect();
-   void  Close()  {FileClose(cHndl);}
+   void  Close()  {FileClose(cHndl); cHndl=INVALID_HANDLE; cFlag-=(_FLAG_PIPE_OK|_FLAG_PIPE_CONNECT);}
    uint  Read(uchar &arr[],bool isBlockMode);
    uint  Write(uchar &arr[],int mSize);
 private:
+   void  CheckChanel();
    void  ProcessError(string mFunc);
    void  ResetError()   {ResetLastError(); cLastError=0;}
 };
@@ -37,6 +37,8 @@ private:
 CPipe::CPipe(string mName,int mFlag):
    cName(mName),
    cOpenFlag(mFlag){
+   uchar temp[]={PIPE_CHECK_MESS};
+   cCheckSize=ArrayCopy(cCheck,temp);
    ResetError();
    if (INVALID_HANDLE!=(cHndl=FileOpen(cName,mFlag))) cFlag+=_FLAG_PIPE_OK;
    ProcessError(__FUNCTION__);}
@@ -51,10 +53,11 @@ bool CPipe::OpenPipe(){
 bool CPipe::CheckConnect(){
    if (cHndl==INVALID_HANDLE&&!OpenPipe()) return false;
    ResetError();
-   ulong tmp=FileSize(cHndl);
+   uint size=FileWriteArray(cHndl,cCheck);
+   ProcessError(__FUNCTION__);
    if (_LastError!=0){
-      cLastError=_LastError;
-      ProcessError(__FUNCTION__);}
+      if (!cFlag.Check(_FLAG_PIPE_CONNECT)) CheckChanel();}
+   else cFlag+=_FLAG_PIPE_CONNECT;
    return !_LastError;}
 //-------------------------------------------------------
 uint CPipe::Read(uchar &arr[],bool isBlockMode){
@@ -78,13 +81,17 @@ void CPipe::ProcessError(string mFunc){
       case ERR_CANNOT_OPEN_FILE:
          cFlag-=(_FLAG_PIPE_OK|_FLAG_PIPE_CONNECT);
          break;
-      case ERR_WRONG_FILEHANDLE:
+      case ERR_FILE_WRITEERROR:
          cFlag-=_FLAG_PIPE_CONNECT;
          break;}
    #ifdef _DEBUG
       Print("Error: ",_LastError," in ",mFunc);
    #endif
 }
+//------------------------------------------------------
+void CPipe::CheckChanel(){
+   Close();
+   OpenPipe();}
 
 #undef _FLAG_PIPE_OK
 #undef _FLAG_PIPE_CONNECT

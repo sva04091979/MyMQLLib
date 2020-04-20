@@ -10,7 +10,7 @@ public:
    CBinaryReader(uchar &array[],int count):cSize(ArrayCopy(str,array,0,0,count)),cPos(0){cMaxSize=cSize;}
    int      Pos() {return cPos;}
    void     Seek(int mPos) {cPos=mPos;}
-   bool     IsEnd(int size=0) {return cPos+size<cSize;}
+   bool     IsEnd(int size=0) {return cPos+size>=cSize;}
    int      GetArray(char &arr[],int count) {int res=ArrayCopy(arr,str,0,cPos,count); cPos+=count; return res;}
    template<typename T>
    T        Get(){
@@ -18,7 +18,7 @@ public:
          T     val;
          uchar arr[sizeof(T)];
       } value;
-      for (int ii=sizeof(T)-1;ii>=0;value.arr[ii--]=str[cPos++]);
+      for (int i=0;i<sizeof(T);value.arr[i++]=str[cPos++]);
       return value.val;}
 };
 //----------------------------------------------------------------
