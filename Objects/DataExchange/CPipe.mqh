@@ -6,14 +6,19 @@
 #define _FLAG_PIPE_OK 0x1
 #define _FLAG_PIPE_CONNECT 0x2
 
-#ifndef PIPE_CHECK_MESS
+#ifndef _PIPE_CHECK_MESS
    #define PIPE_CHECK_MESS 0xff,0xff,0xff,0xff
+#endif
+
+#ifndef _PIPE_CHANEL_CONTROL_TIME
+   #define _PIPE_CHANEL_CONTROL_TIME 1000
 #endif
 
 class CPipe{
    CFlag       cFlag;
    uchar       cCheck[];
    string      cName;
+   ulong       cTimer;
    int         cHndl;
    int         cOpenFlag;
    int         cLastError;
@@ -36,6 +41,7 @@ private:
 //-------------------------------------------------------
 CPipe::CPipe(string mName,int mFlag):
    cName(mName),
+   cTimer(0),
    cOpenFlag(mFlag){
    uchar temp[]={PIPE_CHECK_MESS};
    cCheckSize=ArrayCopy(cCheck,temp);
@@ -83,6 +89,8 @@ void CPipe::ProcessError(string mFunc){
          break;
       case ERR_FILE_WRITEERROR:
          cFlag-=_FLAG_PIPE_CONNECT;
+         break;
+      default:
          break;}
    #ifdef _DEBUG
       Print("Error: ",_LastError," in ",mFunc);
