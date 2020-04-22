@@ -59,7 +59,10 @@ bool CPipe::OpenPipe(){
 bool CPipe::CheckConnect(){
    if (cHndl==INVALID_HANDLE&&!OpenPipe()) return false;
    ResetError();
+   uchar tmp[1024];
+//   uint size=FileSize(cHndl);
    uint size=FileWriteArray(cHndl,cCheck);
+//   uint size=FileReadArray(cHndl,tmp);
    ProcessError(__FUNCTION__);
    if (_LastError!=0){
       if (!cFlag.Check(_FLAG_PIPE_CONNECT)) CheckChanel();}
