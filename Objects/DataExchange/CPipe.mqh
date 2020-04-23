@@ -34,6 +34,7 @@ public:
    uint  Read(uchar &arr[],bool isBlockMode);
    uint  Write(uchar &arr[],int mSize);
 private:
+   bool  _Check() {return cHndl!=INVALID_HANDLE||OpenPipe();}
    void  CheckChanel();
    void  ProcessError(string mFunc);
    void  ResetError()   {ResetLastError(); cLastError=0;}
@@ -57,9 +58,7 @@ bool CPipe::OpenPipe(){
    return cHndl!=INVALID_HANDLE;}
 //-------------------------------------------------------
 bool CPipe::CheckConnect(){
-//   if (cHndl!=INVALID_HANDLE&&GetTickCount()-cTimer<_PIPE_CHANEL_CONTROL_TIME) return true;
- //  else cTimer=GetTickCount();
-   if (cHndl==INVALID_HANDLE&&!OpenPipe()) return false;
+   if (!_Check()) return false;
    ResetError();
    uint size=FileWriteArray(cHndl,cCheck);
    ProcessError(__FUNCTION__);
@@ -69,6 +68,7 @@ bool CPipe::CheckConnect(){
    return !_LastError;}
 //-------------------------------------------------------
 uint CPipe::Read(uchar &arr[],bool isBlockMode){
+   if (!_Check()) return 0;
    ResetError();
    uint size=0;
    if (isBlockMode||FileSize(cHndl)>0)
@@ -77,6 +77,7 @@ uint CPipe::Read(uchar &arr[],bool isBlockMode){
    return size;}
 //-------------------------------------------------------
 uint CPipe::Write(uchar &arr[],int mSize){
+   if (!_Check()) return 0;
    ResetError();
    uint size=FileWriteArray(cHndl,arr,0,mSize);
    ProcessError(__FUNCTION__);
