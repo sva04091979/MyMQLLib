@@ -10,10 +10,6 @@
    #define PIPE_CHECK_MESS 0xff,0xff,0xff,0xff
 #endif
 
-#ifndef _PIPE_CHANEL_CONTROL_TIME
-   #define _PIPE_CHANEL_CONTROL_TIME 1000
-#endif
-
 class CPipe{
    CFlag       cFlag;
    uchar       cCheck[];
