@@ -3,12 +3,18 @@
 
 #include <MyMQLLib\Objects\CFlag.mqh>
 
+#ifdef __MQL4__
+   #define ERR_CANNOT_OPEN_FILE ERR_FILE_CANNOT_OPEN:
+#endif
+
+
 #define _FLAG_PIPE_OK 0x1
 #define _FLAG_PIPE_CONNECT 0x2
 
-#ifndef _PIPE_CHECK_MESS
+#ifndef PIPE_CHECK_MESS
    #define PIPE_CHECK_MESS 0xff,0xff,0xff,0xff
 #endif
+
 
 class CPipe{
    CFlag       cFlag;
@@ -23,13 +29,13 @@ public:
    CPipe(string mName,int flag);
    int   LastError() {return cLastError;}
    bool  IsOpen()  {return cHndl!=INVALID_HANDLE;}
-   bool  OpenPipe();
    bool  IsConnect() {return cFlag.Check(_FLAG_PIPE_CONNECT);}
    bool  CheckConnect();
    void  Close()  {FileClose(cHndl); cHndl=INVALID_HANDLE; cFlag-=(_FLAG_PIPE_OK|_FLAG_PIPE_CONNECT);}
    uint  Read(uchar &arr[],bool isBlockMode);
    uint  Write(uchar &arr[],int mSize);
 private:
+   bool  OpenPipe();
    bool  _Check() {return cHndl!=INVALID_HANDLE||OpenPipe();}
    void  CheckChanel();
    void  ProcessError(string mFunc);
@@ -83,10 +89,19 @@ void CPipe::ProcessError(string mFunc){
    if (!_LastError) return;
    cLastError=_LastError;
    switch(_LastError){
-      case ERR_CANNOT_OPEN_FILE:
+      #ifdef __MQL5__
+         case ERR_CANNOT_OPEN_FILE:
+      #else
+         case ERR_FILE_CANNOT_OPEN:
+      #endif
+         cHndl=INVALID_HANDLE;
          cFlag-=(_FLAG_PIPE_OK|_FLAG_PIPE_CONNECT);
          break;
-      case ERR_FILE_WRITEERROR:
+      #ifdef __MQL5__
+         case ERR_FILE_WRITEERROR:
+      #else
+         case ERR_FILE_WRITE_ERROR:
+      #endif
          cFlag-=_FLAG_PIPE_CONNECT;
          break;
       default:
