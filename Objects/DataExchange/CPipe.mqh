@@ -83,10 +83,18 @@ void CPipe::ProcessError(string mFunc){
    if (!_LastError) return;
    cLastError=_LastError;
    switch(_LastError){
-      case ERR_CANNOT_OPEN_FILE:
+      #ifdef __MQL5__
+         case ERR_CANNOT_OPEN_FILE:
+      #else
+         case ERR_FILE_CANNOT_OPEN:
+      #endif
          cFlag-=(_FLAG_PIPE_OK|_FLAG_PIPE_CONNECT);
          break;
-      case ERR_FILE_WRITEERROR:
+      #ifdef __MQL5__
+         case ERR_FILE_WRITEERROR:
+      #else
+         case ERR_FILE_WRITE_ERROR:
+      #endif
          cFlag-=_FLAG_PIPE_CONNECT;
          break;
       default:
