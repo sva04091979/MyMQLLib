@@ -3,11 +3,6 @@
 
 #include <MyMQLLib\Objects\CFlag.mqh>
 
-#ifdef __MQL4__
-   #define ERR_CANNOT_OPEN_FILE ERR_FILE_CANNOT_OPEN:
-#endif
-
-
 #define _FLAG_PIPE_OK 0x1
 #define _FLAG_PIPE_CONNECT 0x2
 
@@ -27,6 +22,7 @@ class CPipe{
    int         cCheckSize;
 public:
    CPipe(string mName,int flag);
+  ~CPipe() {FileClose(cHndl);}
    int   LastError() {return cLastError;}
    bool  IsOpen()  {return cHndl!=INVALID_HANDLE;}
    bool  IsConnect() {return cFlag.Check(_FLAG_PIPE_CONNECT);}
