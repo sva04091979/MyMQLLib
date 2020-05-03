@@ -1,9 +1,10 @@
 #ifndef _C_INDICATOR_BASE_
 #define _C_INDICATOR_BASE_
 
-struct SBuffer{
+class CBuffer{
+public:
    double buf[];
-   SBuffer() {ArraySetAsSeries(buf,true);}
+   CBuffer() {ArraySetAsSeries(buf,true);}
    bool Create(int mSize)  {return mSize==ArrayResize(buf,mSize);}
    bool Copy(double &newBuf[]) {return ArraySize(newBuf)==ArrayCopy(buf,newBuf);}
    double Get(int mPos) {return buf[mPos];}
@@ -12,7 +13,7 @@ struct SBuffer{
 class CIndicatorBase
   {
 protected:
-   SBuffer           cBuffers[];
+   CBuffer           cBuffers[];
    string            cSymbol;
    int               cDigits;
    ENUM_TIMEFRAMES   cPeriod;
@@ -20,7 +21,7 @@ protected:
    int               cHndl;
    int               cBufferSize;
    datetime          cLastTime;
-   bool              cIsBuffersOk;;
+   bool              cIsBuffersOk;
 public:
                      CIndicatorBase(int mHndl,string mSymbol,ENUM_TIMEFRAMES mPeriod,int mBuffersCount,int mBufferSize);
                     ~CIndicatorBase()  {if (cHndl!=INVALID_HANDLE) IndicatorRelease(cHndl);}
@@ -79,5 +80,7 @@ bool CIndicatorBase::NewBuffersSize(int mNewSize){
    for (int i=0;i<cBufferSize;)
       if (!cBuffers[i++].Create(cBufferSize)) return cIsBuffersOk=false;
    return cIsBuffersOk=true;}
+//-------------------------------------------------------------------------------------------
+
 
 #endif

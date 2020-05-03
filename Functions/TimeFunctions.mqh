@@ -1,6 +1,8 @@
 #ifndef _TIME_FUNCTIONS_
 #define _TIME_FUNCTIONS_
 
+#include <MyMQLLib\Define\MQLDefine.mqh>
+
 #define TIME_DAY  86400
 #define TIME_WEEK 604800
 
@@ -19,7 +21,8 @@ MqlDateTime TextToTimeStruct(string fTextTime){
          case 2:  break;}
    if (size>0){
       time.hour=(int)StringToInteger(data[0]);
-      if (time.hour<0||time.hour>23||IntegerToString(time.hour,2,'0')!=data[0]) RETURN_FALSE_TIME;}
+      if (time.hour==24) {++time.day;time.hour=0;}
+      if (time.hour<0||time.hour>24||IntegerToString(time.hour,2,'0')!=data[0]) RETURN_FALSE_TIME;}
    else time.hour=0;
    if (size>1){
       time.min=(int)StringToInteger(data[1]);
@@ -40,5 +43,10 @@ datetime TextToTime(string fTextTime){
 uint TextToSecons(string fTextTime){
    MqlDateTime time=TextToTimeStruct(fTextTime);
    return time.hour*3600+time.min*60+time.sec;}
+//-------------------------------------------------------------------------------------------
+datetime TextToTime(string fTextTime,ENUM_DAY_OF_WEEK fDay){
+   MqlDateTime time=TextToTimeStruct(fTextTime);
+   time.day_of_week=fDay;
+   return StructToTime(time);}
 
 #endif

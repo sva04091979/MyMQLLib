@@ -1,7 +1,6 @@
 #ifndef _C_FRAME_CONTROL_
 #define _C_FRAME_CONTROL_
 
-#include <MyMQLLib\Objects\Array\CTuple.mqh>
 #include "..\..\Functions\MathFunctions.mqh"
 
 class CFrameControl
@@ -17,6 +16,7 @@ public:
    void              Reset();
    void              Reset(string mSymbol,ENUM_TIMEFRAMES mFrame=0,bool mIsFirstTickNewBarTrue=true);
    bool              IsNewBar();
+   uint              CheckNewBars();
    string            GetSymbol()                                        {return cSymbol==NULL?_Symbol:cSymbol;}
    ENUM_TIMEFRAMES   GetFrame()                                         {return cFrame==0?(ENUM_TIMEFRAMES)Period():cFrame;}
    double            GetAsk()                                           {return SymbolInfoDouble(cSymbol,SYMBOL_ASK);}
@@ -71,5 +71,10 @@ double CFrameControl::GetPrice(int mShift,ENUM_APPLIED_PRICE mMode){
       case PRICE_MEDIAN:   return (GetHigh()+GetLow())/2.0;
       case PRICE_TYPICAL:  return (GetHigh()+GetLow()+GetClose())/3.0;
       case PRICE_WEIGHTED: return (GetHigh()+GetLow()+2.0*GetClose())/4.0;}}
+//---------------------------------------------------------------------------------------------------
+uint CFrameControl::CheckNewBars(){
+   int ret=!cTime?GetBars():GetBarShift(cTime);
+   if (ret>0) cTime=GetTime();
+   return ret>0?(uint)ret:0;}
 
 #endif 

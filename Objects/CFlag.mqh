@@ -19,6 +19,7 @@ public:
    inline bool operator !() {return !cFlag;}
    inline bool operator ==(long mFlag) {return cFlag==mFlag;}
    inline ulong operator =(long mFlag) {return cFlag=mFlag;}
+   inline ulong operator =(CFlag &mFlag) {return cFlag=mFlag.Get();}
    inline ulong operator |=(long mFlag) {return cFlag|=mFlag;}
    inline ulong operator &=(long mFlag) {return cFlag&=mFlag;}
    inline ulong operator ^=(long mFlag) {return cFlag^=mFlag;}

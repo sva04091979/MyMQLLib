@@ -6,6 +6,7 @@
 template<typename T>
 class CRingArray_S:public CRingArray<T>{
    T     cSumm;
+   T     cAvrg;
    int   cMax;
    int   cMin;
 public:
@@ -13,7 +14,7 @@ public:
    inline void    Push(T mValue);
    inline T Max()  {return cArray[cMax];}
    inline T Min()  {return cArray[cMin];}
-   inline T Med()  {return cSumm/cSize;}
+   inline T Avrg() {return cAvrg;}
    inline void    SetLast(T mValue) {cSumm+=mValue-cArray[cLastPos]; CRingArray<T>::SetLast(mValue);}
 private:
    inline void    CheckMax(const T &mValue);
@@ -28,6 +29,7 @@ template<typename T>
 void CRingArray_S::Push(T mValue){
    Write(mValue);
    cSumm+=bool(cFlag&ARRAY_FLAG_FULL)?mValue-cArray[cStartPos]:mValue;
+   cAvrg=cSumm/cSize;
    CheckMax(mValue);
    CheckMin(mValue);
    Step();}

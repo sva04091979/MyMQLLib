@@ -43,6 +43,12 @@
    #define _comission cDealComission    
 #endif
 
+#ifdef __MQL5__
+   #define SET _SET,MQL5_SET
+#else
+   #define SET _SET
+#endif
+
 class CPosition:public CDeal
   {
 protected:
@@ -80,6 +86,7 @@ public:
    bool              IsClosed()              {return cClosePrice!=0.0;}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
+   pos_type          GetPositionType()       {return _type;}
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
    double            GetVolume()             {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
@@ -89,15 +96,22 @@ public:
    double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit;}
    void              NewSL(int mSL);
    void              NewTP(int mTP);
+   void              NewStops(double mSL,double mTP,double mPrice=0.0,bool mIsCancelIfError=true)  {NewSL(mSL,mPrice,mIsCancelIfError);
+                                                                                                    NewTP(mTP,mPrice,mIsCancelIfError);}
    void              NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true);
    void              NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true);
    bool              SetBreakEven(int mBE);
+   #ifdef __MQL5__
+   #else
+      int            Direct() {return _type%2==0?1:-1;}
+   #endif
 protected:
    bool              SelectPosition()  {return #ifdef __MQL5__ cIsNetting?SelectNettingPosition():SelectHedgePosition();
                                                #else OrderSelect(_ticket,SELECT_BY_TICKET); #endif}
    void              PositionStopsControl();
    void              ModifyPosition(double mSL,double mTP);
    bool              CheckClosePosition();
+   bool              CheckDealFull();
    #ifdef __MQL5__
    public:
       bool           TradeTransaction(const MqlTradeTransaction& trans,
@@ -109,7 +123,6 @@ protected:
       bool           SelectNettingPosition();
       bool           SelectHedgePosition();
       bool           PositionSelectByIdent();
-      bool           CheckDealFull();
       void           CheckChangePosition();
       void           SetNewData();
       void           FindNewDeals();
@@ -134,7 +147,7 @@ ulong CPosition::Control(){
       ActiveOrdersControl();
    #endif 
    ulong flag=DealControl();
-   if (!flag||CheckClosePosition()||bool(flag&TRADE_FINISH)#ifdef __MQL5__ ||!CheckDealFull() #endif) return cFlag;
+   if (!flag||CheckClosePosition()||bool(flag&TRADE_FINISH)||!CheckDealFull()) return cFlag;
    if (bool(flag&POSITION_MUST_CLOSE)) Closing();
    else PositionStopsControl();
    return cFlag;}
@@ -172,7 +185,7 @@ void CPosition::PositionStopsControl(void){
       cProfit=PositionGetDouble(POSITION_SWAP);
    #else
       double sl=OrderStopLoss();
-      double tp=OrderTakeProfit();
+      double tp=OrderTakeProfit();      
       cPositionSwap=OrderSwap();
       cProfit=OrderProfit();
    #endif
@@ -185,11 +198,11 @@ void CPosition::PositionStopsControl(void){
    double modSL=IS_VIRTUAL_SL?sl:CheckPriceLevel(sl,price,_freezeLevel,_digits),
           modTP=IS_VIRTUAL_TP?tp:CheckPriceLevel(tp,price,_freezeLevel,_digits);
    if (!IS_VIRTUAL_SL&&CompareDouble(_sl,sl,_digits)!=0){
-      if (!sl||modSL!=0.0) modSL=CheckPriceLevel(_sl,price,_stopLevel,_digits);
-      if (!modSL) modSL=sl;}
+      if (!sl||modSL!=0.0) modSL=!_sl?_sl:CheckPriceLevel(_sl,price,_stopLevel,_digits);
+      if (!modSL&&_sl>0.0) modSL=sl;}
    if (!IS_VIRTUAL_TP&&CompareDouble(_tp,tp,_digits)!=0){
-      if (!tp||modTP!=0.0) modTP=CheckPriceLevel(_tp,price,_stopLevel,_digits);
-      if (!modTP) modTP=tp;}
+      if (!tp||modTP!=0.0) modTP=!_tp?_tp:CheckPriceLevel(_tp,price,_stopLevel,_digits);
+      if (!modTP&&_tp>0.0) modTP=tp;}
    if (modSL==sl&&modTP==tp) return;
    else ModifyPosition(modSL,modTP);}
 //----------------------------------------------------------------------
@@ -203,7 +216,9 @@ void CPosition::ModifyPosition(double mSL,double mTP){
       cRequest.tp=mTP;
       bool res=OrderSend(cRequest,cResult);
    #else
-      bool res=OrderModify(_ticket,_price,mSL,mTP,0);
+      double price=!_price?cOrderPrice:_price;
+      bool res=OrderModify(_ticket,price,mSL,mTP,0);
+//      if (!res) Print(_stopLevel," | ",Ask," | ",Bid," | ",_ticket," | ",price," | ",mSL," | ",mTP," | ",_sl," | ",_tp," | ",OrderStopLoss()," | ",OrderTakeProfit()," | ",OrderCloseTime());
    #endif}
 //----------------------------------------------------------------------
 order_type CPosition::CheckType(void){
@@ -254,7 +269,7 @@ void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
    #else
       mPrice=_type>O_T_SELL?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
-   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||ComparePrice(mSL,mPrice,_direct,_digits)<0) _sl=NormalizePrice(mSL);}
+   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mSL&&_sl>0.0)||ComparePrice(mSL,mPrice,_direct,_digits)<0) _sl=NormalizePrice(mSL);}
 //----------------------------------------------------------------------
 void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
@@ -265,7 +280,7 @@ void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #else
       mPrice=_type>O_T_SELL?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
-   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||ComparePrice(mTP,mPrice,_direct,_digits)>0) _tp=NormalizePrice(mTP);}
+   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mTP&&_tp>0.0)||ComparePrice(mTP,mPrice,_direct,_digits)>0) _tp=NormalizePrice(mTP);}
 //---------------------------------------------------------------------------
 bool CPosition::CheckClosePosition(void){
    #ifdef __MQL5__
@@ -280,9 +295,23 @@ bool CPosition::CheckClosePosition(void){
             cPositionSwap=cCloseOrder.GetDealSwap();
             CLOSE_VALUE_INIT}}
    #else
-      if (OrderCloseTime()) CLOSE_VALUE_INIT
+      if (OrderSelect(_ticket,SELECT_BY_TICKET)&&OrderCloseTime()) CLOSE_VALUE_INIT
    #endif
    return false;}
+//----------------------------------------------------------------------------
+   bool CPosition::CheckDealFull(){
+      if (_price) return true;
+      if (!bool(cFlag&DEAL_FULL)) return false;
+      _price=cDealPrice;
+      _sl=cOrderSL?cOrderSL:NormalizePrice(_price-_direct*cSLPips*_point);
+      _tp=cOrderTP?cOrderTP:NormalizePrice(_price+_direct*cTPPips*_point);
+      #ifdef __MQL5__
+         _ticket=cOrderTicket;
+         _volume=cDealVolume;
+         _comission=cDealComission;
+         cPositionLastUpdate=cDealTime;
+      #endif
+      return true;}
 //----------------------------------------------------------------------
 #ifdef __MQL5__
    bool CPosition::SelectNettingPosition(void){
@@ -299,18 +328,6 @@ bool CPosition::CheckClosePosition(void){
       for (int i=PositionsTotal()-1;i>=0;--i)
          if (PositionGetTicket(i)&&PositionGetInteger(POSITION_IDENTIFIER)==cIdent) return true;
       return false;}
-//----------------------------------------------------------------------------
-   bool CPosition::CheckDealFull(){
-      if (_price) return true;
-      if (!bool(cFlag&DEAL_FULL)) return false;
-      _ticket=cOrderTicket;
-      _price=cDealPrice;
-      _volume=cDealVolume;
-      _sl=cOrderSL?cOrderSL:NormalizePrice(_price-_direct*cSLPips*_point);
-      _tp=cOrderTP?cOrderTP:NormalizePrice(_price+_direct*cTPPips*_point);
-      _comission=cDealComission;
-      cPositionLastUpdate=cDealTime;
-      return true;}
 //----------------------------------------------------------------------------
    void CPosition::CheckChangePosition(void){
       if (PositionGetInteger(POSITION_TIME_UPDATE_MSC)==cPositionLastUpdate) return;
@@ -388,5 +405,6 @@ bool CheckEndTrade(ulong fFlag){
 #undef CLOSE_VALUE_INIT
 #undef CLOSE_TRUE
 #undef IS_ORDER_END
+#undef SET
 
 #endif

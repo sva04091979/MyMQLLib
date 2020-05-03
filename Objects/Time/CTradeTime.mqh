@@ -40,6 +40,7 @@ CTradeTime::CTradeTime(string mTimeStart,string mTimeStop,bool isFirstNewDayRequ
 //--------------------------------------------------------------------------------------   
 bool CTradeTime::StringToTimeStruct(string mTimeStart,string mTimeStop,MqlDateTime &mTimeCurStruct,int mId){
    if (mId>=ArraySize(cTradeTime)) return false;
+   uint tmp=0;
    MqlDateTime mTimeStruct=mTimeCurStruct;
    string mData[],
           mText=mId==0?mTimeStart:mTimeStop;
@@ -52,6 +53,7 @@ bool CTradeTime::StringToTimeStruct(string mTimeStart,string mTimeStop,MqlDateTi
          case 1:  mData[i]="0"+mData[i]; break;
          case 2:  break;}
    if (mSize>0){
+      if (mData[0]=="24") mData[0]="00";
       mTimeStruct.hour=(int)StringToInteger(mData[0]);
       if (mTimeStruct.hour<0||mTimeStruct.hour>23||IntegerToString(mTimeStruct.hour,2,'0')!=mData[0]) return false;}
    else mTimeStruct.hour=0;

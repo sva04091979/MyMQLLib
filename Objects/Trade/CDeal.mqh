@@ -4,6 +4,12 @@
 #include "COrder.mqh"
 
 #ifdef __MQL5__
+   #define SET _SET,MQL5_SET
+#else
+   #define SET _SET
+#endif
+
+#ifdef __MQL5__
    #define _ticket   cDealTicket
 #else
    #define _ticket   cOrderTicket
@@ -66,10 +72,12 @@ ulong CDeal::DealControl(void){
       cDealSwap=HistoryDealGetDouble(ticket,DEAL_SWAP);
       cIdent=HistoryDealGetInteger(ticket,DEAL_POSITION_ID);
    #else
-      if (!OrderSelect(_ticket,SELECT_BY_TICKET)) return cFlag;
+      if (!OrderSelect(_ticket,SELECT_BY_TICKET)||
+          OrderType()>1) return cFlag;
       cDealTime=OrderOpenTime();
       cDealPrice=OrderOpenPrice();
       cDealComission=OrderCommission();
+      cOrderType%=2;
    #endif
    cFlag|=DEAL_FULL;
    return cFlag;}
@@ -104,7 +112,7 @@ ulong CDeal::DealControl(void){
       else cFlag|=DEAL_FULL;}
 #endif
 
-
+#undef SET
 #undef _ticket
 
 #endif

@@ -18,10 +18,38 @@ enum ENUM_TRAL_START_BALLANCE_TYPE{
 
 enum ENUM_TRAL_TYPE {TRAL_TYPE_CURRENCY,TRAL_TYPE_PERCENT};
 
+struct SBallanceControlParam{
+   double sl;
+   double tp;
+   double tralTrigger;
+   double tralSize;
+   ENUM_TRAL_START_BALLANCE_TYPE type;
+   ENUM_TRAL_TYPE tralType;
+   SBallanceControlParam(){}
+   SBallanceControlParam(double _sl, double _tp, double _tralTrigger, double _tralSize, ENUM_TRAL_START_BALLANCE_TYPE _type, ENUM_TRAL_TYPE _tralType):
+      sl(_sl),tp(_tp),tralTrigger(_tralTrigger),tralSize(_tralSize),type(_type),tralType(_tralType){}
+   void Set(double _sl, double _tp, double _tralTrigger, double _tralSize, ENUM_TRAL_START_BALLANCE_TYPE _type, ENUM_TRAL_TYPE _tralType){
+      sl=_sl;
+      tp=_tp;
+      tralTrigger=_tralTrigger;
+      tralSize=_tralSize;
+      type=_type;
+      tralType=_tralType;}
+   bool operator==(const SBallanceControlParam &other){
+      return sl==other.sl                    &&
+             tp==other.tp                    &&
+             tralTrigger==other.tralTrigger  &&
+             tralSize==other.tralSize        &&
+             type==other.type                &&
+             tralType==other.tralType;}
+};
+
 class CBallanceControl
 {
 protected:
+   SBallanceControlParam cParam;
    double         cStartBallance;
+   double         cMaxEquity;
    double         cProfitOut;
    double         cStopOut;
    double         cTralTrigger;
@@ -35,18 +63,24 @@ public:
                                    double mTP,
                                    double mTralTrigger,
                                    double mTralSize,
-                                   double mBallance=0.0,
+                                   double mStartBallance=0.0,
                                    ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
-                                   ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY){Reset(mSL,mTP,mTralTrigger,mTralSize,mBallance,mType,mTralType);}
+                                   ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY){Reset(mSL,mTP,mTralTrigger,mTralSize,mStartBallance,mType,mTralType);}
                  ~CBallanceControl(){}
    void           Reset(double mSL,
                         double mTP,
                         double mTralTrigger,
                         double mTralSize,
-                        double mBallance=0.0,
+                        double mStartBallance=0.0,
                         ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
                         ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY);
-   void           NewSettings(ENUM_TRAL_TYPE mTralType,double mSL,double mTP,double mTralTrigger,double mTralSize);
+   void           SetNewParam(double mSL,
+                              double mTP,
+                              double mTralTrigger,
+                              double mTralSize,
+                              double mStartBallance=0.0,
+                              ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
+                              ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY);
    virtual bool   Check();
    bool           Check(int &mFlag);
    bool           CheckTral(const double &mEquity);
@@ -63,10 +97,12 @@ void CBallanceControl::Reset(double mSL,
                              double mTP,
                              double mTralTrigger,
                              double mTralSize,
-                             double mBallance=0.000000,
+                             double mStartBallance=0.000000,
                              ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
                              ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY){
-   cStartBallance=mBallance<=0.0?mType==TRAL_BALLANCE?AccountInfoDouble(ACCOUNT_BALANCE):AccountInfoDouble(ACCOUNT_EQUITY):mBallance;
+   cParam.Set(mSL,mTP,mTralTrigger,mTralSize,mType,mTralType);
+   cStartBallance=mStartBallance<=0.0?mType==TRAL_BALLANCE?AccountInfoDouble(ACCOUNT_BALANCE):AccountInfoDouble(ACCOUNT_EQUITY):mStartBallance;
+   cMaxEquity=cStartBallance;
    cTralStop=0.0;
    cProfitOut=mTP<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance+mTP:cStartBallance*(1+mTP/100.0);
    cStopOut=mSL<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance-mSL:cStartBallance*(1-mSL/100.0);
@@ -74,20 +110,23 @@ void CBallanceControl::Reset(double mSL,
    cTralSize=mTralSize<=0.0?0.0:mTralSize;
    cFlag=0;
    cTralType=mTralType;}
-//--------------------------------------------------------------------------------------------------------------------------------
-void CBallanceControl::NewSettings(ENUM_TRAL_TYPE mTralType,double mSL,double mTP,double mTralTrigger,double mTralSize){
-   cTralStop=0.0;
-   cProfitOut=mTP<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance+mTP:cStartBallance*(1+mTP/100.0);
-   cStopOut=mSL<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance-mSL:cStartBallance*(1-mSL/100.0);
-   cTralTrigger=mTralTrigger<=0.0||mTralSize<=0.0?0.0:mTralType==TRAL_TYPE_CURRENCY?cStartBallance+mTralTrigger:cStartBallance*(1+mTralTrigger/100.0);
-   cTralSize=mTralSize<=0.0?0.0:mTralSize;
-   cFlag&=~BALLANCE_CONTROL_CHANGE_STOP;
-   cTralType=mTralType;}
+//--------------------------------------------------------------
+void CBallanceControl::SetNewParam(double mSL,
+                                   double mTP,
+                                   double mTralTrigger,
+                                   double mTralSize,
+                                   double mStartBallance=0.000000,
+                                   ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
+                                   ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY){
+   SBallanceControlParam param(mSL,mTP,mTralTrigger,mTralSize,mType,mTralType);
+   if (param==cParam) return;
+   else Reset(mSL,mTP,mTralTrigger,mTralSize,mStartBallance,mType,mTralType);}
 //--------------------------------------------------------------
 bool CBallanceControl::Check(){
    cFlag&=~BALLANCE_CONTROL_CHANGE_STOP;
    if (!(bool(cFlag&BALLANCE_STOP))){
       double equity=EQUITY;
+      cMaxEquity=MathMax(cMaxEquity,equity);
       if (cProfitOut!=0.0&&equity>=cProfitOut) cFlag|=BALLANCE_CONTROL_TP;
       if (cStopOut!=0.0&&equity<=cStopOut) cFlag|=BALLANCE_CONTROL_SL;
       if (CheckTral(equity)) cFlag|=BALLANCE_CONTROL_TRAL;}

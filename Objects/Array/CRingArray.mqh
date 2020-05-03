@@ -1,49 +1,78 @@
 #ifndef _C_RING_ARRAY_
 #define _C_RING_ARRAY_
 
-#define ARRAY_FLAG_FULL 0x1
+#include <MyMQLLib\Define\MQLDefine.mqh>
 
-template<typename T>
-class CRingArray
+template<typename T,typename Type>
+class CRingBase
 {
-   T     cArray[];
-   int   cSize;
-   int   cStartPos;
-   int   cLastPos;
-   int   cFlag;
-public:
-         CRingArray(int mSize);
-   virtual inline void  Push(T mValue);
-   inline bool   IsFull()  {return bool(cFlag&ARRAY_FLAG_FULL);}
-   virtual inline void   SetLast(T mValue) {cArray[cLastPos]=mValue;}
-   inline T operator [](int mPos) {int pos=cStartPos+mPos; return cArray[pos<cSize?pos:pos-cSize];}
 protected:
-   inline void  Write(T mValue);
-   inline void  Step();
+   T     cArray[];
+   uint  cSize;
+   uint  cCount;
+   uint  cStartPos;
+   uint  cLastPos;
+   int   cPos;
+protected:
+         CRingBase(uint mSize);
+public:
+   T operator [](int mPos) {uint pos=(cStartPos+mPos)%cSize; return cArray[pos];}
+   Type* const OverloadPtr(int mPos) {cPos=mPos<(int)cCount?mPos:-1; return &this;}
+   T Back() {return cArray[cLastPos];}
+   T Front() {return cArray[cStartPos];}
+   uint Count() {return cCount;}
+   uint Size() {return cSize;}
 };
-//-------------------------------------------------
+//----------------------------------------------------------------------------------
+template<typename T,typename Type>
+CRingBase::CRingBase(uint mSize):cSize(ArrayResize(cArray,mSize)),cCount(0),cStartPos(0),cLastPos(0),cPos(-1){}
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-CRingArray::CRingArray(int mSize):
-   cSize(ArrayResize(cArray,mSize)),cStartPos(0),cLastPos(0),cFlag(0){}
+class CRingNumeric:public CRingBase<T,CRingNumeric>
+{
+   double   cAvrg;
+   T        cSumm;
+public:
+         CRingNumeric(uint mSize):CRingBase<T,CRingNumeric>(mSize),cAvrg(0.0),cSumm(0){}
+   CRingNumeric* const  Push(T mValue) {return cCount<cSize?_PushStart(mValue):_Push(mValue);}
+//   T     Summ()   {return cSumm;}
+//   double Avrg()  {return cAvrg;}
+   T operator=(T mValue);
+   T Back(T mValue) {return _p(cLastPos)=mValue;}
+   T Front(T mValue) {return _p(cStartPos)=mValue;}
+   T Max() {return cArray[ArrayMaximum(cArray)];}
+   T Min() {return cArray[ArrayMinimum(cArray)];}
+private:
+   CRingNumeric<T>* const _PushStart(T mValue);
+   CRingNumeric<T>* const _Push(T mValue);
+};
 //---------------------------------------------------
 template<typename T>
-void CRingArray::Push(T mValue){
-   Write(mValue);
-   Step();}
+CRingNumeric* const CRingNumeric::_PushStart(T mValue){
+   cLastPos=cCount++;
+   cArray[cLastPos]=mValue;
+//   cSumm+=mValue;
+//   cAvrg=(double)cSumm/cCount;
+   return &this;}
 //---------------------------------------------------
 template<typename T>
-void CRingArray::Write(T mValue){
-   if (bool(cFlag&ARRAY_FLAG_FULL))
-      cArray[cStartPos]=mValue;
-   else{
-      cArray[cLastPos]=mValue;
-      if (cLastPos==cSize-1) cFlag|=ARRAY_FLAG_FULL;
-      else ++cLastPos;}}
+CRingNumeric* const CRingNumeric::_Push(T mValue){
+//   cSumm+=mValue-cArray[cStartPos];
+//   cAvrg=(double)cSumm/cCount;
+   cArray[cStartPos]=mValue;
+   ++cStartPos;
+   ++cLastPos;
+   cStartPos%=cSize;
+   cLastPos%=cSize;
+   return &this;}
 //---------------------------------------------------
 template<typename T>
-void CRingArray::Step(){
-   if (bool(cFlag&ARRAY_FLAG_FULL)){
-      if (++cStartPos==cSize) cStartPos=0;
-      if (++cLastPos==cSize) cLastPos=0;}}
+T CRingNumeric::operator=(T mValue){
+//   cSumm+=mValue-cArray[cPos];
+//   cAvrg=(double)cSumm/cCount;   
+   cArray[cPos]=mValue;
+   cPos=-1;
+   return mValue;}
 
 #endif

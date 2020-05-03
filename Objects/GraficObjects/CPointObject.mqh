@@ -26,5 +26,35 @@ public:
 CPointObject::CPointObject(string mName,ENUM_OBJECT mType,long mChartId,int mSubWindow,long mX,long mY,int mFlag):
    CGraficObject(mName,mType,mChartId,mSubWindow,0,0,mFlag){
    Move(mX,mY);}
-   
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+class CField:public CPointObject{
+protected:
+   string            cText;
+   long              cXSize;
+   long              cYSize;
+public:
+                     CField(string mName,
+                            ENUM_OBJECT mType,
+                            long mChartId,
+                            int mSubWindow,
+                            long mX,
+                            long mY,
+                            long mXSize,
+                            long mYSize,
+                            int mFlag);
+   bool              SetText(string mText) {if (SET_STRING(OBJPROP_TEXT,cText=mText)) return true; else {cText=GET_STRING(OBJPROP_TEXT); return false;}}
+   bool              SetXSize(long mXSize) {if (SetInt(OBJPROP_XSIZE,cXSize=mXSize)) return true; else {cXSize=GetInt(OBJPROP_XSIZE); return false;}}
+   bool              SetYSize(long mYSize) {if (SetInt(OBJPROP_YSIZE,cYSize=mYSize)) return true; else {cYSize=GetInt(OBJPROP_YSIZE); return false;}}
+   bool              SetXYSize(long mXSize,long mYSize)  {return (int)SetXSize(mXSize)+(int)SetYSize(mYSize)==2;}
+};
+//-----------------------------------------------------------------------
+CField::CField(string mName,ENUM_OBJECT mType,long mChartId,int mSubWindow,long mX,long mY,long mXSize,long mYSize,int mFlag):
+   CPointObject(mName,mType,mChartId,mSubWindow,mX,mY,mFlag),
+   cText(mName),
+   cXSize(mXSize),
+   cYSize(mYSize){
+   SetText(cText);
+   SetXYSize(mXSize,mYSize);   
+   }
 #endif

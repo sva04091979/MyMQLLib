@@ -32,19 +32,21 @@ public:
    bool              SetColor(color mColor) {if (SetInt(OBJPROP_COLOR,cColor=mColor)) return true; else {cColor=(color)GetInt(OBJPROP_COLOR); return false;}}
    inline bool       SetSelectable(bool isSelectable);
    inline long       GetInt(ENUM_OBJECT_PROPERTY_INTEGER mSet)     {return ObjectGetInteger(cChartId,cName,mSet);}
+   inline string     GetString(ENUM_OBJECT_PROPERTY_STRING mSet)   {return ObjectGetString(cChartId,cName,mSet);}
    bool              Equal(string mName)  {return mName==cName;}
+   virtual bool      ChartEvent(const int id,const long &lparam,const double &dparam,const string &sparam) {return sparam==cName;}
   };
 //----------------------------------------------------------------
 void CGraficObject::CGraficObject(string mName,ENUM_OBJECT mType,long mChartId,int mSubWindow,datetime mTime,double mPrice,int mFlag):
    cName(mName),cType(mType),cChartId(mChartId),cSubWindow(mSubWindow),
    _Flag(mFlag){
    if (ObjectCreate(mChartId,mName,mType,mSubWindow,mTime,mPrice)) _Flag+=OBJECT_FLAG_CREATE;
-   ObjectSetInteger(cChartId,cName,OBJPROP_SELECTABLE,false);
+   ObjectSetInteger(cChartId,cName,OBJPROP_SELECTABLE,_Flag.Check(OBJECT_FLAG_SELECTABLE));
    cColor=(color)GetInt(OBJPROP_COLOR);}
 //-----------------------------------------------------------------
 bool CGraficObject::SetSelectable(bool isSelectable){
-   bool res=SetInt(OBJPROP_COLOR,isSelectable);
-   if (!res) isSelectable=(bool)GetInt(OBJPROP_COLOR);
+   bool res=SetInt(OBJPROP_SELECTABLE,isSelectable);
+   if (!res) isSelectable=(bool)GetInt(OBJPROP_SELECTABLE);
    if (isSelectable) _Flag+=OBJECT_FLAG_SELECTABLE; else _Flag-=OBJECT_FLAG_SELECTABLE;
    return res;}
 

@@ -12,6 +12,20 @@
    #define DELETE(dObj) do {delete dObj; dObj=NULL;} while(false)
 #endif
 
+#define __sf StringFormat
+
+//#define LOG (__CLOG(__FUNCTION__)).Log
+#define _(dPtr) dPtr.Dereference()
+#define _p OverloadPtr
+
+class __CLOG{
+   string cFunc;
+public:
+   __CLOG(string mFunc):cFunc(mFunc){}
+   void Log(string mText) {PrintFormat("%s: %s",cFunc,mText);}
+};
+
+
 #define MINUTE          60
 #define HOUR            3600
 #define DAY             86400
@@ -40,5 +54,10 @@
 #define YEAR            31536000
 #define YEAR_BIG        31622400
 
+enum ECompare{
+   LESS=-1,
+   EQUALLY=0,
+   MORE=1
+};
 
 #endif

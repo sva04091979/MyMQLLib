@@ -12,9 +12,9 @@
 #define _stopLevel   cTradeConst.stopLevel
 #define _freezeLevel cTradeConst.freezeLevel
 #define _digits      cTradeConst.digits
+#define _executionMode     cTradeConst.executionMode
 #ifdef __MQL5__
    #define _marginMode        cTradeConst.marginMode
-   #define _executionMode     cTradeConst.executionMode
    #define _expirationMode    cTradeConst.expirationMode
    #define _fillingMode       cTradeConst.fillingMode
    #define _orderMode         cTradeConst.orderMode
@@ -33,15 +33,16 @@ public:
    double                  stopLevel;
    double                  freezeLevel;
    int                     digits;
+   ENUM_SYMBOL_TRADE_EXECUTION   executionMode;
 #ifdef __MQL5__
    ENUM_ACCOUNT_MARGIN_MODE      marginMode;
-   ENUM_SYMBOL_TRADE_EXECUTION   executionMode;
    int                           expirationMode;
    int                           fillingMode;
    int                           orderMode;
 #endif   
 public:
                      CTradeConst(string mSymbol=NULL):symbol(mSymbol==NULL?_Symbol:mSymbol){if (!Init()) delete GetPointer(this);}
+   double NormalizePrice(double mPrice) {return NormalizeDouble(MathRound(mPrice/tickSize)*tickSize,digits);}
 private:
    bool              Init();
   };
@@ -56,9 +57,9 @@ bool CTradeConst::Init(void){
    stopLevel=SymbolInfoInteger(symbol,SYMBOL_TRADE_STOPS_LEVEL)*point;
    freezeLevel=SymbolInfoInteger(symbol,SYMBOL_TRADE_FREEZE_LEVEL)*point;
    digits=(int)SymbolInfoInteger(symbol,SYMBOL_DIGITS);
+   executionMode=(ENUM_SYMBOL_TRADE_EXECUTION)SymbolInfoInteger(symbol,SYMBOL_TRADE_EXEMODE);
 #ifdef __MQL5__
    marginMode=(ENUM_ACCOUNT_MARGIN_MODE)AccountInfoInteger(ACCOUNT_MARGIN_MODE);
-   executionMode=(ENUM_SYMBOL_TRADE_EXECUTION)SymbolInfoInteger(symbol,SYMBOL_TRADE_EXEMODE);
    fillingMode=(int)SymbolInfoInteger(symbol,SYMBOL_FILLING_MODE);
    expirationMode=(int)SymbolInfoInteger(symbol,SYMBOL_EXPIRATION_MODE);
    orderMode=(int)SymbolInfoInteger(symbol,SYMBOL_ORDER_MODE);
