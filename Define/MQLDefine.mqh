@@ -1,6 +1,9 @@
 #ifndef _MQL_DEFINE_
 #define _MQL_DEFINE_
 
+#include <STD\Define\StdDefine.mqh>
+
+/*
 #define EQUITY AccountInfoDouble(ACCOUNT_EQUITY)
 #define BALLANCE AccountInfoDouble(ACCOUNT_BALANCE)
 #define TOTAL_PROFIT AccountInfoDouble(ACCOUNT_PROFIT)
@@ -59,5 +62,5 @@ enum ECompare{
    EQUALLY=0,
    MORE=1
 };
-
+*/
 #endif
