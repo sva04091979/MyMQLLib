@@ -140,7 +140,8 @@ CPosition::CPosition(SET):
    #endif
    {#ifdef __MQL5__
       cPositionDirect=mType%2==0?1:-1;
-   #endif}
+   #endif
+   }
 //------------------------------------------------------
 ulong CPosition::Control(){
    #ifdef __MQL5__
