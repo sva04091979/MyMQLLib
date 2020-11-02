@@ -94,6 +94,7 @@ public:
    double            GetSL();
    double            GetTP();
    double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit;}
+   double            Comission() {return _comission;}
    void              NewSL(int mSL);
    void              NewTP(int mTP);
    void              NewStops(double mSL,double mTP,double mPrice=0.0,bool mIsCancelIfError=true)  {NewSL(mSL,mPrice,mIsCancelIfError);
@@ -304,8 +305,8 @@ bool CPosition::CheckClosePosition(void){
       if (_price) return true;
       if (!bool(cFlag&DEAL_FULL)) return false;
       _price=cDealPrice;
-      _sl=cOrderSL?cOrderSL:NormalizePrice(_price-_direct*cSLPips*_point);
-      _tp=cOrderTP?cOrderTP:NormalizePrice(_price+_direct*cTPPips*_point);
+      _sl=cOrderSL?cOrderSL:!cSLPips?0.0:NormalizePrice(_price-_direct*cSLPips*_point);
+      _tp=cOrderTP?cOrderTP:!cTPPips?0.0:NormalizePrice(_price+_direct*cTPPips*_point);
       #ifdef __MQL5__
          _ticket=cOrderTicket;
          _volume=cDealVolume;
