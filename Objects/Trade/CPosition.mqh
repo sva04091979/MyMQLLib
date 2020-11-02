@@ -248,12 +248,12 @@ double CPosition::GetTP(void){
 void CPosition::NewSL(int mSL){
    if (mSL<0) return;
    cSLPips=mSL;
-   if (_price) _sl=_price-_direct*mSL*_point;}
+   if (_price) _sl=!mSL?0.0:_price-_direct*mSL*_point;}
 //---------------------------------------------------------------------
 void CPosition::NewTP(int mTP){
    if (mTP<0) return;
    cTPPips=mTP;
-   if (_price) _tp=_price+_direct*mTP*_point;}
+   if (_price) _tp=!mTP?0.0:_price+_direct*mTP*_point;}
 //----------------------------------------------------------------------
 bool CPosition::SetBreakEven(int mBE){
    if (!_price) return false;
