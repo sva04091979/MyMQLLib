@@ -1,7 +1,7 @@
 #ifndef _MQL_DEFINE_
 #define _MQL_DEFINE_
 
-#include <STD\Define\StdDefine.mqh>
+#include <MyMQLLib\STD\Define\StdDefine.mqh>
 
 /*
 #define EQUITY AccountInfoDouble(ACCOUNT_EQUITY)
