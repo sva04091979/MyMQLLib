@@ -96,6 +96,7 @@ public:
    double            GetTP();
    double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit;}
    double            Comission() {return _comission;}
+   double            Swap() {return cPositionSwap;}
    void              NewSL(int mSL);
    void              NewTP(int mTP);
    void              NewStops(double mSL,double mTP,double mPrice=0.0,bool mIsCancelIfError=true)  {NewSL(mSL,mPrice,mIsCancelIfError);
