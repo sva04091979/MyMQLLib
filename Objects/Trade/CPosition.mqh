@@ -80,6 +80,7 @@ public:
                                 #ifdef __MQL5__
                                  if (CheckPointer(cCloseOrder)) delete cCloseOrder;
                                 #endif}
+   ITral*            Tral()                  {return cTral;}
    ulong             Control();
    bool              Closing();
    bool              IsTralOn()              {return cTral!=NULL;}
