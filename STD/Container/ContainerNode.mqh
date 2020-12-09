@@ -34,9 +34,11 @@ protected:
    _tdecl_ForwardNode(const T &mObj,Type* mNext):_tdecl_ContainerNode<T,Type>(mObj),cNext(mNext){}
    _tdecl_ForwardNode(const Type &mOther):_tdecl_ContainerNode<T,Type>(mOther),cNext(mOther.Next()){}
 public:
+   static Type* NewNode(_tdecl_ForwardNode<T,Type> &mNode,Type* mNext) {return new Type(mNode.cObject,mNext);}
    Type* Free() override;
    Type* Next() const {return cNext;}
    Type* EraceNext();
+   Type* Insert(const T &mVal);
    void Next(Type* mNext) {cNext=mNext;}
    bool IsLast() {return cNext!=NULL&&cNext.IsEnd();}
 };
@@ -53,6 +55,14 @@ Type* _tdecl_ForwardNode::EraceNext(){
    cNext=cNext.Free();
    return cNext;
 }
+//-------------------------------------------------
+template<typename T,typename Type>
+Type*
+_tdecl_ForwardNode::Insert(const T &mVal){
+   cNext=new Type(mVal,cNext);
+   return cNext;
+}
+
 
 END_SPACE
 
