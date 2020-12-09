@@ -55,6 +55,8 @@ public:
    const _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T>* End() const {return &cEnd;}
    _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> EraceAfter(const _tdeclForwardIterator<T> &mIt) {return EraceAfter(mIt.Wrape());}
    _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> EraceAfter(const _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> &mWrape);
+   _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> Insert(const _tdeclForwardIterator<T> &mIt,const T &mVal) {return Insert(mIt.Wrape(),mVal);}
+   _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> Insert(const _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> &mWrape,const T &mVal);
    T Front() const {return _(cFront);}
    void PushFront(T &obj);
    T PopFront();
@@ -90,11 +92,11 @@ _tdeclForwardList::_tdeclForwardList(_tdeclForwardList<T> &mOther):
    if (mOther.IsEmpty()) return;
    cSize=mOther.Size();
    _tForwardIterator<T> it=mOther.Begin();
-   _tdeclForwardNode<T>* first=new _tdeclForwardNode<T>(_rv(_(it)),NULL);
+   _tdeclForwardNode<T>* first=_tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T>::NewNode(it.Wrape(),NULL);
    _tdeclForwardNode<T>* node=first;
    ++it;
    while(!it.IsEnd()){
-      node.Next(new _tdeclForwardNode<T>(_rv(_(it)),NULL));
+      node.Next(_tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T>::NewNode(it.Wrape(),NULL));
       node=node.Next();
       ++it;}
    node.Next(cFront);
@@ -134,6 +136,17 @@ _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> _tdeclForwardLi
       --cSize;
       return mWrape.EraceNext();}
 }
+//--------------------------------------------------------------
+template<typename T>
+_tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T>
+_tdeclForwardList::Insert(const _tdecl_ForwardProxy<_tdeclForwardList<T>,_tdeclForwardNode<T>,T> &mWrape,const T &mVal){
+   if (!mWrape.CheckContainer(this)) {ABORT("Wrong container");}
+   if (mWrape.IsEnd()) ABORT("This operation is not alloed whith end iterator");
+   else{
+      ++cSize;
+      return mWrape.Insert(mVal);}
+   return mWrape;
+}
 //-------------------------------------------------------------------------------
 template<typename T>
 void _tdeclForwardList::Clear(){
@@ -163,5 +176,38 @@ void Free(_tdeclForwardList<T> &fList){
 }
 
 END_SPACE
+
+struct SUnitTestForwardList{
+   int a;
+   SUnitTestForwardList(){}
+   SUnitTestForwardList(int _a):a(_a){}
+   SUnitTestForwardList(SUnitTestForwardList &mOther){this=mOther;}
+   bool operator ==(SUnitTestForwardList &mOther) {return a==mOther.a;}
+};
+   
+void UnitTestForwardList(void){
+   int x[]={0,1,2,3,4,5,6,7,8,9};
+   _tForwardList<int> _test(x);
+   _tForwardList<int> test(_test);
+   _tForwardIterator<int> it=test.Begin();
+   ++it;
+   it=test.Insert(++it,_rv(777));
+   PrintFormat("Size=%u",test.Size());
+   PrintFormat("It=%i",_(it));
+   for (it=test.Begin();!it.IsEnd();++it)
+      Print(_(it));
+   _tForwardList<SUnitTestForwardList> test1();
+   for (int i=0;i<ArraySize(x);++i){
+      test1.PushFront(SUnitTestForwardList(i));
+   }
+   _tForwardIterator<SUnitTestForwardList> _it=test1.Begin();
+   ++_it;
+   _it=test1.Insert(++_it,SUnitTestForwardList(777));
+   PrintFormat("Size=%u",test1.Size());
+   PrintFormat("It=%i",_(_it).a);
+   test1.EraceAfter(_it);
+   for (_it=test1.Begin();!_it.IsEnd();++_it)
+      Print(_(_it).a);
+}
 
 #endif

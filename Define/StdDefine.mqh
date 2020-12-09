@@ -8,6 +8,7 @@
    #define __decl(dName) dName
    #define _tSizeT ulong
    #define _tPtrDiffT long
+   #define _tTicket ulong
 #else
    #define NAMESPACE(dName)
    #define END_SPACE
@@ -15,6 +16,7 @@
    #define __decl(dName) __std(dName)
    #define _tSizeT uint
    #define _tPtrDiffT int
+   #define _tTicket int
 #endif
 
 #define EQUITY AccountInfoDouble(ACCOUNT_EQUITY)
@@ -75,7 +77,7 @@
 #define YEAR            31536000
 #define YEAR_BIG        31622400
 
-#define _rv(dVal) (__std(FRVWrape(dVal))).cVal
+#define _rv(dVal) (__std(FRVWrape)(dVal)).cVal
 
 #define _tECompare __std(ECompare)
 #define _tdeclECompare __decl(ECompare)
@@ -132,8 +134,16 @@ public:
 };
 
 template<typename T>
-__decl(RVWrape)<T> __decl(FRVWrape)(T fVal){return __decl(RVWrape<T>)(fVal);}
+__decl(RVWrape)<T> __decl(FRVWrape)(T fVal){
+   __decl(RVWrape)<T> ret(fVal);
+   return ret;}
 
 END_SPACE
+
+class CSTDUnitTestBase{
+public:
+   CSTDUnitTestBase(){}
+   CSTDUnitTestBase(CSTDUnitTestBase &mOther){this=mOther;}
+};
 
 #endif
