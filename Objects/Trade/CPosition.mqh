@@ -131,6 +131,7 @@ protected:
       void           FindNewDeals();
       void           ActiveOrdersControl();
    #else
+      public:
                      CPosition(CTradeConst* mTradeConst);
    #endif
   };
