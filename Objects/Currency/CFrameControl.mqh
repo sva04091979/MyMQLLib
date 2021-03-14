@@ -74,6 +74,12 @@ double CFrameControl::GetPrice(int mShift,ENUM_APPLIED_PRICE mMode){
 //---------------------------------------------------------------------------------------------------
 uint CFrameControl::CheckNewBars(){
    int ret=!cTime?GetBars():GetBarShift(cTime);
+   if (ret<0){
+      datetime time=GetTime();
+      if (time>cTime){
+         ret=GetBarShift(cTime,false)+1;
+      }
+   }
    if (ret>0) cTime=GetTime();
    return ret>0?(uint)ret:0;}
 
