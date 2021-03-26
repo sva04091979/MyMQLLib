@@ -48,6 +48,7 @@
 #define __sf StringFormat
 
 #define ABORT(dText) __std(Abort)(__FILE__,__LINE__,dText)
+#define ASSERT(dCondition,dText) __std(Assert)(__FILE__,__LINE__,dCondition,dText)
 
 #define MINUTE          60
 #define HOUR            3600
@@ -79,6 +80,8 @@
 
 #define _rv(dVal) (__std(FRVWrape)(dVal)).cVal
 
+#define _tEPushPop __std(EPushPop)
+#define _tdeclEPushPop __decl(EPushPop)
 #define _tECompare __std(ECompare)
 #define _tdeclECompare __decl(ECompare)
 #define _tEDirect __std(EDirect)
@@ -87,6 +90,8 @@
 #define _fdeclMove __decl(Move)
 #define _fSwap __std(Swap)
 #define _fdeclSwap __decl(Swap)
+#define _fTemp __std(TempCondition)
+#define _fdeclTemp __decl(TempCondition)
 
 NAMESPACE(STD)
 
@@ -94,6 +99,15 @@ void __decl(Abort)(string mFile,int mLine,string mText){
    PrintFormat("Abort at file %s, line %i, reason: \"%s\"",mFile,mLine,mText);
    int __a=0;
    int __b=1/__a;}
+
+void __decl(Assert)(string mFile,int mLine,bool mCondition,string mText){
+   if (!mCondition){
+      PrintFormat("Assert at file %s, line %i, reason: \"%s\"",mFile,mLine,mText);
+      int __a=0;
+      int __b=1/__a;}   
+}
+
+enum EPushPop {PUSH,POP};
 
 #define _eLess __std(LESS)
 #define _eEqual __std(EQUAL)
@@ -137,6 +151,15 @@ template<typename T>
 __decl(RVWrape)<T> __decl(FRVWrape)(T fVal){
    __decl(RVWrape)<T> ret(fVal);
    return ret;}
+
+template<typename T>
+void TempCondition(T &fValue,EPushPop fAct){
+   static T temp=T();
+   switch(fAct){
+      case PUSH: temp=fValue; break;
+      case POP: fValue=temp;
+   }
+}
 
 END_SPACE
 

@@ -3,39 +3,29 @@
 
 #include <STD\Define\StdDefine.mqh>
 
-#define _tEIteratorType __std(EIteratorType)
-
-#define _tdecl_Iterator __decl(_SIterator)
-#define _tdeclEIteratorType __decl(EIteratorType)
+#define _tdeclIterator __decl(IIterator)
 
 NAMESPACE(STD)
 
-template<typename ContainerType,typename WrapeType,typename NodeType,typename T>
-struct _tdecl_Iterator{
-   WrapeType cWrape;
+template<typename ContainerType,typename IteratorType,typename ProxyType,typename NodeType,typename Type>
+struct _tdeclIterator{
+   ProxyType cProxy;
 protected:
-   _tdecl_Iterator(const WrapeType* mWrape):
-      cWrape(mWrape){}
-   _tdecl_Iterator(NodeType* mNode,ContainerType* mContainer):
-      cWrape(mContainer,mNode){}
+   _tdeclIterator(const ProxyType* mProxy):cProxy(mProxy){}
+   _tdeclIterator(NodeType* mNode,ContainerType* mContainer):cProxy(mContainer,mNode){}
 public:
-   const WrapeType* Wrape() const {return &cWrape;}
-   bool CheckContainer(ContainerType &mContainer) {return cWrape.CheckContainer(mContainer);}
+   const ProxyType* Proxy() const {return &cProxy;}
+   bool CheckContainer(ContainerType &mContainer) {return cProxy.CheckContainer(mContainer);}
 public:
-   T Dereference() const {return _(cWrape);}
-   void operator =(_tdecl_Iterator<ContainerType,WrapeType,NodeType,T> &mOther);
-   void operator =(WrapeType &mWrape) {cWrape=mWrape;}
-   bool operator ==(_tdecl_Iterator<ContainerType,WrapeType,NodeType,T> &other) {return cWrape==other.cWrape;}
-   bool operator !=(_tdecl_Iterator<ContainerType,WrapeType,NodeType,T> &other) {return cWrape!=other.cWrape;}
-   bool operator ==(const WrapeType &mWrape) {return cWrape==mWrape;}
-   bool operator !=(const WrapeType &mWrape) {return cWrape!=mWrape;}
-   bool IsEnd() {return cWrape.IsEnd();}
+   Type Dereference() const {return _(cProxy);}
+   void operator =(IteratorType &mOther) {cProxy=mOther.Proxy();}
+   void operator =(ProxyType &mProxy) {cProxy=mProxy;}
+   bool operator ==(IteratorType &other) {return cProxy==other.cProxy;}
+   bool operator !=(IteratorType &other) {return cProxy!=other.cProxy;}
+   bool operator ==(const ProxyType &mProxy) {return cProxy==mProxy;}
+   bool operator !=(const ProxyType &mProxy) {return cProxy!=mProxy;}
+   bool IsEnd() {return cProxy.IsEnd();}
 };
-//-----------------------------------------------------------------
-template<typename ContainerType,typename WrapeType,typename NodeType,typename T>
-void _tdecl_Iterator::operator =(_tdecl_Iterator<ContainerType,WrapeType,NodeType,T> &mOther){
-   cWrape=mOther.Wrape();
-}
 
 END_SPACE
 

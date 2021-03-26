@@ -1,9 +1,8 @@
-#ifndef _STD_C_CONTAINER_
-#define _STD_C_CONTAINER_
+#ifndef _STD_I_CONTAINER_
+#define _STD_I_CONTAINER_
 
 #include <STD\Define\StdDefine.mqh>
 
-#define _tContainer __std(CContainer)
 #define _tdeclContainer __decl(CContainer)
 
 NAMESPACE(STD)
