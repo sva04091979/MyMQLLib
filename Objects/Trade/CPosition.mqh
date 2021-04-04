@@ -81,6 +81,7 @@ public:
                                  if (CheckPointer(cCloseOrder)) delete cCloseOrder;
                                 #endif}
    ITral*            Tral() const            {return cTral;}
+   datetime          CloseTime() const       {return cCloseTime;}
    ulong             Control();
    bool              Closing();
    bool              IsTralOn()              {return cTral!=NULL;}
