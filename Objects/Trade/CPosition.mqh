@@ -262,7 +262,7 @@ void CPosition::NewTP(int mTP){
 bool CPosition::SetBreakEven(int mBE){
    if (!_price) return false;
    double sl=_price+_direct*mBE*_point;
-   if (ComparePrice(sl,_direct>0?BID:ASK,_direct,_digits)>=0) return false;
+   if (ComparePrice(sl,_direct>0?Bid(_symbol):Ask(_symbol),_direct,_digits)>=0) return false;
    _sl=sl;
    return true;}
 //----------------------------------------------------------------------
