@@ -55,7 +55,7 @@ protected:
    double         cTralTrigger;
    double         cTralSize;
    double         cTralStop;
-   int            cFlag;
+   uint            cFlag;
    ENUM_TRAL_TYPE cTralType;
 public:
                   CBallanceControl():cStartBallance(0.0),cProfitOut(0.0),cStopOut(0.0),cTralTrigger(0.0),cTralSize(0.0),cTralStop(0.0),cFlag(0){}
@@ -82,7 +82,7 @@ public:
                               ENUM_TRAL_START_BALLANCE_TYPE mType=TRAL_EQUITY,
                               ENUM_TRAL_TYPE mTralType=TRAL_TYPE_CURRENCY);
    virtual bool   Check();
-   bool           Check(int &mFlag);
+   bool           Check(uint &mFlag);
    bool           CheckTral(const double &mEquity);
    double         GetProfitStop()   {return cProfitOut;}
    double         GetStopOut()   {return cStopOut;}   
@@ -132,7 +132,7 @@ bool CBallanceControl::Check(){
       if (CheckTral(equity)) cFlag|=BALLANCE_CONTROL_TRAL;}
    return bool(cFlag&BALLANCE_STOP);}
 //--------------------------------------------------------------
-bool CBallanceControl::Check(int &mFlag){
+bool CBallanceControl::Check(uint &mFlag){
    bool res=Check();
    mFlag=cFlag;
    return res;}
