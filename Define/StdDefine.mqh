@@ -2,22 +2,19 @@
 #define _STD_DEFINE_
 
 #ifdef __MQL5__
-   #define NAMESPACE(dName) namespace dName {
-   #define END_SPACE }
-   #define __std(dName) STD::dName
-   #define __decl(dName) dName
    #define _tSizeT ulong
    #define _tPtrDiffT long
    #define _tTicket ulong
 #else
-   #define NAMESPACE(dName)
-   #define END_SPACE
-   #define __std(dName) STD_##dName
-   #define __decl(dName) __std(dName)
    #define _tSizeT uint
    #define _tPtrDiffT int
    #define _tTicket int
 #endif
+
+#define NAMESPACE(dName)
+#define END_SPACE
+#define __std(dName) STD_##dName
+#define __decl(dName) __std(dName)
 
 #define EQUITY AccountInfoDouble(ACCOUNT_EQUITY)
 #define BALLANCE AccountInfoDouble(ACCOUNT_BALANCE)
