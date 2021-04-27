@@ -92,7 +92,7 @@ public:
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
    double            GetVolume()             {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
-   double            GetOpenPrice()          {return _price;}
+   double            GetOpenPrice()          {return cDealPrice;}
    double            GetSL();
    double            GetTP();
    double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit;}
