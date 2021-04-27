@@ -268,7 +268,7 @@ bool CPosition::SetBreakEven(int mBE){
 //----------------------------------------------------------------------
 void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
-      if (_ticket) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
+      if (IsActivate()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
       else{
          COrder::NewSL(mSL);
          return;}
@@ -279,7 +279,7 @@ void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
 //----------------------------------------------------------------------
 void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
-      if (_ticket) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
+      if (IsActivate()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
       else{
          COrder::NewTP(mTP);
          return;}
@@ -346,8 +346,8 @@ bool CPosition::CheckClosePosition(void){
       cPositionDirect=cPositionType%2==0?1:-1;
       cPositionVolume=PositionGetDouble(POSITION_VOLUME);
       cPositionPrice=PositionGetDouble(POSITION_PRICE_OPEN);
-      cPositionSL=PositionGetDouble(POSITION_SL);
-      cPositionTP=PositionGetDouble(POSITION_TP);
+      if (!cPositionSL) cPositionSL=PositionGetDouble(POSITION_SL);
+      if (!cPositionTP) cPositionTP=PositionGetDouble(POSITION_TP);
       cPositionLastUpdate=PositionGetInteger(POSITION_TIME_UPDATE_MSC);}
 //----------------------------------------------------------------------------
    void CPosition::ActiveOrdersControl(void){
