@@ -273,7 +273,7 @@ void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
          COrder::NewSL(mSL);
          return;}
    #else
-      mPrice=_type>O_T_SELL?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
+      mPrice=!IsOpen()?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
    if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mSL&&_sl>0.0)||ComparePrice(mSL,mPrice,_direct,_digits)<0) _sl=NormalizePrice(mSL);}
 //----------------------------------------------------------------------
@@ -284,7 +284,7 @@ void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
          COrder::NewTP(mTP);
          return;}
    #else
-      mPrice=_type>O_T_SELL?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
+      mPrice=!IsOpen()?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
    if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mTP&&_tp>0.0)||ComparePrice(mTP,mPrice,_direct,_digits)>0) _tp=NormalizePrice(mTP);}
 //---------------------------------------------------------------------------
