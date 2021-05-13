@@ -106,6 +106,7 @@ public:
    void              NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true);
    bool              SetBreakEven(int mBE);
    #ifdef __MQL5__
+      int            Direct() {return IsOpen()?cPositionDirect:cOrderDirect;}
    #else
       int            Direct() {return _type%2==0?1:-1;}
    #endif
