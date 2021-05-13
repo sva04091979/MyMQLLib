@@ -5,10 +5,12 @@
    #define _tSizeT ulong
    #define _tPtrDiffT long
    #define _tTicket ulong
+   #define _tAccountNumber long
 #else
    #define _tSizeT uint
    #define _tPtrDiffT int
    #define _tTicket int
+   #define _tAccountNumber int
 #endif
 
 #define NAMESPACE(dName)
