@@ -92,7 +92,7 @@ public:
    ENUM_ORDER_TYPE   Type()                  #ifdef __MQL5__
                                                 {return IsOpen()?(ENUM_ORDER_TYPE)cPositionType:(ENUM_ORDER_TYPE)cOrderType;}
                                              #else
-                                                {return cOrderType;}
+                                                {return (ENUM_ORDER_TYPE)cOrderType;}
                                              #endif
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
