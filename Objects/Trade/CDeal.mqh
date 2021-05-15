@@ -35,6 +35,7 @@ public:
    double            GetDealComission()   {return cDealComission;}
    #ifdef __MQL5__
                      CDeal(ulong mTicket,CTradeConst* mTradeConst);
+                     CDeal(CTradeConst* tradeConst,ulong positionID);
       long_type      GetDealTicket()   {return cDealTicket;}
       double         GetDealSwap()     {return cDealSwap;}
       virtual bool   TradeTransaction(const MqlTradeTransaction& trans,
@@ -89,6 +90,38 @@ ulong CDeal::DealControl(void){
       cDealVolume=HistoryDealGetDouble(mTicket,DEAL_VOLUME);
       cIdent=HistoryDealGetInteger(mTicket,DEAL_POSITION_ID);
       cFlag|=DEAL_FULL;}
+//-----------------------------------------------------------------------------
+   CDeal::CDeal(CTradeConst *tradeConst,ulong positionID):
+      COrder(tradeConst,positionID){
+      bool isOk=false;
+      cDealSwap=0.0;
+      ulong ticket=0;
+      if (HistorySelectByPosition(positionID)){
+         for (uint i=0,count=HistoryDealsTotal();i<count;++i){
+            ticket=HistoryDealGetTicket(i);
+            if (!ticket) continue;
+            if (HistoryDealGetInteger(ticket,DEAL_ORDER)==positionID){
+               isOk=true;
+               break;
+            }
+         }
+      }
+      if (isOk){
+         cDealTime=(datetime)HistoryDealGetInteger(ticket,DEAL_TIME);
+         cDealPrice=HistoryDealGetDouble(ticket,DEAL_PRICE);
+         cDealComission=HistoryDealGetDouble(ticket,DEAL_COMMISSION);
+         cDealTicket=ticket;
+         cDealVolume=HistoryDealGetDouble(ticket,DEAL_VOLUME);
+         cFlag|=DEAL_FULL;
+      }
+      else{
+         cDealTime=0;
+         cDealPrice=0.0;
+         cDealComission=0.0;
+         cDealTicket=0;
+         cDealVolume=0.0;
+      }
+   }
 //-----------------------------------------------------------------------------
    bool CDeal::TradeTransaction(const MqlTradeTransaction &trans,const MqlTradeRequest &request,const MqlTradeResult &result){
       if (trans.type!=TRADE_TRANSACTION_DEAL_ADD||trans.order!=cOrderTicket) return false;
