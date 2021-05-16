@@ -275,7 +275,7 @@ bool CPosition::SetBreakEven(int mBE){
 //----------------------------------------------------------------------
 void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
-      if (IsActivate()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
+      if (IsOpen()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
       else{
          COrder::NewSL(mSL);
          return;}
@@ -286,7 +286,7 @@ void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
 //----------------------------------------------------------------------
 void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
-      if (IsActivate()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
+      if (IsOpen()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
       else{
          COrder::NewTP(mTP);
          return;}
