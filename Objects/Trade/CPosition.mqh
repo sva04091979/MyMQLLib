@@ -89,6 +89,11 @@ public:
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType()       {return _type;}
+   ENUM_ORDER_TYPE   Type()                  #ifdef __MQL5__
+                                                {return IsOpen()?(ENUM_ORDER_TYPE)cPositionType:(ENUM_ORDER_TYPE)cOrderType;}
+                                             #else
+                                                {return (ENUM_ORDER_TYPE)cOrderType;}
+                                             #endif
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
    double            GetVolume()             {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
@@ -119,6 +124,7 @@ protected:
    bool              CheckDealFull();
    #ifdef __MQL5__
    public:
+                     CPosition(CTradeConst* tradeConst,ulong ticket);
       bool           TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
@@ -188,8 +194,8 @@ void CPosition::PositionStopsControl(void){
    #ifdef __MQL5__
       double sl=PositionGetDouble(POSITION_SL);
       double tp=PositionGetDouble(POSITION_TP);
-      cPositionSwap=PositionGetDouble(POSITION_PROFIT);
-      cProfit=PositionGetDouble(POSITION_SWAP);
+      cPositionSwap=PositionGetDouble(POSITION_SWAP);
+      cProfit=PositionGetDouble(POSITION_PROFIT);
    #else
       double sl=OrderStopLoss();
       double tp=OrderTakeProfit();      
@@ -269,7 +275,7 @@ bool CPosition::SetBreakEven(int mBE){
 //----------------------------------------------------------------------
 void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
-      if (IsActivate()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
+      if (IsOpen()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
       else{
          COrder::NewSL(mSL);
          return;}
@@ -280,7 +286,7 @@ void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
 //----------------------------------------------------------------------
 void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
-      if (IsActivate()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
+      if (IsOpen()) mPrice=!mPrice?TradePrice(_symbol,-_direct):mPrice; 
       else{
          COrder::NewTP(mTP);
          return;}
@@ -321,6 +327,40 @@ bool CPosition::CheckClosePosition(void){
       return true;}
 //----------------------------------------------------------------------
 #ifdef __MQL5__
+   CPosition::CPosition(CTradeConst *tradeConst,ulong ticket):
+      CDeal(tradeConst,ticket){
+         cCloseTime=0;
+         cClosePrice=0.0;
+         cPositionComission=cDealComission;
+         cTral=NULL;
+         cSLPips=0;
+         cTPPips=0;
+         cCloseOrder=NULL;
+         if (PositionSelectByTicket(ticket)){
+            cProfit=PositionGetDouble(POSITION_PROFIT);
+            cPositionSwap=PositionGetDouble(POSITION_SWAP);
+            cPositionTicket=PositionGetInteger(POSITION_TICKET);
+            cPositionType=(ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE);
+            cPositionVolume=PositionGetDouble(POSITION_VOLUME);
+            cPositionPrice=PositionGetDouble(POSITION_PRICE_OPEN);
+            cPositionLastUpdate=PositionGetInteger(POSITION_TIME_UPDATE);
+            cPositionDirect=cPositionType%2==0?1:-1;
+            cPositionSL=PositionGetDouble(POSITION_SL);
+            cPositionTP=PositionGetDouble(POSITION_TP);
+      }
+         else{
+            cProfit=0.0;
+            cPositionSwap=0.0;
+            cPositionTicket=0;
+            cPositionVolume=0.0;
+            cPositionPrice=0.0;
+            cPositionLastUpdate=0;
+            cPositionDirect=0;
+            cPositionSL=0.0;
+            cPositionTP=0.0;
+         }
+}
+//---------------------------------------------------------------------------
    bool CPosition::SelectNettingPosition(void){
       if (!PositionSelect(_symbol)) return false;
       CheckChangePosition();
