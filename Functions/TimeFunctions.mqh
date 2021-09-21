@@ -1,7 +1,7 @@
 #ifndef _TIME_FUNCTIONS_
 #define _TIME_FUNCTIONS_
 
-#include <MyMQLLib\Define\MQLDefine.mqh>
+#include "..\Define\MQLDefine.mqh"
 
 #define TIME_DAY  86400
 #define TIME_WEEK 604800
