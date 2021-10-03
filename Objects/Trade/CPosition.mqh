@@ -175,7 +175,14 @@ bool CPosition::Closing(){
       else if (!(cFlag&DEAL_FULL)&&!(DealControl()&DEAL_FULL)) return false;}
    #ifdef __MQL5__
       if (CheckPointer(cCloseOrder))
-         if (bool(cCloseOrder.DealControl()|DEAL_FULL)) CLOSE_VALUE_INIT
+         if (bool(cCloseOrder.DealControl()|DEAL_FULL)){
+            if (!cCloseOrder.GetDealTime()){
+               DELETE(cCloseOrder);
+            }      
+            else{
+               CLOSE_VALUE_INIT
+            }
+         }
          else return false;
       if (!SelectPosition()) return CheckClosePosition();
       cCloseOrder=new CDeal(_symbol,ENUM_ORDER_TYPE(1-_type),_volume,0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
