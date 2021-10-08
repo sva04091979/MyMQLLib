@@ -83,7 +83,11 @@ public:
    ITral*            Tral() const            {return cTral;}
    datetime          CloseTime() const       {return cCloseTime;}
    ulong             Control();
-   bool              Closing();
+   #ifdef MY_MQL_LIB_TRADE_LOG
+      bool              Closing(string from);
+   #else
+      bool              Closing();
+   #endif
    bool              IsTralOn()              {return cTral!=NULL;}
    bool              IsClosed()              {return cClosePrice!=0.0;}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
@@ -161,14 +165,23 @@ ulong CPosition::Control(){
    #endif 
    ulong flag=DealControl();
    if (!flag||CheckClosePosition()||bool(flag&TRADE_FINISH)||!CheckDealFull()) return cFlag;
-   if (bool(flag&POSITION_MUST_CLOSE)) Closing();
+   if (bool(flag&POSITION_MUST_CLOSE)) Closing(#ifdef MY_MQL_LIB_TRADE_LOG __FUNCSIG__ #endif);
    else PositionStopsControl();
    return cFlag;}
 //-----------------------------------------------------------------------
-bool CPosition::Closing(){
+bool CPosition::Closing(
+#ifdef MY_MQL_LIB_TRADE_LOG
+   string from
+#endif
+   ){
    if (!cFlag                                   ||
        bool(cFlag&(ORDER_REMOVED|TRADE_ERROR))  ||
        !(cFlag&(ORDER_PENDING|ORDER_ACTIVATE))) CLOSE_TRUE
+   #ifdef MY_MQL_LIB_TRADE_LOG
+      if (!(cFlag&POSITION_MUST_CLOSE)){
+         PrintFormat("Position %i close from %s",_ticket,from);
+      }
+   #endif
    cFlag|=POSITION_MUST_CLOSE;
    if (bool(cFlag&ORDER_PENDING)){
       if (!(cFlag&ORDER_ACTIVATE)) return Remove();
@@ -214,7 +227,7 @@ void CPosition::PositionStopsControl(void){
    bool isSLTPClose=false;
    if ((!sl||CompareDouble(sl,_sl,_digits)!=0)&&_sl&&ComparePrice(price,_sl,-_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_SL;}
    if ((!tp||CompareDouble(tp,_tp,_digits)!=0)&&_tp&&ComparePrice(price,_tp,_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_TP;}
-   if (isSLTPClose) {Closing(); return;}
+   if (isSLTPClose) {Closing(#ifdef MY_MQL_LIB_TRADE_LOG __FUNCSIG__ #endif); return;}
    double modSL=IS_VIRTUAL_SL?sl:CheckPriceLevel(sl,price,_freezeLevel,_digits),
           modTP=IS_VIRTUAL_TP?tp:CheckPriceLevel(tp,price,_freezeLevel,_digits);
    if (!IS_VIRTUAL_SL&&CompareDouble(_sl,sl,_digits)!=0){
