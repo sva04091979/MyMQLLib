@@ -8,7 +8,7 @@
 class CTradeTime{
 protected:
    bool              cIsTrue;
-   int               cFlag;
+   uint               cFlag;
    int               cDay;
    datetime          cTimeCurrent;
    datetime          cTradeTime[2];

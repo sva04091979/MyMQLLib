@@ -1,7 +1,7 @@
 #ifndef _C_GRAFIC_OBJECT_
 #define _C_GRAFIC_OBJECT_
 
-#include <MyMQLLib\Objects\CFlag.mqh>
+#include "..\..\Objects\CFlag.mqh"
 
 #define OBJECT_FLAG_CREATE 0x1
 #define OBJECT_FLAG_SELECTABLE 0x2

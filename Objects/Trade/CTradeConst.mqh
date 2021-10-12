@@ -43,8 +43,7 @@ public:
 public:
                      CTradeConst(string mSymbol=NULL):symbol(mSymbol==NULL?_Symbol:mSymbol){if (!Init()) delete GetPointer(this);}
    double NormalizePrice(double mPrice) {return NormalizeDouble(MathRound(mPrice/tickSize)*tickSize,digits);}
-private:
-   bool              Init();
+   bool              Init(); 
   };
 bool CTradeConst::Init(void){
    if (!MQLInfoInteger(MQL_TESTER)&&!SymbolSelect(symbol,true)) return false;
