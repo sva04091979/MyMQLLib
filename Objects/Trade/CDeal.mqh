@@ -29,8 +29,8 @@ protected:
 public:
                      CDeal(SET);
    ulong             DealControl();
-   datetime          GetDealTime()  {return cDealTime;}
-   double            GetDealPrice() {return cDealPrice;}
+   datetime          GetDealTime()  const {return cDealTime;}
+   double            GetDealPrice() const {return cDealPrice;}
    bool              IsOpen() {return bool(cFlag&DEAL_FULL);}
    double            GetDealComission()   {return cDealComission;}
    #ifdef __MQL5__
