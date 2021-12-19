@@ -8,7 +8,7 @@ public:
                      CFlag(void):cFlag(0) {}
                      CFlag(long mFlag):cFlag(mFlag) {}
    inline ulong Get() {return cFlag;}
-   inline bool Check(long mFlag) {return bool(cFlag&mFlag);}
+   inline bool Check(long mFlag) const {return bool(cFlag&mFlag);}
    inline bool CheckStrong(long mFlag) {return (cFlag&mFlag)==mFlag;}
    inline bool CheckRemove(long mFlag) {bool res=bool(cFlag&mFlag); cFlag&=~mFlag; return res;}
    inline bool CheckAdd(long mFlag)    {bool res=bool(cFlag&mFlag); cFlag|=mFlag; return res;}

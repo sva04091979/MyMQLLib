@@ -100,7 +100,7 @@ public:
                                              #endif
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
-   double            GetVolume()             {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
+   double            GetVolume()      const  {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
    double            GetOpenPrice()          {return cDealPrice;}
    double            GetSL();
    double            GetTP();
@@ -115,9 +115,9 @@ public:
    void              NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true);
    bool              SetBreakEven(int mBE);
    #ifdef __MQL5__
-      int            Direct() {return IsOpen()?cPositionDirect:cOrderDirect;}
+      int            Direct() const {return IsOpen()?cPositionDirect:cOrderDirect;}
    #else
-      int            Direct() {return _type%2==0?1:-1;}
+      int            Direct() const {return _type%2==0?1:-1;}
    #endif
 protected:
    bool              SelectPosition()  {return #ifdef __MQL5__ cIsNetting?SelectNettingPosition():SelectHedgePosition();
