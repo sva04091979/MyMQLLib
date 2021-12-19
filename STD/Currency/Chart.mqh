@@ -23,6 +23,7 @@ public:
    tdeclChart(string symbol,ENUM_TIMEFRAMES frame) {Init(new tdeclSymbol(symbol),frame,true);}
    tdeclChart(const tdeclSymbol &symbol,ENUM_TIMEFRAMES frame) {Init(&symbol,PERIOD_CURRENT,false);}
   ~tdeclChart() {if (cIsSymbolControl) DEL(cSymbol);}
+   void ReInit();
    bool IsNewBar();
    int CountFromLastCheckedBar() const {return cCountFromLastCheckedBar;}
    int BarShift(datetime time) const {return cSymbol.BarShift(time);}
@@ -37,6 +38,11 @@ void tdeclChart::Init(const tdeclSymbol* symbol,ENUM_TIMEFRAMES frame,bool isSym
    cIsSymbolControl=isSymbolControl;
    cLastTime=0;
    cCountFromLastCheckedBar=-1;
+}
+//--------------------------------------------------------------------
+void tdeclChart::ReInit(){
+   DEL(cSymbol);
+   Init(new tdeclSymbol(),PERIOD_CURRENT,true);
 }
 //--------------------------------------------------------------------
 void tdeclChart::SetFirstCheckNotNewBar(){
