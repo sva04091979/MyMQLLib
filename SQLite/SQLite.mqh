@@ -19,7 +19,7 @@
 #ifdef DB_NO_ERROR_CONTROL
    #define ErrorSet(dErr) do while(false)
 #else
-   #define ErrorSet(dErr) do SQLiteError=dErr; while(false);
+   #define ErrorSet(dErr) do SQLiteError=dErr; while(false)
 #endif
 
 #import "sqlite3.dll"
