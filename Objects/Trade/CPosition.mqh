@@ -105,7 +105,7 @@ public:
    double            GetSL();
    double            GetTP();
    double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit;}
-   double            Comission() {return _comission;}
+   double            Comission() const {return _comission;}
    double            Swap() {return cPositionSwap;}
    void              NewSL(int mSL);
    void              NewTP(int mTP);

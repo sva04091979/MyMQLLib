@@ -31,7 +31,7 @@ public:
    ulong             DealControl();
    datetime          GetDealTime()  const {return cDealTime;}
    double            GetDealPrice() const {return cDealPrice;}
-   bool              IsOpen() {return bool(cFlag&DEAL_FULL);}
+   bool              IsOpen() const {return bool(cFlag&DEAL_FULL);}
    double            GetDealComission()   {return cDealComission;}
    #ifdef __MQL5__
                      CDeal(ulong mTicket,CTradeConst* mTradeConst);
