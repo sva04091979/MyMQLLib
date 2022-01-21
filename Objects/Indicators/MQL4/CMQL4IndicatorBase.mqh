@@ -6,7 +6,6 @@ class CMQL4IndicatorBase{
 protected:
    string            cSymbol;
    ENUM_TIMEFRAMES   cFrame;
-private:
    uint              cBuf;
 protected:
    CMQL4IndicatorBase(string mSymbol,ENUM_TIMEFRAMES mFrame):
@@ -17,6 +16,7 @@ public:
    virtual double Get(int mShift,uint mBufferNumber)const =0;
    double operator[](int mShift) const {return Get(mShift,cBuf);}
    T* b(uint mBufferNumber) {cBuf=mBufferNumber; return &this;}
+   void ChangeParam(string mSymbol,ENUM_TIMEFRAMES mFrame) {cSymbol=mSymbol;cFrame=mFrame;} 
 };
 
 #endif
