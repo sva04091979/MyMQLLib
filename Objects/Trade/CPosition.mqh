@@ -55,6 +55,7 @@ protected:
    datetime          cCloseTime;
    double            cClosePrice;
    double            cProfit;
+   double            cClosedProfit;
    double            cPositionSwap;
    ITral*            cTral;
    int               cSLPips;
@@ -90,6 +91,7 @@ public:
    #endif
    bool              IsTralOn()              {return cTral!=NULL;}
    bool              IsClosed()              {return cClosePrice!=0.0;}
+   bool              IsClosingProcess() const {return !IsFinish()&&bool(cFlag&POSITION_MUST_CLOSE);}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType()       {return _type;}
@@ -104,7 +106,7 @@ public:
    double            GetOpenPrice()          {return cDealPrice;}
    double            GetSL();
    double            GetTP();
-   double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit;}
+   double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit+cClosedProfit;}
    double            Comission() const {return _comission;}
    double            Swap() {return cPositionSwap;}
    void              NewSL(int mSL);
@@ -150,7 +152,7 @@ protected:
   };
 //------------------------------------------------------
 CPosition::CPosition(SET):
-   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cPositionSwap(0.0)
+   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0)
    #ifdef __MQL5__
       ,cPositionTicket(0.0),cPositionVolume(0.0),cPositionPrice(0.0),cPositionSL(0.0),cPositionTP(0.0),cPositionLastUpdate(0),cSLPips(0),cTPPips(0),
       _comission(0.0)
@@ -439,7 +441,10 @@ bool CPosition::CheckClosePosition(void){
          if (dealTicket==cDealTicket) break;
          if (pos<0) cOrder.PushBack(new CDeal(dealTicket,cTradeConst));
          else if (dealTicket==cOrder[pos].GetDealTicket()) break;
-         else cOrder.PushNext(new CDeal(dealTicket,cTradeConst));}}
+         else cOrder.PushNext(new CDeal(dealTicket,cTradeConst));
+         cClosedProfit+=HistoryDealGetDouble(dealTicket,DEAL_PROFIT)+HistoryDealGetDouble(dealTicket,DEAL_PROFIT)+HistoryDealGetDouble(dealTicket,DEAL_SWAP);
+      }
+   }
 //----------------------------------------------------------------------------
    bool CPosition::TradeTransaction(const MqlTradeTransaction &trans,const MqlTradeRequest &request,const MqlTradeResult &result){
       if (trans.type!=TRADE_TRANSACTION_DEAL_ADD) return false;
@@ -458,19 +463,15 @@ bool CPosition::CheckClosePosition(void){
       if (NormalizeDouble(volume,_lotDigits)==0.0)
          return true;
       if (NormalizeDouble(_volume+volume,_lotDigits)==0.0){
-         return Closing();
+         Closing();
+         return true;
       }
       ENUM_ORDER_TYPE type=volume>0.0?(ENUM_ORDER_TYPE)_type:ENUM_ORDER_TYPE(1-_type);
       CDeal* deal=new CDeal(_symbol,type,volume,0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
-      if (bool(deal.IS_ORDER_END)){
-         _comission+=deal.GetDealComission();
-         cOrder.PushBack(deal);
-         return true;
-      }
-      else{
-         cActiveOrder.PushBack(deal);
-         return false;
-      }
+      deal.DealControl();
+      bool ret=!deal.IsError();
+      delete deal;
+      return ret;
    }
 #else
    CPosition::CPosition(CTradeConst* mTradeConst):
