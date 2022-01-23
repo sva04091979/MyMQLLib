@@ -134,6 +134,7 @@ protected:
                                       const MqlTradeResult& result);
       bool           IsSLClosed()   {return bool(cCloseFlag&CLOSE_BY_SL);}
       bool           IsTPClosed()   {return bool(cCloseFlag&CLOSE_BY_TP);}
+      bool           ChangePosition(double volume);
    protected:
       bool           SelectNettingPosition();
       bool           SelectHedgePosition();
@@ -450,6 +451,27 @@ bool CPosition::CheckClosePosition(void){
       for (CDeal* it=cActiveOrder.Begine();it!=NULL;it=cActiveOrder.Next())
          if (it.TradeTransaction(trans,request,result)) return true;
       return cCloseOrder!=NULL&&cCloseOrder.TradeTransaction(trans,request,result);}
+//-------------------------------------------------------------------------------------------
+   bool CPosition::ChangePosition(double volume){
+      if (!cIsNetting)
+         return false;
+      if (NormalizeDouble(volume,_lotDigits)==0.0)
+         return true;
+      if (NormalizeDouble(_volume+volume,_lotDigits)==0.0){
+         return Closing();
+      }
+      ENUM_ORDER_TYPE type=volume>0.0?(ENUM_ORDER_TYPE)_type:ENUM_ORDER_TYPE(1-_type);
+      CDeal* deal=new CDeal(_symbol,type,volume,0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
+      if (bool(deal.IS_ORDER_END)){
+         _comission+=deal.GetDealComission();
+         cOrder.PushBack(deal);
+         return true;
+      }
+      else{
+         cActiveOrder.PushBack(deal);
+         return false;
+      }
+   }
 #else
    CPosition::CPosition(CTradeConst* mTradeConst):
       CDeal(mTradeConst),
