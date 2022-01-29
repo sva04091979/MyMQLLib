@@ -21,6 +21,8 @@ class STD_JSONPair{
 public:
    string key;
    STD_JSONValue* value;
+   STD_JSONPair(){}
+   STD_JSONPair(string _key,STD_JSONValue* _value):key(_key),value(_value){}
   ~STD_JSONPair(){
    DEL(value);
    }
@@ -43,6 +45,7 @@ public:
    const JSONType* Cast() const {return dynamic_cast<const JSONType*>(&this);}
    
 };
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 template<typename Type>
@@ -60,7 +63,7 @@ public:
 protected:
    STD_JSONColection():cSize(0),cReserv(0){}
    STD_JSONColection(uint reserv):cSize(0){cReserv=ArrayResize(cArray,reserv);}
-   bool Add(Type* ptr){
+   bool AddPtr(Type* ptr){
       if (cSize>=cReserv){
          uint newReserv=MathMin(MathMax(cReserv+1,cReserv*3/2),SHORT_MAX);
          if (ArrayResize(cArray,newReserv)==-1){
@@ -97,7 +100,7 @@ public:
       if (!ptr)
          return false;
       bool res=cMap.Add(ptr.key,ptr.value);
-      if (res&&!(res=Add(ptr)))
+      if (res&&!(res=AddPtr(ptr)))
          cMap.Remove(ptr.key);
       return res;
    }
@@ -108,6 +111,10 @@ public:
    string ToString() const override {
       return "{"+CollectionToString()+"}";
    }
+   bool Add(string key,STD_JSONValue* value){
+      STD_JSONPair* pair=new STD_JSONPair(key,value);
+      return operator +=(pair);
+   }
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -117,7 +124,7 @@ public:
    STD_JSONArray(uint reserv):STD_JSONColection(reserv){}
    STD_EJSONValueType ValueType() const override final{return _eJSON_Array;}
    bool IsArray() const override final {return true;}
-   bool operator +=(STD_JSONValue* ptr){return !ptr?false:Add(ptr);}
+   bool operator +=(STD_JSONValue* ptr){return !ptr?false:AddPtr(ptr);}
    string ToString() const override {
       return "["+CollectionToString()+"]";
    }
