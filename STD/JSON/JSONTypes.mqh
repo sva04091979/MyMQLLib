@@ -39,6 +39,7 @@ public:
    virtual bool IsFloatingPoint() const {return false;}
    virtual bool IsArray() const {return false;}
    virtual bool IsObject() const {return false;}
+   virtual bool IsString() const {return false;}
    virtual ulong Size() const {return 1;}
    virtual string ToString() const =0;
    template<typename JSONType>
@@ -162,6 +163,7 @@ class STD_JSONString:public STD_JSONValueStore<string>{
 public:
    STD_JSONString(string value):STD_JSONValueStore(value){}
    STD_EJSONValueType ValueType() const override final {return _eJSON_String;}
+   bool IsString() const override final {return true;}
    string ToString() const override {return "\""+cValue+"\"";}
 };
 //////////////////////////////////////////////////////////////////////////////
