@@ -44,7 +44,18 @@ public:
    virtual string ToString() const =0;
    template<typename JSONType>
    const JSONType* Cast() const {return dynamic_cast<const JSONType*>(&this);}
-   
+   template<typename Type>
+   bool GetInteger(Type& val) const {
+      if(IsIntegral()){
+         if (IsSigned())
+            val=(Type)Cast<STD_JSONLong>().Value();
+         else
+            val=(Type)Cast<STD_JSONULong>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
 };
 
 //////////////////////////////////////////////////////////////////////////////
