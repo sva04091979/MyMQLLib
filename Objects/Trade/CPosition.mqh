@@ -92,6 +92,7 @@ public:
    bool              IsTralOn()              {return cTral!=NULL;}
    bool              IsClosed()              {return cClosePrice!=0.0;}
    bool              IsClosingProcess() const {return !IsFinish()&&bool(cFlag&POSITION_MUST_CLOSE);}
+   bool              IsChangeInProcess() const {return !IsClosingProcess() #ifdef __MQL5__ &&cActiveOrder.IsEmpty() #endif; }
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType()       {return _type;}
@@ -467,7 +468,7 @@ bool CPosition::CheckClosePosition(void){
          return true;
       }
       ENUM_ORDER_TYPE type=volume>0.0?(ENUM_ORDER_TYPE)_type:ENUM_ORDER_TYPE(1-_type);
-      CDeal* deal=new CDeal(_symbol,type,volume,0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
+      CDeal* deal=new CDeal(_symbol,type,MathAbs(volume),0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
       deal.DealControl();
       bool ret=!deal.IsError();
       delete deal;
