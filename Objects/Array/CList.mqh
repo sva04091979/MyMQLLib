@@ -37,7 +37,7 @@ public:
                     ~CList()  {if (cIsDeletable) DeleteAll(); else EraceAll();}
    inline int        GetPos()       {return cPos;}
    inline int        GetSize()      {return cSize;}
-   inline bool       IsEmpty()      {return !cSize;}
+   inline bool       IsEmpty() const    {return !cSize;}
    inline bool       IsFirst()      {return cIterator==NULL||cIterator.IsFirst();}
    inline bool       IsLast()       {return cIterator==NULL||cIterator.IsLast();}
    bool              IsDeletable()  {return cIsDeletable;}
