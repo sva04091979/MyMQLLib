@@ -108,6 +108,7 @@ public:
    double            GetSL();
    double            GetTP();
    double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit+cClosedProfit;}
+   long_type         Ticket() const {return _ticket;}
    double            Comission() const {return _comission;}
    double            Swap() {return cPositionSwap;}
    void              NewSL(int mSL);
