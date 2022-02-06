@@ -40,17 +40,45 @@ public:
    virtual bool IsArray() const {return false;}
    virtual bool IsObject() const {return false;}
    virtual bool IsString() const {return false;}
+   virtual bool IsBoolean() const {return false;}
    virtual ulong Size() const {return 1;}
    virtual string ToString() const =0;
    template<typename JSONType>
    const JSONType* Cast() const {return dynamic_cast<const JSONType*>(&this);}
    template<typename Type>
-   bool GetInteger(Type& val) const {
+   bool GetIntegral(Type& val) const {
       if(IsIntegral()){
          if (IsSigned())
             val=(Type)Cast<STD_JSONLong>().Value();
          else
             val=(Type)Cast<STD_JSONULong>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
+   template<typename Type>
+   bool GetString(Type& val) const {
+      if (IsString()){
+         val=(Type)Cast<STD_JSONString>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
+   template<typename Type>
+   bool GetFloatingPoint(Type& val) const {
+      if (IsFloatingPoint()){
+         val=(Type)Cast<STD_JSONDouble>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
+   template<typename Type>
+   bool GetBoolean(Type& val) const {
+      if (IsBoolean()){
+         val=(Type)Cast<STD_JSONBool>().Value();
          return true;
       }
       else
@@ -166,6 +194,7 @@ public:
    STD_JSONBool(bool value):STD_JSONValueStore(value){}
    STD_EJSONValueType ValueType() const override final {return _eJSON_Bool;}
    bool IsIntegral() const override {return true;}
+   bool IsBoolean() const override {return true;}
    string ToString() const override {return cValue?"true":"false";}
 };
 //////////////////////////////////////////////////////////////////////////////
