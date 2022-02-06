@@ -418,7 +418,8 @@ bool CPosition::CheckClosePosition(void){
       if (cActiveOrder.IsEmpty()) return;
       for (CDeal* it=cActiveOrder.Begine();it!=NULL;)
          if (!(it.IS_ORDER_END)){
-            _comission+=it.GetDealComission();
+            _comission+=it.GetDealComission()+it.GetDealSwap();
+            cClosedProfit+=it.DealProfit();
             bool isLast=cActiveOrder.IsLast();
             cOrder.PushBack(cActiveOrder.Move());
             it=isLast?NULL:cActiveOrder.It();}
@@ -442,7 +443,8 @@ bool CPosition::CheckClosePosition(void){
          if (pos<0) cOrder.PushBack(new CDeal(dealTicket,cTradeConst));
          else if (dealTicket==cOrder[pos].GetDealTicket()) break;
          else cOrder.PushNext(new CDeal(dealTicket,cTradeConst));
-         cClosedProfit+=HistoryDealGetDouble(dealTicket,DEAL_PROFIT)+HistoryDealGetDouble(dealTicket,DEAL_PROFIT)+HistoryDealGetDouble(dealTicket,DEAL_SWAP);
+         cClosedProfit+=HistoryDealGetDouble(dealTicket,DEAL_PROFIT);
+         _comission+=HistoryDealGetDouble(dealTicket,DEAL_COMISSION)+HistoryDealGetDouble(dealTicket,DEAL_SWAP);
       }
    }
 //----------------------------------------------------------------------------
