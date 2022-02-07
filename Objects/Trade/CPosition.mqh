@@ -445,7 +445,7 @@ bool CPosition::CheckClosePosition(void){
          else if (dealTicket==cOrder[pos].GetDealTicket()) break;
          else cOrder.PushNext(new CDeal(dealTicket,cTradeConst));
          cClosedProfit+=HistoryDealGetDouble(dealTicket,DEAL_PROFIT);
-         _comission+=HistoryDealGetDouble(dealTicket,DEAL_COMISSION)+HistoryDealGetDouble(dealTicket,DEAL_SWAP);
+         _comission+=HistoryDealGetDouble(dealTicket,DEAL_COMMISSION)+HistoryDealGetDouble(dealTicket,DEAL_SWAP);
       }
    }
 //----------------------------------------------------------------------------

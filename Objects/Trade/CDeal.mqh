@@ -39,6 +39,7 @@ public:
                      CDeal(CTradeConst* tradeConst,ulong positionID);
       long_type      GetDealTicket()   {return cDealTicket;}
       double         GetDealSwap()     {return cDealSwap;}
+      double         DealProfit() const {return cDealProfit;}
       virtual bool   TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
@@ -134,7 +135,7 @@ ulong CDeal::DealControl(void){
       cDealTime=(datetime)HistoryDealGetInteger(cDealTicket,DEAL_TIME);
       cDealPrice=HistoryDealGetDouble(cDealTicket,DEAL_PRICE);
       cDealVolume=HistoryDealGetDouble(cDealTicket,DEAL_VOLUME);
-      cDealProfit=HistoryDealGetDouble(ticket,DEAL_PROFIT);
+      cDealProfit=HistoryDealGetDouble(cDealTicket,DEAL_PROFIT);
       cDealComission=HistoryDealGetDouble(cDealTicket,DEAL_COMMISSION);
       cDealSwap=HistoryDealGetDouble(cDealTicket,DEAL_SWAP);
       if (cIsMain) cIdent=HistoryDealGetInteger(cDealTicket,DEAL_POSITION_ID);
