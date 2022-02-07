@@ -23,6 +23,7 @@ protected:
    double            cDealComission;
    #ifdef __MQL5__
       double            cDealSwap;
+      double            cDealProfit;
       long_type         cDealTicket;
       double            cDealVolume;
    #endif
@@ -38,6 +39,7 @@ public:
                      CDeal(CTradeConst* tradeConst,ulong positionID);
       long_type      GetDealTicket()   {return cDealTicket;}
       double         GetDealSwap()     {return cDealSwap;}
+      double         DealProfit() const {return cDealProfit;}
       virtual bool   TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
@@ -69,6 +71,7 @@ ulong CDeal::DealControl(void){
       cDealTime=(datetime)HistoryDealGetInteger(ticket,DEAL_TIME);
       cDealPrice=HistoryDealGetDouble(ticket,DEAL_PRICE);
       cDealVolume=HistoryDealGetDouble(ticket,DEAL_VOLUME);
+      cDealProfit=HistoryDealGetDouble(ticket,DEAL_PROFIT);
       cDealComission=HistoryDealGetDouble(ticket,DEAL_COMMISSION);
       cDealSwap=HistoryDealGetDouble(ticket,DEAL_SWAP);
       cIdent=HistoryDealGetInteger(ticket,DEAL_POSITION_ID);
@@ -109,7 +112,9 @@ ulong CDeal::DealControl(void){
       if (isOk){
          cDealTime=(datetime)HistoryDealGetInteger(ticket,DEAL_TIME);
          cDealPrice=HistoryDealGetDouble(ticket,DEAL_PRICE);
+         cDealProfit=HistoryDealGetDouble(ticket,DEAL_PROFIT);
          cDealComission=HistoryDealGetDouble(ticket,DEAL_COMMISSION);
+         cDealSwap=HistoryDealGetDouble(cDealTicket,DEAL_SWAP);
          cDealTicket=ticket;
          cDealVolume=HistoryDealGetDouble(ticket,DEAL_VOLUME);
          cFlag|=DEAL_FULL;
@@ -130,6 +135,7 @@ ulong CDeal::DealControl(void){
       cDealTime=(datetime)HistoryDealGetInteger(cDealTicket,DEAL_TIME);
       cDealPrice=HistoryDealGetDouble(cDealTicket,DEAL_PRICE);
       cDealVolume=HistoryDealGetDouble(cDealTicket,DEAL_VOLUME);
+      cDealProfit=HistoryDealGetDouble(cDealTicket,DEAL_PROFIT);
       cDealComission=HistoryDealGetDouble(cDealTicket,DEAL_COMMISSION);
       cDealSwap=HistoryDealGetDouble(cDealTicket,DEAL_SWAP);
       if (cIsMain) cIdent=HistoryDealGetInteger(cDealTicket,DEAL_POSITION_ID);
