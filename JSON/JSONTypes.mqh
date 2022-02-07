@@ -21,6 +21,8 @@ class STD_JSONPair{
 public:
    string key;
    STD_JSONValue* value;
+   STD_JSONPair(){}
+   STD_JSONPair(string _key,STD_JSONValue* _value):key(_key),value(_value){}
   ~STD_JSONPair(){
    DEL(value);
    }
@@ -37,12 +39,53 @@ public:
    virtual bool IsFloatingPoint() const {return false;}
    virtual bool IsArray() const {return false;}
    virtual bool IsObject() const {return false;}
+   virtual bool IsString() const {return false;}
+   virtual bool IsBoolean() const {return false;}
    virtual ulong Size() const {return 1;}
    virtual string ToString() const =0;
    template<typename JSONType>
    const JSONType* Cast() const {return dynamic_cast<const JSONType*>(&this);}
-   
+   template<typename Type>
+   bool GetIntegral(Type& val) const {
+      if(IsIntegral()){
+         if (IsSigned())
+            val=(Type)Cast<STD_JSONLong>().Value();
+         else
+            val=(Type)Cast<STD_JSONULong>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
+   template<typename Type>
+   bool GetString(Type& val) const {
+      if (IsString()){
+         val=(Type)Cast<STD_JSONString>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
+   template<typename Type>
+   bool GetFloatingPoint(Type& val) const {
+      if (IsFloatingPoint()){
+         val=(Type)Cast<STD_JSONDouble>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
+   template<typename Type>
+   bool GetBoolean(Type& val) const {
+      if (IsBoolean()){
+         val=(Type)Cast<STD_JSONBool>().Value();
+         return true;
+      }
+      else
+         return false;
+   }
 };
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 template<typename Type>
@@ -60,7 +103,7 @@ public:
 protected:
    STD_JSONColection():cSize(0),cReserv(0){}
    STD_JSONColection(uint reserv):cSize(0){cReserv=ArrayResize(cArray,reserv);}
-   bool Add(Type* ptr){
+   bool AddPtr(Type* ptr){
       if (cSize>=cReserv){
          uint newReserv=MathMin(MathMax(cReserv+1,cReserv*3/2),SHORT_MAX);
          if (ArrayResize(cArray,newReserv)==-1){
@@ -97,7 +140,7 @@ public:
       if (!ptr)
          return false;
       bool res=cMap.Add(ptr.key,ptr.value);
-      if (res&&!(res=Add(ptr)))
+      if (res&&!(res=AddPtr(ptr)))
          cMap.Remove(ptr.key);
       return res;
    }
@@ -108,6 +151,10 @@ public:
    string ToString() const override {
       return "{"+CollectionToString()+"}";
    }
+   bool Add(string key,STD_JSONValue* value){
+      STD_JSONPair* pair=new STD_JSONPair(key,value);
+      return operator +=(pair);
+   }
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -117,7 +164,7 @@ public:
    STD_JSONArray(uint reserv):STD_JSONColection(reserv){}
    STD_EJSONValueType ValueType() const override final{return _eJSON_Array;}
    bool IsArray() const override final {return true;}
-   bool operator +=(STD_JSONValue* ptr){return !ptr?false:Add(ptr);}
+   bool operator +=(STD_JSONValue* ptr){return !ptr?false:AddPtr(ptr);}
    string ToString() const override {
       return "["+CollectionToString()+"]";
    }
@@ -147,6 +194,7 @@ public:
    STD_JSONBool(bool value):STD_JSONValueStore(value){}
    STD_EJSONValueType ValueType() const override final {return _eJSON_Bool;}
    bool IsIntegral() const override {return true;}
+   bool IsBoolean() const override {return true;}
    string ToString() const override {return cValue?"true":"false";}
 };
 //////////////////////////////////////////////////////////////////////////////
@@ -155,6 +203,7 @@ class STD_JSONString:public STD_JSONValueStore<string>{
 public:
    STD_JSONString(string value):STD_JSONValueStore(value){}
    STD_EJSONValueType ValueType() const override final {return _eJSON_String;}
+   bool IsString() const override final {return true;}
    string ToString() const override {return "\""+cValue+"\"";}
 };
 //////////////////////////////////////////////////////////////////////////////
