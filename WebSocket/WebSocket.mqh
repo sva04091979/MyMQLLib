@@ -19,7 +19,8 @@ public:
    bool Close();
    bool Connect(const string server,uint port,uint timeout);
    bool Send(string text);
-   uint HasData() {return SocketIsReadable(cHndl);}
+   bool HasData() {return DataSize()>1;}
+   uint DataSize() {return SocketIsReadable(cHndl);}
    string Read();
 };
 //----------------------------------------------------------------
@@ -63,17 +64,19 @@ bool _tWS::Connect(const string server,uint port,uint timeout){
 bool _tWS::Send(string text){
    uchar buffer[];
    StringToCharArray(text,buffer,0,WHOLE_ARRAY,CP_UTF8);
-   return SocketSend(cHndl,buffer,ArraySize(buffer)-1)!=-1;
+   int res=SocketSend(cHndl,buffer,ArraySize(buffer));
+   Print(res);
+   return res!=-1;
 }
 //--------------------------------------------------------------------
 string _tWS::Read(){
    string ret="";
-   Print("++++++++++++++++++++");
-   while(HasData()>1){
-   Print("+");
-      Print(HasData());
+//   Print("++++++++++++++++++++");
+   while(DataSize()>1){
+//   Print("+");
+//      Print(HasData());
       uchar buffer[4048];
-      Print(SocketRead(cHndl,buffer,MathMin(HasData(),4048),10000));
+      SocketRead(cHndl,buffer,MathMin(DataSize(),4048),10000);
       ret+=CharArrayToString(buffer,0,WHOLE_ARRAY,CP_UTF8);
    }
    return ret;
