@@ -64,7 +64,9 @@ bool _tWS::Connect(const string server,uint port,uint timeout){
 bool _tWS::Send(string text){
    uchar buffer[];
    StringToCharArray(text,buffer,0,WHOLE_ARRAY,CP_UTF8);
-   return SocketSend(cHndl,buffer,ArraySize(buffer)-1)!=-1;
+   int res=SocketSend(cHndl,buffer,ArraySize(buffer));
+   Print(res);
+   return res!=-1;
 }
 //--------------------------------------------------------------------
 string _tWS::Read(){
