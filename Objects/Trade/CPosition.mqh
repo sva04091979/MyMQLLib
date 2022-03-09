@@ -95,7 +95,7 @@ public:
    bool              IsChangeInProcess() const {return !IsClosingProcess() #ifdef __MQL5__ &&cActiveOrder.IsEmpty() #endif; }
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
-   pos_type          GetPositionType()       {return _type;}
+   pos_type          GetPositionType() const {return _type;}
    ENUM_ORDER_TYPE   Type()                  #ifdef __MQL5__
                                                 {return IsOpen()?(ENUM_ORDER_TYPE)cPositionType:(ENUM_ORDER_TYPE)cOrderType;}
                                              #else
@@ -104,12 +104,13 @@ public:
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
    double            GetVolume()      const  {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
-   double            GetOpenPrice()          {return cDealPrice;}
-   double            GetSL();
-   double            GetTP();
-   double            GetTotalProfit()  {return _comission+cPositionSwap+cProfit+cClosedProfit;}
+   double            GetOpenPrice()   const       {return cDealPrice;}
+   double            GetSL() const;
+   double            GetTP() const;
+   double            GetTotalProfit() const {return _comission+cPositionSwap+cProfit+cClosedProfit;}
+   long_type         Ticket() const {return _ticket;}
    double            Comission() const {return _comission;}
-   double            Swap() {return cPositionSwap;}
+   double            Swap() const {return cPositionSwap;}
    void              NewSL(int mSL);
    void              NewTP(int mTP);
    void              NewStops(double mSL,double mTP,double mPrice=0.0,bool mIsCancelIfError=true)  {NewSL(mSL,mPrice,mIsCancelIfError);
@@ -268,13 +269,13 @@ order_type CPosition::CheckType(void){
       return OrderSelect(_ticket,SELECT_BY_TICKET)?OrderType():-1;
    #endif}
 //------------------------------------------------------------------------
-double CPosition::GetSL(void){
+double CPosition::GetSL(void) const {
    #ifdef __MQL5__
       if (_ticket) return _sl; 
    #endif
    return cOrderSL;}
 //------------------------------------------------------------------------
-double CPosition::GetTP(void){
+double CPosition::GetTP(void) const {
    #ifdef __MQL5__
       if (_ticket) return _tp; 
    #endif
