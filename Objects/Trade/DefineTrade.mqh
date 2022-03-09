@@ -12,7 +12,8 @@
 #define ORDER_MUST_REMOVE     POSITION_MUST_CLOSE
 #define POSITION_CLOSED       0x40
 #define ORDER_REMOVED         POSITION_CLOSED
-#define TRADE_ERROR           0x80
+#define POSITION_CHANGING     0x80
+#define TRADE_ERROR           0x100
 #define TRADE_FINISH (TRADE_ERROR|POSITION_CLOSED)
 
 //Close Flags

@@ -91,7 +91,7 @@ public:
    #endif
    bool              IsTralOn()              {return cTral!=NULL;}
    bool              IsClosed()              {return cClosePrice!=0.0;}
-   bool              IsClosingProcess() const {return !IsFinish()&&bool(cFlag&POSITION_MUST_CLOSE);}
+   bool              IsClosingProcess() const {return !IsFinish()&&bool(cFlag&(POSITION_MUST_CLOSE));}
    bool              IsChangeInProcess() const {return !IsClosingProcess() #ifdef __MQL5__ &&cActiveOrder.IsEmpty() #endif; }
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
@@ -473,7 +473,10 @@ bool CPosition::CheckClosePosition(void){
       CDeal* deal=new CDeal(_symbol,type,MathAbs(volume),0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
       deal.DealControl();
       bool ret=!deal.IsError();
-      delete deal;
+      if (ret)
+         cActiveOrder.PushBack(deal);
+      else
+         delete deal;
       return ret;
    }
 #else
