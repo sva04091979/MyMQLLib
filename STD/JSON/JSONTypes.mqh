@@ -16,6 +16,8 @@
 enum STD_EJSONValueType{_eJSON_Object,_eJSON_Array,_eJSON_Number,_eJSON_String,_eJSON_Bool,_eJSON_Null};
 
 class STD_JSONValue;
+class STD_JSONString;
+class STD_JSONBool;
 
 class STD_JSONPair{
 public:
@@ -35,7 +37,8 @@ class STD_JSONValue{
 public:
    virtual STD_EJSONValueType ValueType() const=0;
    virtual bool IsSigned() const {return false;}
-   virtual bool IsIntegral() const {return false;}
+   virtual bool IsNumber() const {return false;}
+   virtual bool IsInteger() const {return false;}
    virtual bool IsFloatingPoint() const {return false;}
    virtual bool IsArray() const {return false;}
    virtual bool IsObject() const {return false;}
@@ -46,8 +49,8 @@ public:
    template<typename JSONType>
    const JSONType* Cast() const {return dynamic_cast<const JSONType*>(&this);}
    template<typename Type>
-   bool GetIntegral(Type& val) const {
-      if(IsIntegral()){
+   bool GetInteger(Type& val) const {
+      if(IsInteger()){
          if (IsSigned())
             val=(Type)Cast<STD_JSONLong>().Value();
          else
@@ -155,6 +158,30 @@ public:
       STD_JSONPair* pair=new STD_JSONPair(key,value);
       return operator +=(pair);
    }
+   bool String(string key,string& result) const{
+      const STD_JSONValue* it=operator[](key);
+      if (!it||!it.IsString())
+         return false;
+      result=it.Cast<STD_JSONString>().Value();
+      return true;
+   }
+   bool Bool(string key,bool& result) const{
+      const STD_JSONValue* it=operator[](key);
+      if (!it||!it.IsBoolean())
+         return false;
+      result=it.Cast<STD_JSONBool>().Value();
+      return true;
+   }
+   template<typename Type>
+   bool Number(string key,Type& result) const{
+      const STD_JSONValue* it=operator[](key);
+      if (!it||!it.IsNumber())
+         return false;
+      result=it.IsFloatingPoint()?(Type)it.Cast<STD_JSONDouble>().Value():
+                                  it.IsSigned()?(Type)it.Cast<STD_JSONIntegral<long>>().Value():
+                                                (Type)it.Cast<STD_JSONIntegral<ulong>>().Value();
+      return true;        
+   }
 };
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -193,7 +220,6 @@ class STD_JSONBool:public STD_JSONValueStore<bool>{
 public:
    STD_JSONBool(bool value):STD_JSONValueStore(value){}
    STD_EJSONValueType ValueType() const override final {return _eJSON_Bool;}
-   bool IsIntegral() const override {return true;}
    bool IsBoolean() const override {return true;}
    string ToString() const override {return cValue?"true":"false";}
 };
@@ -213,6 +239,7 @@ class STD_JSONNumber:public STD_JSONValueStore<Type>{
 public:
    STD_JSONNumber(Type value):STD_JSONValueStore(value){}
    STD_EJSONValueType ValueType() const override final {return _eJSON_Number;}
+   bool IsNumber() const override final {return true;}
    string ToString() const override {return (string)cValue;}
 };
 //////////////////////////////////////////////////////////////////////////////
@@ -227,7 +254,7 @@ template<typename Type>
 class STD_JSONIntegral:public STD_JSONNumber<Type>{
 public:
    STD_JSONIntegral(Type value):STD_JSONNumber(value){}
-   bool IsIntegral() const override {return true;}
+   bool IsInteger() const override {return true;}
 };
 //////////////////////////////////////////////////////////////////////////////
 class STD_JSONLong:public STD_JSONIntegral<long>{
