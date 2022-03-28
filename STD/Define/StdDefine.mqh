@@ -6,11 +6,13 @@
    #define _tPtrDiffT long
    #define _tTicket ulong
    #define _tAccountNumber long
+   #define tMagic ulong
 #else
    #define _tSizeT uint
    #define _tPtrDiffT int
    #define _tTicket int
    #define _tAccountNumber int
+   #define tMagic int
 #endif
 
 #define NAMESPACE(dName)

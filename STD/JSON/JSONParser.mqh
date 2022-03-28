@@ -336,7 +336,7 @@ STD_JSONValue* STD_JSONParser::ParseBool(const string &json,uint &i){
       isOk=true;
       }
    }
-   else if (json[++i]=='f'&&
+   else if (json[i]=='f'&&
             json[++i]=='a'&&
             json[++i]=='l'&&
             json[++i]=='s'&&
@@ -366,7 +366,6 @@ STD_JSONValue* STD_JSONParser::ParseArray(string &json,uint &i){
    }
    STD_JSONArray* array=new STD_JSONArray;
    while(true){
-      ++i;
       array+=ParseValue(json,i);
       switch(json[i]){
          default:
