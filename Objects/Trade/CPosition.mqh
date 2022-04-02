@@ -57,6 +57,8 @@ protected:
    double            cProfit;
    double            cClosedProfit;
    double            cPositionSwap;
+   double            cSLControl;
+   double            cTPControl;
    ITral*            cTral;
    int               cSLPips;
    int               cTPPips;
@@ -93,6 +95,8 @@ public:
    bool              IsClosed()              {return cClosePrice!=0.0;}
    bool              IsClosingProcess() const {return !IsFinish()&&bool(cFlag&(POSITION_MUST_CLOSE));}
    bool              IsChangeInProcess() const {return !IsClosingProcess() #ifdef __MQL5__ &&cActiveOrder.IsEmpty() #endif; }
+   bool              IsChangeSL() const {return bool(cFlag&TRADE_CHANGE_SL);}
+   bool              IsChangeTP() const {return bool(cFlag&TRADE_CHANGE_TP);}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType() const {return _type;}
@@ -157,7 +161,7 @@ CPosition::CPosition(SET):
    CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0)
    #ifdef __MQL5__
       ,cPositionTicket(0.0),cPositionVolume(0.0),cPositionPrice(0.0),cPositionSL(0.0),cPositionTP(0.0),cPositionLastUpdate(0),cSLPips(0),cTPPips(0),
-      _comission(0.0)
+      _comission(0.0),cSLControl(0.0),cTPControl(0.0)
    #endif
    {#ifdef __MQL5__
       cPositionDirect=mType%2==0?1:-1;
@@ -165,6 +169,7 @@ CPosition::CPosition(SET):
    }
 //------------------------------------------------------
 ulong CPosition::Control(){
+   cFlag^=TRADE_CHANGE_STOP;
    #ifdef __MQL5__
       ActiveOrdersControl();
    #endif 
@@ -228,10 +233,34 @@ void CPosition::PositionStopsControl(void){
       cProfit=OrderProfit();
    #endif
    double price=TradePrice(_symbol,-_direct);
-   if (cTral!=NULL) _sl=cTral.GetSL(price,_sl,_price);
+   if (cTral!=NULL){
+      _sl=cTral.GetSL(price,sl,_price);
+      cSLControl=_sl;
+      cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
+   }
+   if(CompareDouble(tp,cTPControl,_digits)==0){
+      if (bool(cFlag&TRADE_TP_CHANGE_IN_PROCESS)){
+         cFlag^=TRADE_TP_CHANGE_IN_PROCESS;
+      }
+   }
+   else if (!(cFlag&TRADE_TP_CHANGE_IN_PROCESS)){
+      cFlag+=TRADE_CHANGE_TP;
+      cTPControl=tp;
+      _tp=tp;
+   }
+   if(CompareDouble(sl,cSLControl,_digits)==0){
+      if (bool(cFlag&TRADE_SL_CHANGE_IN_PROCESS)){
+         cFlag^=TRADE_SL_CHANGE_IN_PROCESS;
+      }
+   }
+   else if (!(cFlag&TRADE_SL_CHANGE_IN_PROCESS)){
+      cFlag+=TRADE_CHANGE_SL;
+      cSLControl=sl;
+      _sl=sl;
+   }
    bool isSLTPClose=false;
-   if ((!sl||CompareDouble(sl,_sl,_digits)!=0)&&_sl&&ComparePrice(price,_sl,-_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_SL;}
-   if ((!tp||CompareDouble(tp,_tp,_digits)!=0)&&_tp&&ComparePrice(price,_tp,_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_TP;}
+   if ((!sl||CompareDouble(sl,cSLControl,_digits)!=0)&&cSLControl&&ComparePrice(price,cSLControl,-_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_SL;}
+   if ((!tp||CompareDouble(tp,cTPControl,_digits)!=0)&&cTPControl&&ComparePrice(price,cTPControl,_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_TP;}
    if (isSLTPClose) {Closing(#ifdef MY_MQL_LIB_TRADE_LOG __FUNCSIG__ #endif); return;}
    double modSL=IS_VIRTUAL_SL?sl:CheckPriceLevel(sl,price,_freezeLevel,_digits),
           modTP=IS_VIRTUAL_TP?tp:CheckPriceLevel(tp,price,_freezeLevel,_digits);
@@ -284,18 +313,30 @@ double CPosition::GetTP(void) const {
 void CPosition::NewSL(int mSL){
    if (mSL<0) return;
    cSLPips=mSL;
-   if (_price) _sl=!mSL?0.0:_price-_direct*mSL*_point;}
+   if (_price){
+      _sl=!mSL?0.0:_price-_direct*mSL*_point;
+      cSLControl=_sl;
+      cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
+   }
+}
 //---------------------------------------------------------------------
 void CPosition::NewTP(int mTP){
    if (mTP<0) return;
    cTPPips=mTP;
-   if (_price) _tp=!mTP?0.0:_price+_direct*mTP*_point;}
+   if (_price){
+      _tp=!mTP?0.0:_price+_direct*mTP*_point;
+      cTPControl=_tp;
+      cFlag|=TRADE_TP_CHANGE_IN_PROCESS;
+   }
+}
 //----------------------------------------------------------------------
 bool CPosition::SetBreakEven(int mBE){
    if (!_price) return false;
    double sl=_price+_direct*mBE*_point;
    if (ComparePrice(sl,_direct>0?Bid(_symbol):Ask(_symbol),_direct,_digits)>=0) return false;
    _sl=sl;
+   cSLControl=_sl;
+   cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
    return true;}
 //----------------------------------------------------------------------
 void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
@@ -307,7 +348,12 @@ void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
    #else
       mPrice=!IsOpen()?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
-   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mSL&&_sl>0.0)||ComparePrice(mSL,mPrice,_direct,_digits)<0) _sl=NormalizePrice(mSL);}
+   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mSL&&_sl>0.0)||ComparePrice(mSL,mPrice,_direct,_digits)<0){
+   _sl=NormalizePrice(mSL);
+   cSLControl=_sl;
+   cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
+   }
+}
 //----------------------------------------------------------------------
 void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #ifdef __MQL5__
@@ -318,7 +364,12 @@ void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #else
       mPrice=!IsOpen()?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
-   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mTP&&_tp>0.0)||ComparePrice(mTP,mPrice,_direct,_digits)>0) _tp=NormalizePrice(mTP);}
+   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mTP&&_tp>0.0)||ComparePrice(mTP,mPrice,_direct,_digits)>0){
+   _tp=NormalizePrice(mTP);
+   cTPControl=_tp;
+   cFlag|=TRADE_TP_CHANGE_IN_PROCESS;
+   }
+}
 //---------------------------------------------------------------------------
 bool CPosition::CheckClosePosition(void){
    #ifdef __MQL5__
@@ -343,6 +394,8 @@ bool CPosition::CheckClosePosition(void){
       _price=cDealPrice;
       _sl=cOrderSL?cOrderSL:!cSLPips?0.0:NormalizePrice(_price-_direct*cSLPips*_point);
       _tp=cOrderTP?cOrderTP:!cTPPips?0.0:NormalizePrice(_price+_direct*cTPPips*_point);
+      cSLControl=_sl;
+      cTPControl=_tp;
       #ifdef __MQL5__
          _ticket=cOrderTicket;
          _volume=cDealVolume;
@@ -384,6 +437,8 @@ bool CPosition::CheckClosePosition(void){
             cPositionSL=0.0;
             cPositionTP=0.0;
          }
+            cSLControl=cPositionSL;
+            cTPControl=cPositionTP;
 }
 //---------------------------------------------------------------------------
    bool CPosition::SelectNettingPosition(void){
