@@ -88,8 +88,10 @@ public:
    ulong             Control();
    #ifdef MY_MQL_LIB_TRADE_LOG
       bool              Closing(string from);
+      void              Close(double volume,string from)
    #else
       bool              Closing();
+      void              Close(double volume);
    #endif
    bool              IsTralOn()              {return cTral!=NULL;}
    bool              IsClosed()              {return cClosePrice!=0.0;}
@@ -97,10 +99,11 @@ public:
    bool              IsChangeInProcess() const {return !IsClosingProcess() #ifdef __MQL5__ &&cActiveOrder.IsEmpty() #endif; }
    bool              IsChangeSL() const {return bool(cFlag&TRADE_CHANGE_SL);}
    bool              IsChangeTP() const {return bool(cFlag&TRADE_CHANGE_TP);}
+   bool              IsChangeStop() const {return bool(cFlag&TRADE_CHANGE_STOP);}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType() const {return _type;}
-   ENUM_ORDER_TYPE   Type()                  #ifdef __MQL5__
+   ENUM_ORDER_TYPE   Type()  const                #ifdef __MQL5__
                                                 {return IsOpen()?(ENUM_ORDER_TYPE)cPositionType:(ENUM_ORDER_TYPE)cOrderType;}
                                              #else
                                                 {return (ENUM_ORDER_TYPE)cOrderType;}
@@ -140,8 +143,8 @@ protected:
       bool           TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
-      bool           IsSLClosed()   {return bool(cCloseFlag&CLOSE_BY_SL);}
-      bool           IsTPClosed()   {return bool(cCloseFlag&CLOSE_BY_TP);}
+      bool           IsSLClosed()  const  {return bool(cCloseFlag&CLOSE_BY_SL);}
+      bool           IsTPClosed()  const {return bool(cCloseFlag&CLOSE_BY_TP);}
       bool           ChangePosition(double volume);
    protected:
       bool           SelectNettingPosition();
@@ -169,7 +172,7 @@ CPosition::CPosition(SET):
    }
 //------------------------------------------------------
 ulong CPosition::Control(){
-   cFlag^=TRADE_CHANGE_STOP;
+   cFlag&=~TRADE_CHANGE_STOP;
    #ifdef __MQL5__
       ActiveOrdersControl();
    #endif 
@@ -219,6 +222,15 @@ bool CPosition::Closing(
    #endif
    else return false;}
 //----------------------------------------------------------------------
+void CPosition::Close(double volume #ifdef MY_MQL_LIB_TRADE_LOG ,string from #endif){
+   if (!IsOpen()||CompareDouble(volume,_volume,_lotDigits)!=LESS){
+      Closing(#ifdef MY_MQL_LIB_TRADE_LOG from #endif);
+   }
+   else{
+      ChangePosition(volume);
+   }
+}
+//----------------------------------------------------------------------
 void CPosition::PositionStopsControl(void){
    if (!SelectPosition()) return;
    #ifdef __MQL5__
@@ -238,23 +250,18 @@ void CPosition::PositionStopsControl(void){
       cSLControl=_sl;
       cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
    }
-   if(CompareDouble(tp,cTPControl,_digits)==0){
-      if (bool(cFlag&TRADE_TP_CHANGE_IN_PROCESS)){
-         cFlag^=TRADE_TP_CHANGE_IN_PROCESS;
-      }
-   }
+   if(CompareDouble(tp,cTPControl,_digits)==0)
+      cFlag&=~TRADE_TP_CHANGE_IN_PROCESS;
    else if (!(cFlag&TRADE_TP_CHANGE_IN_PROCESS)){
-      cFlag+=TRADE_CHANGE_TP;
+      cFlag|=TRADE_CHANGE_TP;
       cTPControl=tp;
       _tp=tp;
    }
    if(CompareDouble(sl,cSLControl,_digits)==0){
-      if (bool(cFlag&TRADE_SL_CHANGE_IN_PROCESS)){
-         cFlag^=TRADE_SL_CHANGE_IN_PROCESS;
-      }
+      cFlag&=~TRADE_SL_CHANGE_IN_PROCESS;
    }
    else if (!(cFlag&TRADE_SL_CHANGE_IN_PROCESS)){
-      cFlag+=TRADE_CHANGE_SL;
+      cFlag|=TRADE_CHANGE_SL;
       cSLControl=sl;
       _sl=sl;
    }
