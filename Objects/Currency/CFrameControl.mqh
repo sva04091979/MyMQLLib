@@ -27,6 +27,7 @@ public:
    double            GetClose(int mPos=0)                               {return iClose(cSymbol,cFrame,mPos);}
    datetime          GetTime(int mPos=0)                                {return iTime(cSymbol,cFrame,mPos);}
    int               GetBars()                                          {return iBars(cSymbol,cFrame);}
+   long              Volume(int shift=0) const                          {return iVolume(cSymbol,cFrame,shift);}
    int               GetBarShift(datetime mTime,bool mExact)            {return iBarShift(cSymbol,cFrame,mTime,mExact);}
    int               GetBarShift(datetime mTime)                        {return iBarShift(cSymbol,cFrame,mTime,true);}
    int               GetBarShiftN(datetime mTime);

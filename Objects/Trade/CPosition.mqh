@@ -112,6 +112,7 @@ public:
    int               GetDirect()             {return _direct;}
    double            GetVolume()      const  {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
    double            GetOpenPrice()   const       {return cDealPrice;}
+   double            ClosePrice() const {return cClosePrice;}
    double            GetSL() const;
    double            GetTP() const;
    double            GetTotalProfit() const {return _comission+cPositionSwap+cProfit+cClosedProfit;}
