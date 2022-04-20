@@ -57,11 +57,10 @@ protected:
    double            cProfit;
    double            cClosedProfit;
    double            cPositionSwap;
-   double            cSLControl;
-   double            cTPControl;
    ITral*            cTral;
    int               cSLPips;
    int               cTPPips;
+   bool              cIsFirstControl;
    #ifdef __MQL5__
       CList<CDeal>         cOrder;
       CList<CDeal>         cActiveOrder;
@@ -162,10 +161,10 @@ protected:
   };
 //------------------------------------------------------
 CPosition::CPosition(SET):
-   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0)
+   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0),cIsFirstControl(true)
    #ifdef __MQL5__
       ,cPositionTicket(0.0),cPositionVolume(0.0),cPositionPrice(0.0),cPositionSL(0.0),cPositionTP(0.0),cPositionLastUpdate(0),cSLPips(0),cTPPips(0),
-      _comission(0.0),cSLControl(0.0),cTPControl(0.0)
+      _comission(0.0)
    #endif
    {#ifdef __MQL5__
       cPositionDirect=mType%2==0?1:-1;
@@ -247,25 +246,32 @@ void CPosition::PositionStopsControl(void){
    #endif
    double price=TradePrice(_symbol,-_direct);
    if (cTral!=NULL){
-      _sl=cTral.GetSL(price,sl,_price);
-      cSLControl=_sl;
-      cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
+      double tralSL=cTral.GetSL(price,sl,_price);
+      if (CompareDouble(tralSL,_sl,_digits)!=EQUALLY){
+         cSLControl=_sl=tralSL;
+         cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
+      }
    }
    if(CompareDouble(tp,cTPControl,_digits)==0)
       cFlag&=~TRADE_TP_CHANGE_IN_PROCESS;
-   else if (!(cFlag&TRADE_TP_CHANGE_IN_PROCESS)){
-      cFlag|=TRADE_CHANGE_TP;
-      cTPControl=tp;
-      _tp=tp;
+   else if (!cIsFirstControl){
+      if (!(cFlag&TRADE_TP_CHANGE_IN_PROCESS)){
+         cFlag|=TRADE_CHANGE_TP;
+         cTPControl=tp;
+         _tp=tp;
+      }
    }
    if(CompareDouble(sl,cSLControl,_digits)==0){
       cFlag&=~TRADE_SL_CHANGE_IN_PROCESS;
    }
-   else if (!(cFlag&TRADE_SL_CHANGE_IN_PROCESS)){
-      cFlag|=TRADE_CHANGE_SL;
-      cSLControl=sl;
-      _sl=sl;
+   else if (!cIsFirstControl){
+      if (!(cFlag&TRADE_SL_CHANGE_IN_PROCESS)){
+         cFlag|=TRADE_CHANGE_SL;
+         cSLControl=sl;
+         _sl=sl;
+      }
    }
+   cIsFirstControl=false;
    bool isSLTPClose=false;
    if ((!sl||CompareDouble(sl,cSLControl,_digits)!=0)&&cSLControl&&ComparePrice(price,cSLControl,-_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_SL;}
    if ((!tp||CompareDouble(tp,cTPControl,_digits)!=0)&&cTPControl&&ComparePrice(price,cTPControl,_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_TP;}
