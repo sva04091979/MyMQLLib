@@ -532,7 +532,7 @@ bool CPosition::CheckClosePosition(void){
       return cCloseOrder!=NULL&&cCloseOrder.TradeTransaction(trans,request,result);}
 //-------------------------------------------------------------------------------------------
    bool CPosition::ChangePosition(double volume){
-      if (!cIsNetting)
+      if (cIsNetting)
          return false;
       if (NormalizeDouble(volume,_lotDigits)==0.0)
          return true;
