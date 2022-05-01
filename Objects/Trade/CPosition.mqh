@@ -227,7 +227,7 @@ void CPosition::Close(double volume #ifdef MY_MQL_LIB_TRADE_LOG ,string from #en
       Closing(#ifdef MY_MQL_LIB_TRADE_LOG from #endif);
    }
    else{
-      ChangePosition(volume);
+      ChangePosition(-volume);
    }
 }
 //----------------------------------------------------------------------
@@ -387,6 +387,17 @@ void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
 //---------------------------------------------------------------------------
 bool CPosition::CheckClosePosition(void){
    #ifdef __MQL5__
+      if (PositionSelectByTicket(_ticket))
+         return false;
+      else{
+         for (int i=PositionsTotal()-1;i>=0;--i){
+            _tTicket ticket=PositionGetTicket(i);
+            if (PositionSelectByTicket(ticket)){
+               _ticket=ticket;
+               return false;
+            }
+         }
+      }
       if (!HistorySelectByPosition(cIdent)) return false;
       ulong ticket=0;
       for (int i=HistoryOrdersTotal()-1;i>=0;--i,ticket=0){
@@ -532,8 +543,6 @@ bool CPosition::CheckClosePosition(void){
       return cCloseOrder!=NULL&&cCloseOrder.TradeTransaction(trans,request,result);}
 //-------------------------------------------------------------------------------------------
    bool CPosition::ChangePosition(double volume){
-      if (cIsNetting)
-         return false;
       if (NormalizeDouble(volume,_lotDigits)==0.0)
          return true;
       if (NormalizeDouble(_volume+volume,_lotDigits)==0.0){
@@ -542,6 +551,8 @@ bool CPosition::CheckClosePosition(void){
       }
       ENUM_ORDER_TYPE type=volume>0.0?(ENUM_ORDER_TYPE)_type:ENUM_ORDER_TYPE(1-_type);
       CDeal* deal=new CDeal(_symbol,type,MathAbs(volume),0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
+      if (!cIsNetting)
+         deal.SetClosePositionTicket(_ticket);
       deal.DealControl();
       bool ret=!deal.IsError();
       if (ret)
