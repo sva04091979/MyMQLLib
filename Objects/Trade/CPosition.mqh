@@ -392,9 +392,11 @@ bool CPosition::CheckClosePosition(void){
       else{
          for (int i=PositionsTotal()-1;i>=0;--i){
             _tTicket ticket=PositionGetTicket(i);
-            if (PositionSelectByTicket(ticket)){
-               _ticket=ticket;
-               return false;
+            if (PositionGetInteger(POSITION_IDENTIFIER)==cIdent){
+               if (PositionSelectByTicket(ticket)){
+                  _ticket=ticket;
+                  return false;
+               }
             }
          }
       }
