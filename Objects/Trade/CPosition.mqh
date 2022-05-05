@@ -95,7 +95,7 @@ public:
    bool              IsTralOn()              {return cTral!=NULL;}
    bool              IsClosed()              {return cClosePrice!=0.0;}
    bool              IsClosingProcess() const {return !IsFinish()&&bool(cFlag&(POSITION_MUST_CLOSE));}
-   bool              IsChangeInProcess() const {return !IsClosingProcess() #ifdef __MQL5__ &&cActiveOrder.IsEmpty() #endif; }
+   bool              IsChangeInProcess() const {return IsClosingProcess() #ifdef __MQL5__ ||!cActiveOrder.IsEmpty() #endif; }
    bool              IsChangeSL() const {return bool(cFlag&TRADE_CHANGE_SL);}
    bool              IsChangeTP() const {return bool(cFlag&TRADE_CHANGE_TP);}
    bool              IsChangeStop() const {return bool(cFlag&TRADE_CHANGE_STOP);}
@@ -109,6 +109,8 @@ public:
                                              #endif
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
+double               OVol() const {return cOrderVolume;}
+double               PVol() const {return cPositionVolume;}
    double            GetVolume()      const  {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
    double            GetOpenPrice()   const       {return cDealPrice;}
    double            ClosePrice() const {return cClosePrice;}
@@ -506,6 +508,10 @@ bool CPosition::CheckClosePosition(void){
             _comission+=it.GetDealComission()+it.GetDealSwap();
             cClosedProfit+=it.DealProfit();
             bool isLast=cActiveOrder.IsLast();
+            if(it.DealType()%2==Type()%2)
+               cPositionVolume+=it.DealVolume();
+            else
+               cPositionVolume-=it.DealVolume();
             cOrder.PushBack(cActiveOrder.Move());
             it=isLast?NULL:cActiveOrder.It();}
          else it=cActiveOrder.Next();}

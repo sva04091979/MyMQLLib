@@ -26,6 +26,7 @@ protected:
       double            cDealProfit;
       long_type         cDealTicket;
       double            cDealVolume;
+      ENUM_DEAL_TYPE    cDealType;
    #endif
 public:
                      CDeal(SET);
@@ -34,6 +35,8 @@ public:
    double            GetDealPrice() const {return cDealPrice;}
    bool              IsOpen() const {return bool(cFlag&DEAL_FULL);}
    double            GetDealComission()   {return cDealComission;}
+   double            DealVolume() const {return #ifdef __MQL5__ cDealVolume #else cOrderVolume #endif;}
+   ENUM_DEAL_TYPE    DealType() const {return #ifdef __MQL5__ cDealType #else cOrderType%2 #endif;}
    #ifdef __MQL5__
                      CDeal(ulong mTicket,CTradeConst* mTradeConst);
                      CDeal(CTradeConst* tradeConst,ulong positionID);
@@ -75,6 +78,7 @@ ulong CDeal::DealControl(void){
       cDealComission=HistoryDealGetDouble(ticket,DEAL_COMMISSION);
       cDealSwap=HistoryDealGetDouble(ticket,DEAL_SWAP);
       cIdent=HistoryDealGetInteger(ticket,DEAL_POSITION_ID);
+      cDealType=(ENUM_DEAL_TYPE)HistoryDealGetInteger(ticket,DEAL_TYPE);
    #else
       if (!OrderSelect(_ticket,SELECT_BY_TICKET)||
           OrderType()>1) return cFlag;
