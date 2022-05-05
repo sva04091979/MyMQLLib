@@ -36,8 +36,9 @@ public:
    bool              IsOpen() const {return bool(cFlag&DEAL_FULL);}
    double            GetDealComission()   {return cDealComission;}
    double            DealVolume() const {return #ifdef __MQL5__ cDealVolume #else cOrderVolume #endif;}
-   ENUM_DEAL_TYPE    DealType() const {return #ifdef __MQL5__ cDealType #else cOrderType%2 #endif;}
    #ifdef __MQL5__
+      ENUM_DEAL_TYPE    DealType() const {return #ifdef __MQL5__ cDealType #else cOrderType%2 #endif;}
+
                      CDeal(ulong mTicket,CTradeConst* mTradeConst);
                      CDeal(CTradeConst* tradeConst,ulong positionID);
       long_type      GetDealTicket()   {return cDealTicket;}

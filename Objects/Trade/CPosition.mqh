@@ -87,7 +87,7 @@ public:
    ulong             Control();
    #ifdef MY_MQL_LIB_TRADE_LOG
       bool              Closing(string from);
-      void              Close(double volume,string from)
+      void              Close(double volume,string from);
    #else
       bool              Closing();
       void              Close(double volume);
