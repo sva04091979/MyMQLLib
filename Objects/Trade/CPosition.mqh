@@ -60,7 +60,6 @@ protected:
    ITral*            cTral;
    int               cSLPips;
    int               cTPPips;
-   bool              cIsFirstControl;
    #ifdef __MQL5__
       CList<CDeal>         cOrder;
       CList<CDeal>         cActiveOrder;
@@ -163,7 +162,7 @@ protected:
   };
 //------------------------------------------------------
 CPosition::CPosition(SET):
-   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0),cIsFirstControl(true)
+   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0)
    #ifdef __MQL5__
       ,cPositionTicket(0.0),cPositionVolume(0.0),cPositionPrice(0.0),cPositionSL(0.0),cPositionTP(0.0),cPositionLastUpdate(0),cSLPips(0),cTPPips(0),
       _comission(0.0)
