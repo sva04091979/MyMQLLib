@@ -98,6 +98,8 @@ public:
    bool              IsChangeSL() const {return bool(cFlag&TRADE_CHANGE_SL);}
    bool              IsChangeTP() const {return bool(cFlag&TRADE_CHANGE_TP);}
    bool              IsChangeStop() const {return bool(cFlag&TRADE_CHANGE_STOP);}
+   bool              IsChangeVolume() const {return bool(cFlag&TRADE_CHANGED_VOLUME);}
+   bool              IsChanged() const {return bool(cFlag&TRADE_CHANGED);}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType() const {return _type;}
@@ -173,7 +175,7 @@ CPosition::CPosition(SET):
    }
 //------------------------------------------------------
 ulong CPosition::Control(){
-   cFlag&=~TRADE_CHANGE_STOP;
+   cFlag&=~TRADE_CHANGED;
    #ifdef __MQL5__
       ActiveOrdersControl();
    #endif 
@@ -388,14 +390,22 @@ void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
 //---------------------------------------------------------------------------
 bool CPosition::CheckClosePosition(void){
    #ifdef __MQL5__
-      if (PositionSelectByTicket(_ticket))
+      if (PositionSelectByTicket(_ticket)){
+         double volume=PositionGetDouble(POSITION_VOLUME);
+         if (CompareDouble(_volume,volume,_digits)!=EQUALLY){
+            _volume=volume;
+            cFlag|=TRADE_CHANGED_VOLUME;
+         }
          return false;
+      }
       else{
          for (int i=PositionsTotal()-1;i>=0;--i){
             _tTicket ticket=PositionGetTicket(i);
             if (PositionGetInteger(POSITION_IDENTIFIER)==cIdent){
                if (PositionSelectByTicket(ticket)){
                   _ticket=ticket;
+                  _volume=PositionGetDouble(POSITION_VOLUME);
+                  cFlag|=TRADE_CHANGED_VOLUME;
                   return false;
                }
             }

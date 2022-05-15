@@ -99,7 +99,8 @@ protected:
    uint cReserv;
 public:
   ~STD_JSONColection(){
-      for (uint i=0;i<cSize;delete cArray[i++]);
+      for (uint i=0;i<cSize;++i)
+         DEL(cArray[i]);
    }
    ulong Size() const override final{return cSize;}
    const Type* operator [](uint pos) const {return pos<cSize?cArray[pos]:NULL;}
@@ -110,7 +111,7 @@ protected:
       if (cSize>=cReserv){
          uint newReserv=MathMin(MathMax(cReserv+1,cReserv*3/2),SHORT_MAX);
          if (ArrayResize(cArray,newReserv)==-1){
-            delete ptr;
+            DEL(ptr);
             return false;
          }
          cReserv=newReserv;

@@ -19,7 +19,7 @@ public:
    _tdeclSharedPtr(T* obj):cObject(obj),cCount(!obj?NULL:new _tCounter(1)){}
    _tdeclSharedPtr(T* obj,_tCounter* _count):cObject(obj),cCount(!obj?NULL:_count){if (cCount!=NULL) ++cCount;}
    _tdeclSharedPtr(_tdeclSharedPtr<T> &other);
-  ~_tdeclSharedPtr() {if (cCount!=NULL&&!--cCount) {delete cObject; delete cCount;}}
+  ~_tdeclSharedPtr() {if (cCount!=NULL&&!--cCount) {DEL(cObject); DEL(cCount);}}
    template<typename T1>
    _tdeclSharedPtr<T1> StaticCast() {_tdeclSharedPtr<T1> ret((T1*)cObject,cCount); return ret;}
    template<typename T1>
@@ -42,7 +42,7 @@ _tdeclSharedPtr::_tdeclSharedPtr(_tdeclSharedPtr<T> &other){
 template<typename T>
 void _tdeclSharedPtr::Free(){
    if (!cCount) return;
-   if (!--cCount){delete cObject; delete cCount;}
+   if (!--cCount){DEL(cObject); DEL(cCount);}
    cObject=NULL;
    cCount=NULL;}
 //--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ void _tdeclSharedPtr::operator =(_tdeclSharedPtr<T> &other){
 template<typename T>
 void _tdeclSharedPtr::operator =(T* ptr){
    if (cObject==ptr) return;
-   if (cCount!=NULL&&!--cCount) {delete cObject; delete cCount;}
+   if (cCount!=NULL&&!--cCount) {DEL(cObject); DEL(cCount);}
    cObject=ptr;
    cCount=!ptr?NULL:new _tCounter(1);
 }
