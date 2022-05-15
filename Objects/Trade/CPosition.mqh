@@ -146,7 +146,7 @@ protected:
                                       const MqlTradeResult& result);
       bool           IsSLClosed()  const  {return bool(cCloseFlag&CLOSE_BY_SL);}
       bool           IsTPClosed()  const {return bool(cCloseFlag&CLOSE_BY_TP);}
-      bool           ChangePosition(double volume);
+      bool           ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif);
    protected:
       bool           SelectNettingPosition();
       bool           SelectHedgePosition();
@@ -228,7 +228,7 @@ void CPosition::Close(double volume #ifdef MY_MQL_LIB_TRADE_LOG ,string from #en
       Closing(#ifdef MY_MQL_LIB_TRADE_LOG from #endif);
    }
    else{
-      ChangePosition(-volume);
+      ChangePosition(-volume #ifdef MY_MQL_LIB_TRADE_LOG, from #endif);
    }
 }
 //----------------------------------------------------------------------
@@ -549,11 +549,11 @@ bool CPosition::CheckClosePosition(void){
          if (it.TradeTransaction(trans,request,result)) return true;
       return cCloseOrder!=NULL&&cCloseOrder.TradeTransaction(trans,request,result);}
 //-------------------------------------------------------------------------------------------
-   bool CPosition::ChangePosition(double volume){
+   bool CPosition::ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif){
       if (NormalizeDouble(volume,_lotDigits)==0.0)
          return true;
       if (NormalizeDouble(_volume+volume,_lotDigits)==0.0){
-         Closing();
+         Closing(#ifdef MY_MQL_LIB_TRADE_LOG fromWhere #endif);
          return true;
       }
       ENUM_ORDER_TYPE type=volume>0.0?(ENUM_ORDER_TYPE)_type:ENUM_ORDER_TYPE(1-_type);
