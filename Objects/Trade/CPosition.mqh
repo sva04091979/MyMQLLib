@@ -393,8 +393,9 @@ bool CPosition::CheckClosePosition(void){
       if (PositionSelectByTicket(_ticket)){
          double volume=PositionGetDouble(POSITION_VOLUME);
          if (CompareDouble(_volume,volume,_digits)!=EQUALLY){
+            if (_volume!=0.0)
+               cFlag|=TRADE_CHANGED_VOLUME;
             _volume=volume;
-            cFlag|=TRADE_CHANGED_VOLUME;
          }
          return false;
       }
@@ -404,9 +405,10 @@ bool CPosition::CheckClosePosition(void){
             if (PositionGetInteger(POSITION_IDENTIFIER)==cIdent){
                if (PositionSelectByTicket(ticket)){
                   _ticket=ticket;
-                  _volume=PositionGetDouble(POSITION_VOLUME);
+               if (_volume!=0.0)
                   cFlag|=TRADE_CHANGED_VOLUME;
-                  return false;
+               _volume=PositionGetDouble(POSITION_VOLUME);
+               return false;
                }
             }
          }
