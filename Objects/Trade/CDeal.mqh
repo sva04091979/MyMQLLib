@@ -83,6 +83,7 @@ ulong CDeal::DealControl(void){
    #else
       if (!OrderSelect(_ticket,SELECT_BY_TICKET)||
           OrderType()>1) return cFlag;
+      cIdent=_ticket;
       cDealTime=OrderOpenTime();
       cDealPrice=OrderOpenPrice();
       cDealComission=OrderCommission();

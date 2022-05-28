@@ -1,7 +1,7 @@
 #ifndef _STD_S_SHARED_PTR_
 #define _STD_S_SHARED_PTR_
 
-#include <STD\Define\StdDefine.mqh>
+#include "..\Define\StdDefine.mqh"
 #include "Wrape.mqh"
 
 #define _tSharedPtr __std(SSharedPtr)
