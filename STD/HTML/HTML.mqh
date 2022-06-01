@@ -12,6 +12,7 @@ public:
 };
 //--------------------------------------------------------------
 bool _tHTML::Send(string method,string url,string header,uchar& request[],uchar& result[]){
+   Print(url);
    string resultHeader;
    int HTTPResult=WebRequest(method,url,header,60000,request,result,resultHeader);
    bool ret=HTTPResult!=-1;
