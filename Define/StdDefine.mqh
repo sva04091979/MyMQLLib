@@ -168,4 +168,8 @@ public:
    CSTDUnitTestBase(CSTDUnitTestBase &mOther){this=mOther;}
 };
 
+#ifdef __MQL5__
+   double AccountBalance() {return AccountInfoDouble(ACCOUNT_BALANCE);}
+#endif
+
 #endif
