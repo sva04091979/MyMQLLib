@@ -1,7 +1,7 @@
 #ifndef _STD_C_WRAPE_
 #define _STD_C_WRAPE_
 
-#include <STD\Define\StdDefine.mqh>
+#include "..\Define\StdDefine.mqh"
 
 #define _tWrape __std(CWrape)
 #define _tNumeric __std(CWrapeNumeric)

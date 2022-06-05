@@ -16,8 +16,8 @@
       {cCloseTime=cCloseOrder.GetDealTime();    \
       cClosePrice=cCloseOrder.GetDealPrice();   \
       cPositionComission+=cCloseOrder.GetDealComission(); \
-      if (HistoryOrderGetInteger(cCloseOrder.GetOrderTicket(),ORDER_REASON)==ORDER_REASON_SL) cCloseFlag|=CLOSE_BY_SL; \
-      if (HistoryOrderGetInteger(cCloseOrder.GetOrderTicket(),ORDER_REASON)==ORDER_REASON_TP) cCloseFlag|=CLOSE_BY_TP; \
+      if (HistoryDealGetInteger(cCloseOrder.GetOrderTicket(),DEAL_REASON)==DEAL_REASON_SL) cCloseFlag|=CLOSE_BY_SL; \
+      if (HistoryDealGetInteger(cCloseOrder.GetOrderTicket(),DEAL_REASON)==DEAL_REASON_TP) cCloseFlag|=CLOSE_BY_TP; \
       CLOSE_TRUE}
    #define _ticket   cPositionTicket
    #define _price    cPositionPrice
@@ -32,6 +32,9 @@
       {cCloseTime=OrderCloseTime();    \
       cClosePrice=OrderClosePrice();   \
       cDealComission=OrderCommission(); \
+      string comment=OrderComment();\
+      if (StringFind(comment,"[sl]")>=0) cCloseFlag|=CLOSE_BY_SL; \
+      else if (StringFind(comment,"[tp]")>=0) cCloseFlag|=CLOSE_BY_TP; \
       CLOSE_TRUE}
    #define _ticket   cOrderTicket
    #define _price    cDealPrice
@@ -60,7 +63,6 @@ protected:
    ITral*            cTral;
    int               cSLPips;
    int               cTPPips;
-   bool              cIsFirstControl;
    #ifdef __MQL5__
       CList<CDeal>         cOrder;
       CList<CDeal>         cActiveOrder;
@@ -99,6 +101,8 @@ public:
    bool              IsChangeSL() const {return bool(cFlag&TRADE_CHANGE_SL);}
    bool              IsChangeTP() const {return bool(cFlag&TRADE_CHANGE_TP);}
    bool              IsChangeStop() const {return bool(cFlag&TRADE_CHANGE_STOP);}
+   bool              IsChangeVolume() const {return bool(cFlag&TRADE_CHANGED_VOLUME);}
+   bool              IsChanged() const {return bool(cFlag&TRADE_CHANGED);}
    void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType() const {return _type;}
@@ -109,8 +113,6 @@ public:
                                              #endif
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
-//double               OVol() const {return cOrderVolume;}
-//double               PVol() const {return cPositionVolume;}
    double            GetVolume()      const  {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
    double            GetOpenPrice()   const       {return cDealPrice;}
    double            ClosePrice() const {return cClosePrice;}
@@ -127,6 +129,8 @@ public:
    void              NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true);
    void              NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true);
    bool              SetBreakEven(int mBE);
+   bool              IsSLClosed()  const  {return bool(cCloseFlag&CLOSE_BY_SL);}
+   bool              IsTPClosed()  const {return bool(cCloseFlag&CLOSE_BY_TP);}
    #ifdef __MQL5__
       int            Direct() const {return IsOpen()?cPositionDirect:cOrderDirect;}
    #else
@@ -139,15 +143,13 @@ protected:
    void              ModifyPosition(double mSL,double mTP);
    bool              CheckClosePosition();
    bool              CheckDealFull();
+   bool           ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif);
    #ifdef __MQL5__
    public:
                      CPosition(CTradeConst* tradeConst,ulong ticket);
       bool           TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
-      bool           IsSLClosed()  const  {return bool(cCloseFlag&CLOSE_BY_SL);}
-      bool           IsTPClosed()  const {return bool(cCloseFlag&CLOSE_BY_TP);}
-      bool           ChangePosition(double volume);
    protected:
       bool           SelectNettingPosition();
       bool           SelectHedgePosition();
@@ -159,11 +161,13 @@ protected:
    #else
       public:
                      CPosition(CTradeConst* mTradeConst);
+      private:
+         bool        CheckPartialClose();
    #endif
   };
 //------------------------------------------------------
 CPosition::CPosition(SET):
-   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0),cIsFirstControl(true)
+   CDeal(SET_IN),cCloseTime(0),cClosePrice(0.0),cProfit(0.0),cClosedProfit(0.0),cPositionSwap(0.0)
    #ifdef __MQL5__
       ,cPositionTicket(0.0),cPositionVolume(0.0),cPositionPrice(0.0),cPositionSL(0.0),cPositionTP(0.0),cPositionLastUpdate(0),cSLPips(0),cTPPips(0),
       _comission(0.0)
@@ -174,7 +178,7 @@ CPosition::CPosition(SET):
    }
 //------------------------------------------------------
 ulong CPosition::Control(){
-   cFlag&=~TRADE_CHANGE_STOP;
+   cFlag&=~TRADE_CHANGED;
    #ifdef __MQL5__
       ActiveOrdersControl();
    #endif 
@@ -229,9 +233,7 @@ void CPosition::Close(double volume #ifdef MY_MQL_LIB_TRADE_LOG ,string from #en
       Closing(#ifdef MY_MQL_LIB_TRADE_LOG from #endif);
    }
    else{
-   #ifdef __MQL5__
-      ChangePosition(-volume);
-   #endif
+      ChangePosition(-volume #ifdef MY_MQL_LIB_TRADE_LOG, from #endif);
    }
 }
 //----------------------------------------------------------------------
@@ -391,22 +393,32 @@ void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
 //---------------------------------------------------------------------------
 bool CPosition::CheckClosePosition(void){
    #ifdef __MQL5__
-      if (PositionSelectByTicket(_ticket))
+      if (PositionSelectByTicket(_ticket)){
+         double volume=PositionGetDouble(POSITION_VOLUME);
+         if (CompareDouble(_volume,volume,_digits)!=EQUALLY){
+            if (_volume!=0.0)
+               cFlag|=TRADE_CHANGED_VOLUME;
+            _volume=volume;
+         }
          return false;
+      }
       else{
          for (int i=PositionsTotal()-1;i>=0;--i){
             _tTicket ticket=PositionGetTicket(i);
             if (PositionGetInteger(POSITION_IDENTIFIER)==cIdent){
                if (PositionSelectByTicket(ticket)){
                   _ticket=ticket;
-                  return false;
+               if (_volume!=0.0)
+                  cFlag|=TRADE_CHANGED_VOLUME;
+               _volume=PositionGetDouble(POSITION_VOLUME);
+               return false;
                }
             }
          }
       }
       if (!HistorySelectByPosition(cIdent)) return false;
       ulong ticket=0;
-      for (int i=HistoryOrdersTotal()-1;i>=0;--i,ticket=0){
+      for (int i=HistoryDealsTotal()-1;i>=0;--i,ticket=0){
          ticket=HistoryDealGetTicket(i);
          if (!ticket) continue;
          ENUM_DEAL_ENTRY deal=(ENUM_DEAL_ENTRY)HistoryDealGetInteger(ticket,DEAL_ENTRY);
@@ -416,7 +428,12 @@ bool CPosition::CheckClosePosition(void){
             cPositionSwap=cCloseOrder.GetDealSwap();
             CLOSE_VALUE_INIT}}
    #else
-      if (OrderSelect(_ticket,SELECT_BY_TICKET)&&OrderCloseTime()) CLOSE_VALUE_INIT
+      if (OrderSelect(_ticket,SELECT_BY_TICKET)&&OrderCloseTime()){
+         if(!CheckPartialClose())
+            CLOSE_VALUE_INIT
+         else
+            cFlag|=TRADE_CHANGED_VOLUME;
+      }
    #endif
    return false;}
 //----------------------------------------------------------------------------
@@ -552,11 +569,11 @@ bool CPosition::CheckClosePosition(void){
          if (it.TradeTransaction(trans,request,result)) return true;
       return cCloseOrder!=NULL&&cCloseOrder.TradeTransaction(trans,request,result);}
 //-------------------------------------------------------------------------------------------
-   bool CPosition::ChangePosition(double volume){
+   bool CPosition::ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif){
       if (NormalizeDouble(volume,_lotDigits)==0.0)
          return true;
       if (NormalizeDouble(_volume+volume,_lotDigits)==0.0){
-         Closing();
+         Closing(#ifdef MY_MQL_LIB_TRADE_LOG fromWhere #endif);
          return true;
       }
       ENUM_ORDER_TYPE type=volume>0.0?(ENUM_ORDER_TYPE)_type:ENUM_ORDER_TYPE(1-_type);
@@ -583,6 +600,40 @@ bool CPosition::CheckClosePosition(void){
       cTPPips(0)
       {if (!cCloseTime) return;
       else cFlag|=ORDER_REMOVED;}
+//-------------------------------------------------------------------------------------------
+   bool CPosition::ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif){
+      if (NormalizeDouble(volume,_lotDigits)==0.0)
+         return true;
+      if (NormalizeDouble(_volume+volume,_lotDigits)==0.0){
+         Closing(#ifdef MY_MQL_LIB_TRADE_LOG fromWhere #endif);
+         return true;
+      }
+      if (!OrderSelect(_ticket,SELECT_BY_TICKET)) return false;
+      if (OrderCloseTime()) CLOSE_VALUE_INIT
+      if (OrderClose(OrderTicket(),volume,TradePrice(_symbol,-1),SHORT_MAX,clrAliceBlue)){
+         CheckPartialClose();
+         return true;
+      }
+      else
+         return false;
+   }
+//----------------------------------------------------
+   bool CPosition::CheckPartialClose(){
+      string comment=OrderComment();
+      int pos=StringFind(comment,"to #");
+      if(pos<0)
+         return false;
+      int ticket=(int)StringToInteger(StringSubstr(comment,pos+StringLen("from #")));
+      double closedProfit=OrderProfit();
+      double closedSwap=OrderSwap();
+      double closedComission=OrderCommission();
+      if (!OrderSelect(ticket,SELECT_BY_TICKET))
+         return false;
+      _ticket=ticket;
+      cClosedProfit+=closedProfit;
+      CheckPartialClose();
+      return OrderCloseTime()==0;
+   }
 #endif
 //-------------------------------------------------------------------------------
 bool CheckEndTrade(ulong fFlag){

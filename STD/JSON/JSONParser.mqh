@@ -370,7 +370,7 @@ STD_JSONValue* STD_JSONParser::ParseArray(string &json,uint &i){
       switch(json[i]){
          default:
             PrintFormat("JSON array parse error in %s",__FUNCSIG__);
-            delete array;
+            DEL(array);
             return NULL;
          case ']':
             return array;
