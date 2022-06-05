@@ -109,8 +109,8 @@ public:
                                              #endif
    order_type        CheckType();
    int               GetDirect()             {return _direct;}
-double               OVol() const {return cOrderVolume;}
-double               PVol() const {return cPositionVolume;}
+//double               OVol() const {return cOrderVolume;}
+//double               PVol() const {return cPositionVolume;}
    double            GetVolume()      const  {return #ifdef __MQL5__ !(cFlag&DEAL_FULL)?cOrderVolume: #endif _volume;}
    double            GetOpenPrice()   const       {return cDealPrice;}
    double            ClosePrice() const {return cClosePrice;}
@@ -229,7 +229,9 @@ void CPosition::Close(double volume #ifdef MY_MQL_LIB_TRADE_LOG ,string from #en
       Closing(#ifdef MY_MQL_LIB_TRADE_LOG from #endif);
    }
    else{
+   #ifdef __MQL5__
       ChangePosition(-volume);
+   #endif
    }
 }
 //----------------------------------------------------------------------
