@@ -249,6 +249,7 @@ public:
    STD_JSONDouble(double value):STD_JSONNumber(value){}
    bool IsSigned() const override {return true;}
    bool IsFloatingPoint() const override {return true;}
+   string ToString() const override {return StringFormat("%f",cValue);}
 };
 //////////////////////////////////////////////////////////////////////////////
 template<typename Type>
