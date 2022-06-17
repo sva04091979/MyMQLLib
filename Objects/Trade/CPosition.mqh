@@ -46,11 +46,11 @@
    #define _comission cDealComission    
 #endif
 
-#ifdef __MQL5__
-   #define SET _SET,MQL5_SET
-#else
-   #define SET _SET
-#endif
+//#ifdef __MQL5__
+//   #define SET _SET,MQL5_SET
+//#else
+//   #define SET _SET
+//#endif
 
 class CPosition:public CDeal
   {
@@ -644,6 +644,5 @@ bool CheckEndTrade(ulong fFlag){
 #undef CLOSE_VALUE_INIT
 #undef CLOSE_TRUE
 #undef IS_ORDER_END
-#undef SET
 
 #endif

@@ -3,11 +3,11 @@
 
 #include "COrder.mqh"
 
-#ifdef __MQL5__
-   #define SET _SET,MQL5_SET
-#else
-   #define SET _SET
-#endif
+//#ifdef __MQL5__
+//   #define SET _SET,MQL5_SET
+//#else
+//   #define SET _SET
+//#endif
 
 #ifdef __MQL5__
    #define _ticket   cDealTicket
@@ -157,7 +157,6 @@ ulong CDeal::DealControl(void){
       else cFlag|=DEAL_FULL;}
 #endif
 
-#undef SET
 #undef _ticket
 
 #endif

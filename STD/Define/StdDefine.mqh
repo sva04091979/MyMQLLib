@@ -172,6 +172,12 @@ public:
 
 #ifdef __MQL5__
    double AccountBalance() {return AccountInfoDouble(ACCOUNT_BALANCE);}
+   double AccountEquity()  {return AccountInfoDouble(ACCOUNT_EQUITY);}
+   double AccountFreeMargin() {return AccountInfoDouble(ACCOUNT_MARGIN_FREE);}
+   long AccountNumber() {return AccountInfoInteger(ACCOUNT_LOGIN);}
+   bool IsTesting() {return (bool)MQLInfoInteger(MQL_TESTER);}
+   bool IsOptimization() {return (bool)MQLInfoInteger(MQL_OPTIMIZATION);}
+   datetime OrderCloseTime() {return 0;}
 #endif
 
 #endif
