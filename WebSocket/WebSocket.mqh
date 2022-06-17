@@ -66,6 +66,8 @@ bool _tWS::Send(string text){
    StringToCharArray(text,buffer,0,WHOLE_ARRAY,CP_UTF8);
    int res=SocketSend(cHndl,buffer,ArraySize(buffer));
    Print(res);
+   if (res==-1)
+      PrintFormat("Error: %i; is connected: %i",GetLastError(),IsConnected());
    return res!=-1;
 }
 //--------------------------------------------------------------------
