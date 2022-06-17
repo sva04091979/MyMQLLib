@@ -15,10 +15,14 @@ bool _tHTML::Send(string method,string url,string header,uchar& request[],uchar&
    string resultHeader;
    int HTTPResult=WebRequest(method,url,header,60000,request,result,resultHeader);
    bool ret=HTTPResult!=-1;
-   PrintFormat("Answer: %i",HTTPResult);
+   if (HTTPResult!=200){
+      PrintFormat("Head: %s",header);
+      PrintFormat("Send: %s",CharArrayToString(request));
+      PrintFormat("Answer: %i",HTTPResult);
+      PrintFormat ("Res header: %s",resultHeader);
+   }
    if (!ret)
       PrintFormat("Error: %i",GetLastError());
-   PrintFormat ("Res header: %s",resultHeader);
    return ret;
 }
 
