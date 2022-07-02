@@ -610,7 +610,7 @@ bool CPosition::CheckClosePosition(void){
       }
       if (!OrderSelect(_ticket,SELECT_BY_TICKET)) return false;
       if (OrderCloseTime()) CLOSE_VALUE_INIT
-      if (OrderClose(OrderTicket(),volume,TradePrice(_symbol,-1),SHORT_MAX,clrAliceBlue)){
+      if (OrderClose(OrderTicket(),MathAbs(volume),TradePrice(_symbol,-1),SHORT_MAX,clrAliceBlue)){
          CheckPartialClose();
          return true;
       }
@@ -623,13 +623,14 @@ bool CPosition::CheckClosePosition(void){
       int pos=StringFind(comment,"to #");
       if(pos<0)
          return false;
-      int ticket=(int)StringToInteger(StringSubstr(comment,pos+StringLen("from #")));
+      int ticket=(int)StringToInteger(StringSubstr(comment,pos+StringLen("to #")));
       double closedProfit=OrderProfit();
       double closedSwap=OrderSwap();
       double closedComission=OrderCommission();
       if (!OrderSelect(ticket,SELECT_BY_TICKET))
          return false;
       _ticket=ticket;
+      _volume=OrderLots();
       cClosedProfit+=closedProfit;
       CheckPartialClose();
       return OrderCloseTime()==0;
