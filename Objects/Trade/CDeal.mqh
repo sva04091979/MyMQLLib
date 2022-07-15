@@ -94,11 +94,15 @@ ulong CDeal::DealControl(void){
 //---------------------------------------------------------------------------
 #ifdef __MQL5__
    CDeal::CDeal(ulong mTicket,CTradeConst* mTradeConst):COrder(mTicket,mTradeConst),cDealTicket(mTicket){
-      cDealTime=(datetime)HistoryDealGetInteger(mTicket,DEAL_TIME);
-      cDealPrice=HistoryDealGetDouble(mTicket,DEAL_PRICE);
-      cDealVolume=HistoryDealGetDouble(mTicket,DEAL_VOLUME);
-      cIdent=HistoryDealGetInteger(mTicket,DEAL_POSITION_ID);
-      cFlag|=DEAL_FULL;}
+      cDealTime=0;
+      cDealPrice=0.0;
+      cDealComission=0.0;
+      cDealVolume=0.0;
+      cDealSwap=0.0;
+      cDealProfit=0.0;
+      cDealTicket=0;
+      cIdent=mTicket;
+   }
 //-----------------------------------------------------------------------------
    CDeal::CDeal(CTradeConst *tradeConst,ulong positionID):
       COrder(tradeConst,positionID){
