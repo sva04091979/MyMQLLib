@@ -146,7 +146,8 @@ protected:
    bool           ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif);
    #ifdef __MQL5__
    public:
-                     CPosition(CTradeConst* tradeConst,ulong ticket);
+                     CPosition(CTradeConst* tradeConst,ulong ident);
+                     CPosition(_tTicket ticket, CTradeConst* tradeConst);
       bool           TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
@@ -454,6 +455,42 @@ bool CPosition::CheckClosePosition(void){
       return true;}
 //----------------------------------------------------------------------
 #ifdef __MQL5__
+      CPosition::CPosition(ulong ticket,CTradeConst *tradeConst):
+         CDeal(ticket,tradeConst){
+                  cCloseTime=0;
+         cClosePrice=0.0;
+         cPositionComission=cDealComission;
+         cTral=NULL;
+         cSLPips=0;
+         cTPPips=0;
+         cCloseOrder=NULL;
+         if (PositionSelectByTicket(ticket)){
+            cProfit=PositionGetDouble(POSITION_PROFIT);
+            cPositionSwap=PositionGetDouble(POSITION_SWAP);
+            cPositionTicket=PositionGetInteger(POSITION_TICKET);
+            cPositionType=(ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE);
+            cPositionVolume=PositionGetDouble(POSITION_VOLUME);
+            cPositionPrice=PositionGetDouble(POSITION_PRICE_OPEN);
+            cPositionLastUpdate=PositionGetInteger(POSITION_TIME_UPDATE);
+            cPositionDirect=cPositionType%2==0?1:-1;
+            cPositionSL=PositionGetDouble(POSITION_SL);
+            cPositionTP=PositionGetDouble(POSITION_TP);
+         }
+         else{
+            cProfit=0.0;
+            cPositionSwap=0.0;
+            cPositionTicket=0;
+            cPositionVolume=0.0;
+            cPositionPrice=0.0;
+            cPositionLastUpdate=0;
+            cPositionDirect=0;
+            cPositionSL=0.0;
+            cPositionTP=0.0;
+         }
+            cSLControl=cPositionSL;
+            cTPControl=cPositionTP;
+      }
+//------------------------------------------------------------------------
    CPosition::CPosition(CTradeConst *tradeConst,ulong ticket):
       CDeal(tradeConst,ticket){
          cCloseTime=0;
