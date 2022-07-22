@@ -146,8 +146,8 @@ protected:
    bool           ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif);
    #ifdef __MQL5__
    public:
-                     CPosition(CTradeConst* tradeConst,ulong ident);
-                     CPosition(_tTicket ticket, CTradeConst* tradeConst);
+                     CPosition(CTradeConst* tradeConst,ulong ident); //Position
+                     CPosition(_tTicket ticket, CTradeConst* tradeConst); //Order
       bool           TradeTransaction(const MqlTradeTransaction& trans,
                                       const MqlTradeRequest& request,
                                       const MqlTradeResult& result);
@@ -456,7 +456,7 @@ bool CPosition::CheckClosePosition(void){
 //----------------------------------------------------------------------
 #ifdef __MQL5__
       CPosition::CPosition(ulong ticket,CTradeConst *tradeConst):
-         CDeal(ticket,tradeConst){
+         CDeal(ticket,tradeConst!=NULL?tradeConst:new CTradeConst(OrderGetString(ORDER_SYMBOL))){
                   cCloseTime=0;
          cClosePrice=0.0;
          cPositionComission=cDealComission;
@@ -491,8 +491,8 @@ bool CPosition::CheckClosePosition(void){
             cTPControl=cPositionTP;
       }
 //------------------------------------------------------------------------
-   CPosition::CPosition(CTradeConst *tradeConst,ulong ticket):
-      CDeal(tradeConst,ticket){
+   CPosition::CPosition(CTradeConst *tradeConst,ulong ident):
+      CDeal(tradeConst!=NULL?tradeConst:new CTradeConst(PositionGetString(POSITION_SYMBOL)),ident){
          cCloseTime=0;
          cClosePrice=0.0;
          cPositionComission=cDealComission;
@@ -500,7 +500,7 @@ bool CPosition::CheckClosePosition(void){
          cSLPips=0;
          cTPPips=0;
          cCloseOrder=NULL;
-         if (PositionSelectByTicket(ticket)){
+         if (PositionSelectByTicket(ident)){
             cProfit=PositionGetDouble(POSITION_PROFIT);
             cPositionSwap=PositionGetDouble(POSITION_SWAP);
             cPositionTicket=PositionGetInteger(POSITION_TICKET);
