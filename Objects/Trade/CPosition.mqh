@@ -457,7 +457,8 @@ bool CPosition::CheckClosePosition(void){
 #ifdef __MQL5__
       CPosition::CPosition(ulong ticket,CTradeConst *tradeConst):
          CDeal(ticket,tradeConst!=NULL?tradeConst:new CTradeConst(OrderGetString(ORDER_SYMBOL))){
-                  cCloseTime=0;
+         cIsDeleteableTradeConst=tradeConst==NULL;
+         cCloseTime=0;
          cClosePrice=0.0;
          cPositionComission=cDealComission;
          cTral=NULL;
@@ -487,12 +488,13 @@ bool CPosition::CheckClosePosition(void){
             cPositionSL=0.0;
             cPositionTP=0.0;
          }
-            cSLControl=cPositionSL;
-            cTPControl=cPositionTP;
+            cSLControl=cOrderSL;
+            cTPControl=cOrderTP;
       }
 //------------------------------------------------------------------------
    CPosition::CPosition(CTradeConst *tradeConst,ulong ident):
       CDeal(tradeConst!=NULL?tradeConst:new CTradeConst(PositionGetString(POSITION_SYMBOL)),ident){
+         cIsDeleteableTradeConst=tradeConst==NULL;
          cCloseTime=0;
          cClosePrice=0.0;
          cPositionComission=cDealComission;
