@@ -633,11 +633,15 @@ bool CPosition::CheckClosePosition(void){
       cCloseTime(OrderCloseTime()),
       cClosePrice(OrderClosePrice()),
       cProfit(OrderProfit()),
+      cClosedProfit(0.0),
       cPositionSwap(OrderSwap()),
       cTral(NULL),
       cSLPips(0),
       cTPPips(0)
-      {if (!cCloseTime) return;
+      {
+      cSLControl=cOrderSL;
+      cTPControl=cOrderTP;
+      if (!cCloseTime) return;
       else cFlag|=ORDER_REMOVED;}
 //-------------------------------------------------------------------------------------------
    bool CPosition::ChangePosition(double volume #ifdef MY_MQL_LIB_TRADE_LOG, string fromWhere #endif){
