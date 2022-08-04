@@ -34,6 +34,7 @@ public:
    inline bool       SetSelectable(bool isSelectable);
    inline long       GetInt(ENUM_OBJECT_PROPERTY_INTEGER mSet)     {return ObjectGetInteger(cChartId,cName,mSet);}
    inline string     GetString(ENUM_OBJECT_PROPERTY_STRING mSet)   {return ObjectGetString(cChartId,cName,mSet);}
+   string Name() const {return cName;}
    bool              Equal(string mName)  {return mName==cName;}
    void              Deletable(bool key) {if (key) _Flag-=OBJECT_FLAG_NOT_DELETABLE; else _Flag+=OBJECT_FLAG_NOT_DELETABLE;}
    virtual bool      ChartEvent(const int id,const long &lparam,const double &dparam,const string &sparam) {return sparam==cName;}

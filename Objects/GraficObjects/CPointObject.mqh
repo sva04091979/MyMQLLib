@@ -33,6 +33,7 @@ protected:
    string            cText;
    long              cXSize;
    long              cYSize;
+   color             cFieldColor;
 public:
                      CField(string mName,
                             ENUM_OBJECT mType,
@@ -47,6 +48,7 @@ public:
    bool              SetXSize(long mXSize) {if (SetInt(OBJPROP_XSIZE,cXSize=mXSize)) return true; else {cXSize=GetInt(OBJPROP_XSIZE); return false;}}
    bool              SetYSize(long mYSize) {if (SetInt(OBJPROP_YSIZE,cYSize=mYSize)) return true; else {cYSize=GetInt(OBJPROP_YSIZE); return false;}}
    bool              SetXYSize(long mXSize,long mYSize)  {return (int)SetXSize(mXSize)+(int)SetYSize(mYSize)==2;}
+   bool              SetFieldColor(color mColor) {if (SetInt(OBJPROP_BGCOLOR,cFieldColor=mColor)) return true; else {cFieldColor=(color)GetInt(OBJPROP_BGCOLOR); return false;}}
 };
 //-----------------------------------------------------------------------
 CField::CField(string mName,ENUM_OBJECT mType,long mChartId,int mSubWindow,long mX,long mY,long mXSize,long mYSize,int mFlag):
@@ -55,6 +57,7 @@ CField::CField(string mName,ENUM_OBJECT mType,long mChartId,int mSubWindow,long 
    cXSize(mXSize),
    cYSize(mYSize){
    SetText(cText);
-   SetXYSize(mXSize,mYSize);   
+   SetXYSize(mXSize,mYSize);
+   cFieldColor=(color)ObjectGetInteger(cChartId,cName,OBJPROP_BORDER_COLOR);  
    }
 #endif
