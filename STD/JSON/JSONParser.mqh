@@ -110,10 +110,11 @@ string STD_JSONParser::ParseString(string &json,uint &i){
          case '"':
             return StringSubstr(json,start,count);
          case '\\':
-            if (!CheckShield(json,i)){
-               PrintFormat("JSON strig parse error in %s, reason: wrong shield parse",__FUNCSIG__);
-               return NULL;
-            }
+            ++count;
+//            if (!CheckShield(json,i)){
+//               PrintFormat("JSON strig parse error in %s, reason: wrong shield parse",__FUNCSIG__);
+//               return NULL;
+//            }
             break;
       }
    }
