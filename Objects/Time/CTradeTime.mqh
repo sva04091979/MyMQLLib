@@ -19,6 +19,7 @@ public:
    bool              IsTradeAlloed(datetime mTime=0);
 private:
    bool              StringToTimeStruct(string mTimeStart,string mTimeStop,MqlDateTime &mTimeCurStruct,int mId);
+   static bool       StringToTime(       
    void              Control(datetime mTime);
    bool              CheckTime();
   };
