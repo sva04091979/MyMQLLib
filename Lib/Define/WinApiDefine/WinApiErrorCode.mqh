@@ -1,0 +1,6 @@
+#ifndef _WIN_API_ERROR_CODE_
+#define _WIN_API_ERROR_CODE_
+
+#define ERROR_ALREADY_EXISTS 183
+
+#endif
