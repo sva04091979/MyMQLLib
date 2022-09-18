@@ -21,10 +21,12 @@ enum ENUM_START_FLAG{
    START_FLAG_CHARTCHANGE
 };
 
-string gChartSymbol;
-ENUM_TIMEFRAMES gChartTimeFrame;
-double gChartLotStep,gChartLotMax,gChartLotMin,gChartTickSize,gChartStopLevel,gChartFreezeLevel,gChartLotSize;
-int gChartLotDigits;
+struct SStartValue{
+   string symbol;
+   double lotStep,lotMax,lotMin,tickSize,stopLevel,freezeLevel,lotSize;
+   ENUM_TIMEFRAMES timeFrame;
+   int lotDigits;
+} gChartVal;
 
 //---------------------------------------------------------------------
 ENUM_INIT_RETCODE Start(ENUM_START_FLAG fFlag=START_FLAG_NONE){
@@ -47,8 +49,8 @@ ENUM_INIT_RETCODE Start(ENUM_START_FLAG fFlag=START_FLAG_NONE){
 }
 //-------------------------------------------------------------------------------
 void CheckChartOnInit(CFlag &mFlag){
-   if (gChartSymbol!=_Symbol) mFlag+=INIT_FLAG_CHANGE_SYMBOL;
-   else if (gChartTimeFrame!=_Period) mFlag+=INIT_FLAG_CHANGE_FRAME;}
+   if (gChartVal.symbol!=_Symbol) mFlag+=INIT_FLAG_CHANGE_SYMBOL;
+   else if (gChartVal.timeFrame!=_Period) mFlag+=INIT_FLAG_CHANGE_FRAME;}
 //-------------------------------------------------------------------------------
 void RestartOnInit(ENUM_INIT_RETCODE &fRes){
    StopOnInit(fRes);
@@ -60,21 +62,21 @@ void StartOnInit(ENUM_INIT_RETCODE &fRes){
 void ChangeParamOnInit(ENUM_INIT_RETCODE &fRes){};
 //-------------------------------------------------------------------------------
 void ChangeFrameOnInit(ENUM_INIT_RETCODE &fRes){
-   gChartTimeFrame=_Period;}
+   gChartVal.timeFrame=_Period;}
 //--------------------------------------------------------------------------------
 void StopOnInit(ENUM_INIT_RETCODE &fRes){};
 //--------------------------------------------------------------------
 void InitChartValues(){
-   gChartSymbol=_Symbol;
-   gChartTimeFrame=_Period;
-   gChartLotSize=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE);
-   gChartLotStep=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
-   gChartLotDigits=MathMax(-(int)MathFloor(MathLog10(gChartLotStep)),0);
-   gChartLotMax=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MAX);
-   gChartLotMin=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MIN);
-   gChartTickSize=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE);
-   gChartStopLevel=SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL)*_Point;
-   gChartFreezeLevel=SymbolInfoInteger(_Symbol,SYMBOL_TRADE_FREEZE_LEVEL)*_Point;}
+   gChartVal.symbol=_Symbol;
+   gChartVal.timeFrame=_Period;
+   gChartVal.lotSize=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_CONTRACT_SIZE);
+   gChartVal.lotStep=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
+   gChartVal.lotDigits=MathMax(-(int)MathFloor(MathLog10(gChartVal.lotStep)),0);
+   gChartVal.lotMax=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MAX);
+   gChartVal.lotMin=SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MIN);
+   gChartVal.tickSize=SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE);
+   gChartVal.stopLevel=SymbolInfoInteger(_Symbol,SYMBOL_TRADE_STOPS_LEVEL)*_Point;
+   gChartVal.freezeLevel=SymbolInfoInteger(_Symbol,SYMBOL_TRADE_FREEZE_LEVEL)*_Point;}
 
 
 #endif
