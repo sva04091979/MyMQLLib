@@ -43,6 +43,10 @@ public:
    Type* Back() {return !cBack?NULL:cBack.Get();}
    void PushFront(Type* it);
    void PushBack(Type* it);
+   bool Insert(CLinkedListNode<Type>* hint,Type* it);
+   CLinkedListNode<Type>* Erase(CLinkedListNode<Type>* it);
+   Type* PopFront();
+   Type* PopBack();
 private:
    CLinkedListNode<Type>* Make(Type* it);
 };
@@ -60,7 +64,7 @@ void CLinkedList::PushFront(Type* it){
    ++cSize;
    CLinkedListNode<Type>* node=Make(it);
    node.Next(cFront);
-   if(cFront){
+   if(cFront!=NULL){
       cFront.Prev(node);
    }
    else{
@@ -68,5 +72,94 @@ void CLinkedList::PushFront(Type* it){
    }
    cFront=node;
 }
+//---------------------------------------------------------
+template<typename Type>
+void CLinkedList::PushBack(Type* it){
+   ++cSize;
+   CLinkedListNode<Type>* node=Make(it);
+   node.Prev(cBack);
+   if(cBack!=NULL){
+      cBack.Next(node);
+   }
+   else{
+      cFront=node;
+   }
+   cBack=node;
+}
+//---------------------------------------------------------
+template<typename Type>
+bool CLinkedList::Insert(CLinkedListNode<Type>* hint,Type* it){
+   if (!hint){
+      PushBack(it);
+      return true;
+   }
+   if (hint.List()!=&this)
+      return false;
+   if (hint==cFront){
+      PushFront(it);
+      return true;
+   }
+   ++cSize;
+   CLinkedListNode<Type>* node=Make(it);
+   CLinkedListNode<Type>* prev=hint.Prev();
+   prev.Next(node);
+   hint.Prev(node);
+   node.Prev(prev);
+   node.Next(hint);
+   return true;
+}
+//---------------------------------------------------------
+template<typename Type>
+CLinkedListNode<Type>* Erase(CLinkedListNode<Type>* it){
+   if (!it||it.List()!=&this)
+      return NULL;
+   if (it==cFront){
+      PopFront();
+      return FrontIt();
+   }
+   else if(it==cBack){
+      PopBack();
+      return NULL;
+   }
+   --cSize;
+   CLinkedListNode<Type>* ret=it.Next();
+   CLinkedListNode<Type>* prev=it.Prev();
+   if (prev)
+      prev.Next(ret);
+   if (ret)
+      ret.Prev(ret);
+   delete it;
+}
+//---------------------------------------------------------
+template<typename Type>
+Type* CLinkedList::PopFront(){
+   if (IsEmpty())
+      return NULL;
+   --cSize;
+   Type* ret=cFront.Get();
+   if (cBack==cFront)
+      cBack=NULL;
+   CLinkedListNode<Type>* forDelete=cFront;
+   cFront=cFront.Next();
+   cFront.Prev(NULL);
+   delete forDelete;
+   return ret;
+}
+//---------------------------------------------------------
+template<typename Type>
+Type* CLinkedList::PopBack(){
+   if (IsEmpty())
+      return NULL;
+   --cSize;
+   Type* ret=cBack.Get();
+   if (cFront==cBack)
+      cFront=NULL;
+   CLinkedListNode<Type>* forDelete=cBack;
+   cBack=cBack.Prev();
+   cBack.Next(NULL);
+   delete forDelete;
+   return ret;
+}
+
 
 #endif
