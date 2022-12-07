@@ -59,7 +59,7 @@ double TTral::BreackEvenControl(double mPrice,double sl){
       isBE=true;
       return cBreakEven;
    }
-   return sl;
+   return !sl?cDirection>0?sl:EMPTY_VALUE:sl;
 }
 //---------------------------------------------------------------------------------------------------
 double TTral::TralControl(double mPrice,double sl){
@@ -68,5 +68,5 @@ double TTral::TralControl(double mPrice,double sl){
          return NormalizeDouble(mPrice-cDirection*cTral,cTradeConst.digits); 
       }
    }
-   return sl;
+   return !sl?cDirection>0?sl:EMPTY_VALUE:sl;
 }
