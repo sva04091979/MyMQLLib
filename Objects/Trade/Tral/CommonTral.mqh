@@ -51,7 +51,15 @@ double TTral::GetSL(double mPrice,double mSL,double mPriceOpen){
       Init(mPriceOpen);
    double bSL=BreackEvenControl(mPrice,mSL);
    double tSL=TralControl(mPrice,mSL);
-   return cDirection>0?MathMax(mSL,MathMax(bSL,tSL)):MathMin(mSL,MathMin(bSL,tSL));
+   if (cDirection>0)
+      return MathMax(mSL,MathMax(bSL,tSL));
+   else{
+      if (bSL==mSL)
+         return !mSL?tSL:MathMin(tSL,mSL);
+      else if (tSL==mSL)
+         return !mSL?bSL:MathMin(bSL,mSL);
+      else return MathMin(mSL,MathMin(bSL,tSL));
+   }
 }
 //----------------------------------------------------------------------------------------------------
 double TTral::BreackEvenControl(double mPrice,double sl){
@@ -59,7 +67,7 @@ double TTral::BreackEvenControl(double mPrice,double sl){
       isBE=true;
       return cBreakEven;
    }
-   return !sl?cDirection>0?sl:EMPTY_VALUE:sl;
+   return sl;
 }
 //---------------------------------------------------------------------------------------------------
 double TTral::TralControl(double mPrice,double sl){
@@ -68,5 +76,5 @@ double TTral::TralControl(double mPrice,double sl){
          return NormalizeDouble(mPrice-cDirection*cTral,cTradeConst.digits); 
       }
    }
-   return !sl?cDirection>0?sl:EMPTY_VALUE:sl;
+   return sl;
 }
