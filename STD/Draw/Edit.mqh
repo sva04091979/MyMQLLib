@@ -16,14 +16,14 @@ class TEdit:public __tBase{
 public:
    ENUM_ALIGN_MODE Align() const {return cAlignMode;}
    bool Align(ENUM_ALIGN_MODE align);
-   bool Init(string name);
+   bool Create(string name);
    bool Show() override;
 protected:
    void Init() override;
 };
 //----------------------------------------------------------
-bool TEdit::Init(string name){
-   bool ret=TBaseObject::Init(name,OBJ_EDIT,true);
+bool TEdit::Create(string name){
+   bool ret=TBaseObject::Create(name,OBJ_EDIT,true);
    return ret;
 }
 //----------------------------------------------------------

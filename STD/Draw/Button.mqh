@@ -13,8 +13,8 @@
 class TButton:public __tBase{
    bool cState;
 public:
-   bool Init(long chartId,int subWindow);
-   bool Init(string name);
+   bool Create(long chartId,int subWindow,string name);
+   bool Create(string name);
    bool Press(bool isPress);
    bool Press();
    bool IsPress() const {return cState;}
@@ -23,12 +23,14 @@ protected:
    void Init() override;
 };
 //----------------------------------------------------------
-bool TButton::Init(string name){
-   bool ret=TBaseObject::Init(name,OBJ_BUTTON,true);
+bool TButton::Create(string name){
+   bool ret=Create(0,0,name,OBJ_BUTTON,true);
    return ret;
 }
 //----------------------------------------------------------
-void TButton
+bool TButton::Create(long chartId,int subWindow,string name){
+   return TBaseObject::Create(chartId,subWindow,name,OBJ_BUTTON,true);
+}
 //----------------------------------------------------------
 void TButton::Init(){
    __tBase::Init();

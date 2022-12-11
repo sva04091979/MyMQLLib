@@ -25,19 +25,19 @@ public:
    ENUM_OBJECT Type() const {return cType;}
    string Name() const {return cName;}
    template<typename Type>
-   bool Set(ENUM_OBJECT_PROPERTY_INTEGER prop,Type val) {return ObjectSetInteger(0,cName,prop,val);}
+   bool Set(ENUM_OBJECT_PROPERTY_INTEGER prop,Type val) {return ObjectSetInteger(cChartId,cName,prop,val);}
    template<typename Type>
-   bool Set(ENUM_OBJECT_PROPERTY_DOUBLE prop,Type val) {return ObjectSetDouble(0,cName,prop,val);}
+   bool Set(ENUM_OBJECT_PROPERTY_DOUBLE prop,Type val) {return ObjectSetDouble(cChartId,cName,prop,val);}
    template<typename Type>
-   bool Set(ENUM_OBJECT_PROPERTY_STRING prop,Type val) {return ObjectSetString(0,cName,prop,val);}
-   long Get(ENUM_OBJECT_PROPERTY_INTEGER prop) {return ObjectGetInteger(0,cName,prop);}
-   double Get(ENUM_OBJECT_PROPERTY_DOUBLE prop) {return ObjectGetDouble(0,cName,prop);}
-   string Get(ENUM_OBJECT_PROPERTY_STRING prop) {return ObjectGetString(0,cName,prop);}
+   bool Set(ENUM_OBJECT_PROPERTY_STRING prop,Type val) {return ObjectSetString(cChartId,cName,prop,val);}
+   long Get(ENUM_OBJECT_PROPERTY_INTEGER prop) {return ObjectGetInteger(cChartId,cName,prop);}
+   double Get(ENUM_OBJECT_PROPERTY_DOUBLE prop) {return ObjectGetDouble(cChartId,cName,prop);}
+   string Get(ENUM_OBJECT_PROPERTY_STRING prop) {return ObjectGetString(cChartId,cName,prop);}
    bool Hide();
    virtual bool Show();
 protected:
-   bool Init(long chartId,int subWindow,string name,ENUM_OBJECT type,bool isDeletable);
-   bool Init(string name,ENUM_OBJECT type,bool isDeletable=true);
+   bool Create(long chartId,int subWindow,string name,ENUM_OBJECT type,bool isDeletable);
+   bool Create(string name,ENUM_OBJECT type,bool isDeletable=true);
    virtual void Init();
 };
 //-----------------------------------------------------
@@ -47,7 +47,7 @@ TBaseObject::~TBaseObject(void){
    }
 }
 //----------------------------------------------------
-bool TBaseObject::Init(long chartId,int subWindow,string name,ENUM_OBJECT type,bool isDeletable){
+bool TBaseObject::Create(long chartId,int subWindow,string name,ENUM_OBJECT type,bool isDeletable){
    cChartId=chartId;
    cSubWindow=subWindow;
    bool ret=ObjectCreate(cChartId,name,type,cSubWindow,0,0.0);
@@ -61,12 +61,13 @@ bool TBaseObject::Init(long chartId,int subWindow,string name,ENUM_OBJECT type,b
    return ret;
 }
 //----------------------------------------------------
-bool TBaseObject::Init(string name,ENUM_OBJECT type,bool isDeletable){
-   return Init(0,0,name,type,isDeletable);
+bool TBaseObject::Create(string name,ENUM_OBJECT type,bool isDeletable){
+   return Create(0,0,name,type,isDeletable);
 }
 //----------------------------------------------------
 void TBaseObject::Init(){
    cZorder=Get(OBJPROP_ZORDER);
+   cIsBack=Get(OBJPROP_BACK);
 }
 //----------------------------------------------------
 bool TBaseObject::Zorder(long zorder){
@@ -97,6 +98,7 @@ bool TBaseObject::Show(){
    if (ret){
       cIsHidden=false;
       Zorder(cZorder);
+      Back(cIsBack);
    }
    return ret;
 }
