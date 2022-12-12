@@ -8,22 +8,24 @@
 #include "TextObject.mqh"
 #include "XYObject.mqh"
 #include "Color.mqh"
+#include "ReadOnly.mqh"
 
-#define __tBase TRectangleObject<TBackColor<TBorderColor<TXYObject<TTextObject<TBaseObject>>>>>
+#define __tBase TRectangleObject<TBackColor<TBorderColor<TXYObject<TTextObject<TReadOnly<TBaseObject>>>>>>
 
 class TEdit:public __tBase{
    ENUM_ALIGN_MODE cAlignMode;
 public:
    ENUM_ALIGN_MODE Align() const {return cAlignMode;}
    bool Align(ENUM_ALIGN_MODE align);
-   bool Create(string name);
+   bool Create(long chartId,int subWindow,string name);
+   bool Create(string name) {return Create(0,0,name);}
    bool Show() override;
 protected:
    void Init() override;
 };
 //----------------------------------------------------------
-bool TEdit::Create(string name){
-   bool ret=TBaseObject::Create(name,OBJ_EDIT,true);
+bool TEdit::Create(long chartId,int subWindow,string name){
+   bool ret=TBaseObject::Create(chartId,subWindow,name,OBJ_EDIT,true);
    return ret;
 }
 //----------------------------------------------------------
