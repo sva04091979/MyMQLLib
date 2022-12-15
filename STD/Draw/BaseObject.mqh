@@ -30,9 +30,9 @@ public:
    bool Set(ENUM_OBJECT_PROPERTY_DOUBLE prop,Type val) {return ObjectSetDouble(cChartId,cName,prop,val);}
    template<typename Type>
    bool Set(ENUM_OBJECT_PROPERTY_STRING prop,Type val) {return ObjectSetString(cChartId,cName,prop,val);}
-   long Get(ENUM_OBJECT_PROPERTY_INTEGER prop) {return ObjectGetInteger(cChartId,cName,prop);}
-   double Get(ENUM_OBJECT_PROPERTY_DOUBLE prop) {return ObjectGetDouble(cChartId,cName,prop);}
-   string Get(ENUM_OBJECT_PROPERTY_STRING prop) {return ObjectGetString(cChartId,cName,prop);}
+   long Get(ENUM_OBJECT_PROPERTY_INTEGER prop) const {return ObjectGetInteger(cChartId,cName,prop);}
+   double Get(ENUM_OBJECT_PROPERTY_DOUBLE prop) const {return ObjectGetDouble(cChartId,cName,prop);}
+   string Get(ENUM_OBJECT_PROPERTY_STRING prop) const {return ObjectGetString(cChartId,cName,prop);}
    bool Hide();
    virtual bool Show();
 protected:

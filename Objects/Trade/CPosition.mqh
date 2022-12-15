@@ -598,7 +598,9 @@ bool CPosition::CheckClosePosition(void){
    }
 //----------------------------------------------------------------------------
    bool CPosition::TradeTransaction(const MqlTradeTransaction &trans,const MqlTradeRequest &request,const MqlTradeResult &result){
-      if (trans.type!=TRADE_TRANSACTION_DEAL_ADD) return false;
+      if (trans.type!=TRADE_TRANSACTION_DEAL_ADD){
+         return false;
+      }
       if (!(cFlag&DEAL_FULL)&&trans.order==cOrderTicket){
          CDeal::TradeTransaction(trans,request,result);
          cPositionTicket=trans.position;

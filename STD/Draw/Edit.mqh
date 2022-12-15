@@ -10,7 +10,7 @@
 #include "Color.mqh"
 #include "ReadOnly.mqh"
 
-#define __tBase TRectangleObject<TBackColor<TBorderColor<TXYObject<TTextObject<TReadOnly<TBaseObject>>>>>>
+#define __tBase TRectangleObject<TBackColor<TBorderColor<TXYObject<TTextObject<TColor<TReadOnly<TBaseObject>>>>>>>
 
 class TEdit:public __tBase{
    ENUM_ALIGN_MODE cAlignMode;

@@ -4,7 +4,7 @@
 #include "Color.mqh"
 
 template<typename Type>
-class TTextObject:public TColor<Type>{
+class TTextObject:public Type{
    string cText;
    string cFont;
    int cFontSize;
@@ -23,7 +23,7 @@ protected:
 //----------------------------------------------------
 template<typename Type>
 void TTextObject::Init(){
-   TColor<Type>::Init();
+   Type::Init();
    cText=Get(OBJPROP_TEXT);
    cFont=Get(OBJPROP_FONT);
    cFontSize=(int)Get(OBJPROP_FONTSIZE);
@@ -55,7 +55,7 @@ bool TTextObject::FontSize(int fontSize){
 //----------------------------------------------------
 template<typename Type>
 bool TTextObject::Show(){
-   bool ret=TColor<Type>::Show();
+   bool ret=Type::Show();
    if (ret){
       Text(cText);
       Font(cFont);

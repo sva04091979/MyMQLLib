@@ -4,12 +4,15 @@
 #include "RectangleReadOnly.mqh"
 
 template<typename Type>
-class TRectangleObject:public TRectangleReadOnlyObject<Type>{
+class TRectangleObject:public Type{
+protected:
+   int cXSize;
+   int cYSize;
 public:
    bool XSize(int xSize);
    bool YSize(int ySize);
-   int XSize() const {return TRectangleReadOnlyObject<Type>::XSize();}
-   int YSize() const {return TRectangleReadOnlyObject<Type>::YSize();}
+   int XSize() const {return cXSize;}
+   int YSize() const {return cYSize;}
    bool Show() override;
 protected:
    void Init() override;
@@ -17,7 +20,7 @@ protected:
 //----------------------------------------------------
 template<typename Type>
 void TRectangleObject::Init(){
-   TRectangleReadOnlyObject<Type>::Init();
+   Type::Init();
 }
 //----------------------------------------------------
 template<typename Type>
@@ -38,10 +41,10 @@ bool TRectangleObject::YSize(int ySize){
 //----------------------------------------------------
 template<typename Type>
 bool TRectangleObject::Show(){
-   bool ret=TRectangleReadOnlyObject<Type>::Show();
+   bool ret=Type::Show();
    if (ret){
-      XSize(TRectangleReadOnlyObject<Type>::XSize());
-      YSize(TRectangleReadOnlyObject<Type>::YSize());
+      XSize(cXSize);
+      YSize(cYSize);
    }
    return ret;
 }

@@ -1,5 +1,3 @@
-#include "../pch.mqh"
-
 #ifndef _ND_RECTANGLE_LABEL_
 #define _ND_RECTANGLE_LABEL_
 
@@ -8,19 +6,23 @@
 #include "BackColor.mqh"
 #include "XYObject.mqh"
 
-#define __tBase TRectangleObject<TXYObject<TBackColor<TBaseObject>>>
+#define __tBase TRectangleObject<TXYObject<TBackColor<TBorderColor<TBaseObject>>>>
 
 class TRectangleLabel:public __tBase{
 public:
-   bool Init(string name);
+   bool Create(long chartId,int subWindow,string name);
+   bool Create(string name);
    bool Show() override;
 protected:
    void Init() override;
 };
 //----------------------------------------------------------
-bool TRectangleLabel::Init(string name){
-   bool ret=TBaseObject::Init(name,OBJ_RECTANGLE_LABEL,true);
-   return ret;
+bool TRectangleLabel::Create(long chartId,int subWindow,string name){
+   return TBaseObject::Create(chartId,subWindow,name,OBJ_RECTANGLE_LABEL,true);
+}
+//----------------------------------------------------------
+bool TRectangleLabel::Create(string name){
+   return Create(0,0,name);
 }
 //----------------------------------------------------------
 void TRectangleLabel::Init(){

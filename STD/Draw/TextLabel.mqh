@@ -7,7 +7,7 @@
 #include "XYObject.mqh"
 #include "AnchorPoint.mqh"
 
-#define __tBase TRectangleReadOnlyObject<TXYObject<TAnchorPoint<TTextObject<TBaseObject>>>>
+#define __tBase TRectangleReadOnlyObject<TXYObject<TAnchorPoint<TTextObject<TColor<TBaseObject>>>>>
 
 class TTextLabel:public __tBase{
 public:
