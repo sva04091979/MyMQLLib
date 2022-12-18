@@ -12,8 +12,7 @@ public:
    bool Text(string text);
    bool Font(string font);
    bool FontSize(int fontSize);
-   void CheckText();
-   string Text() const {return cText;}
+   string Text() {return cText=Get(OBJPROP_TEXT);}
    string Font() const {return cFont;}
    int FontSize() const {return cFontSize;}
    bool Show() override;
@@ -62,11 +61,6 @@ bool TTextObject::Show(){
       FontSize(cFontSize);
    }
    return ret;
-}
-//----------------------------------------------------
-template<typename Type>
-void TTextObject::CheckText(){
-   cText=Get(OBJPROP_TEXT);
 }
 
 #endif

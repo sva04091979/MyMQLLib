@@ -14,7 +14,7 @@
 #ifdef __MQL5__
    #define CLOSE_VALUE_INIT                     \
       {cCloseTime=cCloseOrder.GetDealTime();    \
-      cClosePrice=cCloseOrder.GetDealPrice();   \
+      cClosePrice=HistoryDealGetDouble(cCloseOrder.GetOrderTicket(),DEAL_PRICE);   \
       cPositionComission+=cCloseOrder.GetDealComission(); \
       if (HistoryDealGetInteger(cCloseOrder.GetOrderTicket(),DEAL_REASON)==DEAL_REASON_SL) cCloseFlag|=CLOSE_BY_SL; \
       if (HistoryDealGetInteger(cCloseOrder.GetOrderTicket(),DEAL_REASON)==DEAL_REASON_TP) cCloseFlag|=CLOSE_BY_TP; \
@@ -220,7 +220,8 @@ bool CPosition::Closing(
       if (!SelectPosition()) return CheckClosePosition();
       cCloseOrder=new CDeal(_symbol,ENUM_ORDER_TYPE(1-_type),_volume,0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
       cCloseOrder.SetClosePositionTicket(_ticket);
-      if (bool(cCloseOrder.DealControl()&DEAL_FULL)) CLOSE_VALUE_INIT
+      if (bool(cCloseOrder.DealControl()&DEAL_FULL)) 
+         CLOSE_VALUE_INIT
    #else
       if (!OrderSelect(_ticket,SELECT_BY_TICKET)) return false;
       if (OrderCloseTime()) CLOSE_VALUE_INIT
@@ -427,7 +428,8 @@ bool CPosition::CheckClosePosition(void){
             DELETE(cCloseOrder);
             cCloseOrder=new CDeal(ticket,cTradeConst);
             cPositionSwap=cCloseOrder.GetDealSwap();
-            CLOSE_VALUE_INIT}}
+            CLOSE_VALUE_INIT
+         }}
    #else
       if (OrderSelect(_ticket,SELECT_BY_TICKET)&&OrderCloseTime()){
          if(!CheckPartialClose())
