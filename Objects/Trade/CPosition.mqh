@@ -12,9 +12,9 @@
 #define IS_ORDER_END DealControl()&(DEAL_FULL|ORDER_REMOVED|TRADE_ERROR)
 
 #ifdef __MQL5__
-   #define CLOSE_VALUE_INIT                     \
+   #define CLOSE_VALUE_INIT            \
       {cCloseTime=cCloseOrder.GetDealTime();    \
-      cClosePrice=HistoryDealGetDouble(cCloseOrder.GetOrderTicket(),DEAL_PRICE);   \
+      cClosePrice=cCloseOrder.GetDealPrice();  \
       cPositionComission+=cCloseOrder.GetDealComission(); \
       if (HistoryDealGetInteger(cCloseOrder.GetOrderTicket(),DEAL_REASON)==DEAL_REASON_SL) cCloseFlag|=CLOSE_BY_SL; \
       if (HistoryDealGetInteger(cCloseOrder.GetOrderTicket(),DEAL_REASON)==DEAL_REASON_TP) cCloseFlag|=CLOSE_BY_TP; \
@@ -207,7 +207,7 @@ bool CPosition::Closing(
       if (!(cFlag&ORDER_ACTIVATE)) return Remove();
       else if (!(cFlag&DEAL_FULL)&&!(DealControl()&DEAL_FULL)) return false;}
    #ifdef __MQL5__
-      if (CheckPointer(cCloseOrder))
+      if (CheckPointer(cCloseOrder)){
          if (bool(cCloseOrder.DealControl()|DEAL_FULL)){
             if (!cCloseOrder.GetDealTime()){
                DELETE(cCloseOrder);
@@ -217,11 +217,13 @@ bool CPosition::Closing(
             }
          }
          else return false;
+      }
       if (!SelectPosition()) return CheckClosePosition();
       cCloseOrder=new CDeal(_symbol,ENUM_ORDER_TYPE(1-_type),_volume,0.0,0.0,0.0,0,0,0,NULL,cTradeConst,0,0,false);
       cCloseOrder.SetClosePositionTicket(_ticket);
-      if (bool(cCloseOrder.DealControl()&DEAL_FULL)) 
+      if (bool(cCloseOrder.DealControl()&DEAL_FULL)){
          CLOSE_VALUE_INIT
+      }
    #else
       if (!OrderSelect(_ticket,SELECT_BY_TICKET)) return false;
       if (OrderCloseTime()) CLOSE_VALUE_INIT
@@ -251,6 +253,7 @@ void CPosition::PositionStopsControl(void){
       double tp=OrderTakeProfit();      
       cPositionSwap=OrderSwap();
       cProfit=OrderProfit();
+      DLOG("Real: ",cProfit);
    #endif
    double price=TradePrice(_symbol,-_direct);
    if (cTral!=NULL){
@@ -426,7 +429,7 @@ bool CPosition::CheckClosePosition(void){
          ENUM_DEAL_ENTRY deal=(ENUM_DEAL_ENTRY)HistoryDealGetInteger(ticket,DEAL_ENTRY);
          if (deal==DEAL_ENTRY_OUT||deal==DEAL_ENTRY_OUT_BY){
             DELETE(cCloseOrder);
-            cCloseOrder=new CDeal(ticket,cTradeConst);
+            cCloseOrder=new CDeal(ticket,cTradeConst,int());
             cPositionSwap=cCloseOrder.GetDealSwap();
             CLOSE_VALUE_INIT
          }}
@@ -458,16 +461,18 @@ bool CPosition::CheckClosePosition(void){
 //----------------------------------------------------------------------
 #ifdef __MQL5__
       CPosition::CPosition(ulong ticket,CTradeConst *tradeConst):
-         CDeal(ticket,tradeConst!=NULL?tradeConst:new CTradeConst(OrderGetString(ORDER_SYMBOL))){
+         CDeal(ticket,tradeConst!=NULL?tradeConst:new CTradeConst(OrderGetString(ORDER_SYMBOL)),OrderGetString(ORDER_SYMBOL)){
          cIsDeleteableTradeConst=tradeConst==NULL;
          cCloseTime=0;
          cClosePrice=0.0;
+         cClosedProfit=0.0;
          cPositionComission=cDealComission;
          cTral=NULL;
          cSLPips=0;
          cTPPips=0;
          cCloseOrder=NULL;
          if (PositionSelectByTicket(ticket)){
+            cIdent=PositionGetInteger(POSITION_IDENTIFIER);
             cProfit=PositionGetDouble(POSITION_PROFIT);
             cPositionSwap=PositionGetDouble(POSITION_SWAP);
             cPositionTicket=PositionGetInteger(POSITION_TICKET);
@@ -478,6 +483,7 @@ bool CPosition::CheckClosePosition(void){
             cPositionDirect=cPositionType%2==0?1:-1;
             cPositionSL=PositionGetDouble(POSITION_SL);
             cPositionTP=PositionGetDouble(POSITION_TP);
+            cPositionLastUpdate=PositionGetInteger(POSITION_TIME_UPDATE_MSC);
          }
          else{
             cProfit=0.0;
@@ -495,16 +501,18 @@ bool CPosition::CheckClosePosition(void){
       }
 //------------------------------------------------------------------------
    CPosition::CPosition(CTradeConst *tradeConst,ulong ident):
-      CDeal(tradeConst!=NULL?tradeConst:new CTradeConst(PositionGetString(POSITION_SYMBOL)),ident){
+      CDeal(tradeConst!=NULL?tradeConst:new CTradeConst(PositionGetString(POSITION_SYMBOL)),ident,PositionGetString(POSITION_SYMBOL)){
          cIsDeleteableTradeConst=tradeConst==NULL;
          cCloseTime=0;
          cClosePrice=0.0;
+         cClosedProfit=0.0;
          cPositionComission=cDealComission;
          cTral=NULL;
          cSLPips=0;
          cTPPips=0;
          cCloseOrder=NULL;
          if (PositionSelectByTicket(ident)){
+            cIdent=ident;
             cProfit=PositionGetDouble(POSITION_PROFIT);
             cPositionSwap=PositionGetDouble(POSITION_SWAP);
             cPositionTicket=PositionGetInteger(POSITION_TICKET);
@@ -515,6 +523,8 @@ bool CPosition::CheckClosePosition(void){
             cPositionDirect=cPositionType%2==0?1:-1;
             cPositionSL=PositionGetDouble(POSITION_SL);
             cPositionTP=PositionGetDouble(POSITION_TP);
+            cPositionLastUpdate=PositionGetInteger(POSITION_TIME_UPDATE_MSC);
+            cFlag|=(DEAL_FULL|ORDER_ACTIVATE);
       }
          else{
             cProfit=0.0;
@@ -591,11 +601,11 @@ bool CPosition::CheckClosePosition(void){
          ulong dealTicket=HistoryDealGetTicket(i);
          if (!dealTicket) continue;
          if (dealTicket==cDealTicket) break;
-         if (pos<0) cOrder.PushBack(new CDeal(dealTicket,cTradeConst));
-         else if (dealTicket==cOrder[pos].GetDealTicket()) break;
-         else cOrder.PushNext(new CDeal(dealTicket,cTradeConst));
          cClosedProfit+=HistoryDealGetDouble(dealTicket,DEAL_PROFIT);
          _comission+=HistoryDealGetDouble(dealTicket,DEAL_COMMISSION)+HistoryDealGetDouble(dealTicket,DEAL_SWAP);
+         if (pos<0) cOrder.PushBack(new CDeal(dealTicket,cTradeConst,GetSymbol()));
+         else if (dealTicket==cOrder[pos].GetDealTicket()) break;
+         else cOrder.PushNext(new CDeal(dealTicket,cTradeConst,GetSymbol()));
       }
    }
 //----------------------------------------------------------------------------

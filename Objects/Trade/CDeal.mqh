@@ -39,8 +39,9 @@ public:
    #ifdef __MQL5__
       ENUM_DEAL_TYPE    DealType() const {return #ifdef __MQL5__ cDealType #else cOrderType%2 #endif;}
 
-                     CDeal(ulong mTicket,CTradeConst* mTradeConst);
-                     CDeal(CTradeConst* tradeConst,ulong positionID);
+                     CDeal(ulong mTicket,CTradeConst* mTradeConst,string symbol);
+                     CDeal(CTradeConst* tradeConst,ulong positionID,string symbol);
+                     CDeal(_tTicket ticket,CTradeConst* mTradeConst,string symbol,int);
       long_type      GetDealTicket()   {return cDealTicket;}
       double         GetDealSwap()     {return cDealSwap;}
       double         DealProfit() const {return cDealProfit;}
@@ -93,7 +94,7 @@ ulong CDeal::DealControl(void){
    return cFlag;}
 //---------------------------------------------------------------------------
 #ifdef __MQL5__
-   CDeal::CDeal(ulong mTicket,CTradeConst* mTradeConst):COrder(mTicket,mTradeConst),cDealTicket(mTicket){
+   CDeal::CDeal(ulong mTicket,CTradeConst* mTradeConst,string symbol):COrder(mTicket,mTradeConst,symbol),cDealTicket(mTicket){
       cDealTime=0;
       cDealPrice=0.0;
       cDealComission=0.0;
@@ -104,8 +105,19 @@ ulong CDeal::DealControl(void){
       cIdent=mTicket;
    }
 //-----------------------------------------------------------------------------
-   CDeal::CDeal(CTradeConst *tradeConst,ulong positionID):
-      COrder(tradeConst,positionID){
+   CDeal::CDeal(_tTicket ticket,CTradeConst* mTradeConst,string symbol,int):COrder(ticket,cTradeConst,symbol){
+      cFlag|=DEAL_FULL;
+      cDealTime=(datetime)HistoryDealGetInteger(ticket,DEAL_TIME);
+      cDealPrice=HistoryDealGetDouble(ticket,DEAL_PRICE);
+      cDealProfit=HistoryDealGetDouble(ticket,DEAL_PROFIT);
+      cDealComission=HistoryDealGetDouble(ticket,DEAL_COMMISSION);
+      cDealSwap=HistoryDealGetDouble(cDealTicket,DEAL_SWAP);
+      cDealTicket=ticket;
+      cDealVolume=HistoryDealGetDouble(ticket,DEAL_VOLUME);
+   }
+//-----------------------------------------------------------------------------
+   CDeal::CDeal(CTradeConst *tradeConst,ulong positionID,string symbol):
+      COrder(tradeConst,positionID,symbol){
       bool isOk=false;
       cDealSwap=0.0;
       ulong ticket=0;
@@ -148,7 +160,7 @@ ulong CDeal::DealControl(void){
       cDealProfit=HistoryDealGetDouble(cDealTicket,DEAL_PROFIT);
       cDealComission=HistoryDealGetDouble(cDealTicket,DEAL_COMMISSION);
       cDealSwap=HistoryDealGetDouble(cDealTicket,DEAL_SWAP);
-      if (cIsMain) cIdent=HistoryDealGetInteger(cDealTicket,DEAL_POSITION_ID);
+      cIdent=HistoryDealGetInteger(cDealTicket,DEAL_POSITION_ID);
       if (cDealTicket) cFlag|=DEAL_FULL;
       return true;}
 #else

@@ -30,7 +30,7 @@ public:
          it=it.Next();
          delete forDelete;
       }
-  }
+   }
    void Add(void* it,__Func func){
       if (it!=NULL&&!Find(it)){
          PushBack(new STD_EventStruct<__Func>(it,func));
