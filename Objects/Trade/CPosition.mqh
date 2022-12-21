@@ -103,7 +103,7 @@ public:
    bool              IsChangeStop() const {return bool(cFlag&TRADE_CHANGE_STOP);}
    bool              IsChangeVolume() const {return bool(cFlag&TRADE_CHANGED_VOLUME);}
    bool              IsChanged() const {return bool(cFlag&TRADE_CHANGED);}
-   void              SetTral(ITral *mTral)   {cTral=mTral.Init(cTradeConst,cOrderDirect);}
+   void              SetTral(ITral *mTral)   {CancelTral(); if (mTral!=NULL) cTral=mTral.Init(cTradeConst,cOrderDirect);}
    void              CancelTral()            {if (cTral==NULL) return; delete cTral; cTral=NULL;}
    pos_type          GetPositionType() const {return _type;}
    ENUM_ORDER_TYPE   Type()  const                #ifdef __MQL5__
