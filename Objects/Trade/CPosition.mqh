@@ -429,7 +429,7 @@ bool CPosition::CheckClosePosition(void){
          ENUM_DEAL_ENTRY deal=(ENUM_DEAL_ENTRY)HistoryDealGetInteger(ticket,DEAL_ENTRY);
          if (deal==DEAL_ENTRY_OUT||deal==DEAL_ENTRY_OUT_BY){
             DELETE(cCloseOrder);
-            cCloseOrder=new CDeal(ticket,cTradeConst,int());
+            cCloseOrder=new CDeal(ticket,cTradeConst,GetSymbol(),int());
             cPositionSwap=cCloseOrder.GetDealSwap();
             CLOSE_VALUE_INIT
          }}
