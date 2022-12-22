@@ -6,7 +6,7 @@ class TRectangleReadOnlyObject:public Type{
 public:
    virtual int XSize() const {return (int)Get(OBJPROP_XSIZE);}
    int YSize() const {return (int)Get(OBJPROP_YSIZE);}
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override;
 };
@@ -17,8 +17,8 @@ void TRectangleReadOnlyObject::Init(){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TRectangleReadOnlyObject::Show(){
-   return Type::Show();
+bool TRectangleReadOnlyObject::Show(int subW){
+   return Type::Show(subW);
 }
 
 

@@ -7,7 +7,7 @@ class TAnchorPoint:public Type{
 public:
    ENUM_ANCHOR_POINT AnchorPoint() const {return cAnchorPoint;}
    bool AnchorPoint(ENUM_ANCHOR_POINT anchorPoint);
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override; 
 };
@@ -27,8 +27,8 @@ bool TAnchorPoint::AnchorPoint(ENUM_ANCHOR_POINT anchorPoint){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TAnchorPoint::Show(){
-   bool ret=Type::Show();
+bool TAnchorPoint::Show(int subW){
+   bool ret=Type::Show(subW);
    if (ret){
       AnchorPoint(cAnchorPoint);
    }

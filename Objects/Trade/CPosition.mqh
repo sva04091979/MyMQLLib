@@ -284,8 +284,12 @@ void CPosition::PositionStopsControl(void){
    }
    cIsFirstControl=false;
    bool isSLTPClose=false;
-   if ((!sl||CompareDouble(sl,cSLControl,_digits)!=0)&&cSLControl&&ComparePrice(price,cSLControl,-_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_SL;}
-   if ((!tp||CompareDouble(tp,cTPControl,_digits)!=0)&&cTPControl&&ComparePrice(price,cTPControl,_direct,_digits)>=0) {isSLTPClose=true; cCloseFlag|=CLOSE_BY_TP;}
+   if ((!sl||CompareDouble(sl,cSLControl,_digits)!=0)&&cSLControl&&ComparePrice(price,cSLControl,-_direct,_digits)>=0) {
+      isSLTPClose=true; cCloseFlag|=CLOSE_BY_SL;
+   }
+   if ((!tp||CompareDouble(tp,cTPControl,_digits)!=0)&&cTPControl&&ComparePrice(price,cTPControl,_direct,_digits)>=0) {
+      isSLTPClose=true; cCloseFlag|=CLOSE_BY_TP;
+   }
    if (isSLTPClose) {Closing(#ifdef MY_MQL_LIB_TRADE_LOG __FUNCSIG__ #endif); return;}
    double modSL=IS_VIRTUAL_SL?sl:CheckPriceLevel(sl,price,_freezeLevel,_digits),
           modTP=IS_VIRTUAL_TP?tp:CheckPriceLevel(tp,price,_freezeLevel,_digits);

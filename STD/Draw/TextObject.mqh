@@ -15,7 +15,7 @@ public:
    string Text() {return cText=Get(OBJPROP_TEXT);}
    string Font() const {return cFont;}
    int FontSize() const {return cFontSize;}
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override; 
 };
@@ -53,8 +53,8 @@ bool TTextObject::FontSize(int fontSize){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TTextObject::Show(){
-   bool ret=Type::Show();
+bool TTextObject::Show(int subW){
+   bool ret=Type::Show(subW);
    if (ret){
       Text(cText);
       Font(cFont);

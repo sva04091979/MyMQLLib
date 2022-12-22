@@ -18,7 +18,7 @@ public:
    bool Press(bool isPress);
    bool Press();
    bool IsPress() {return cState=Get(OBJPROP_STATE);}
-   bool Show() override;
+   bool Show(int subW=0) override;
 protected:
    void Init() override;
 };
@@ -51,8 +51,8 @@ bool TButton::Press(void){
    return cState;
 }
 //------------------------------------------------------
-bool TButton::Show(void){
-   bool ret=__tBase::Show();
+bool TButton::Show(int subW){
+   bool ret=__tBase::Show(subW);
    if (ret){
       Press(cState);
    }

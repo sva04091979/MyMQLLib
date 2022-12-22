@@ -7,7 +7,7 @@ class TColor:public Type{
 public:
    color Color() const {return cColor;}
    bool Color(color _color);
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override; 
 };
@@ -27,8 +27,8 @@ bool TColor::Color(color _color){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TColor::Show(){
-   bool ret=Type::Show();
+bool TColor::Show(int subW){
+   bool ret=Type::Show(subW);
    if (ret){
       Color(cColor);
    }

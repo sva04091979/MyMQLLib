@@ -19,7 +19,7 @@ public:
    bool Align(ENUM_ALIGN_MODE align);
    bool Create(long chartId,int subWindow,string name);
    bool Create(string name) {return Create(0,0,name);}
-   bool Show() override;
+   bool Show(int subW=0) override;
 protected:
    void Init() override;
 };
@@ -34,8 +34,8 @@ void TEdit::Init(){
    cAlignMode=(ENUM_ALIGN_MODE)Get(OBJPROP_ALIGN);
 }
 //------------------------------------------------------
-bool TEdit::Show(void){
-   bool ret=__tBase::Show();
+bool TEdit::Show(int subW){
+   bool ret=__tBase::Show(subW);
    if(ret){
       Align(cAlignMode);
    }

@@ -1,38 +1,33 @@
-#ifndef _ND_READONLY_OBJECT_
-#define _ND_READONLY_OBJECT_
-
 template<typename Type>
-class TReadOnly:public Type{
-   bool cReadOnly;
+class TPrice:public Type{
+   double cPrice;
 public:
-   bool ReadOnly() const {return cReadOnly;}
-   bool ReadOnly(bool readOnly);
+   double Price() {return cPrice=Get(OBJPROP_PRICE);}
+   bool Price(double price);
    bool Show(int subW) override;
 protected:
    void Init() override; 
 };
 //----------------------------------------------------
 template<typename Type>
-void TReadOnly::Init(){
+void TPrice::Init(){
    Type::Init();
-   cReadOnly=(bool)Get(OBJPROP_READONLY);
+   cPrice=Get(OBJPROP_PRICE);
 }
 //----------------------------------------------------
 template<typename Type>
-bool TReadOnly::ReadOnly(bool readOnly){
-   bool ret=Set(OBJPROP_READONLY,readOnly);
+bool TPrice::Price(double price){
+   bool ret=Set(OBJPROP_PRICE,price);
    if (ret)
-      cReadOnly=readOnly;
+      cPrice=price;
    return ret;
 }
 //----------------------------------------------------
 template<typename Type>
-bool TReadOnly::Show(int subW){
+bool TPrice::Show(int subW){
    bool ret=Type::Show(subW);
    if (ret){
-      ReadOnly(cReadOnly);
+      Price(cPrice);
    }
    return ret;
 }
-
-#endif

@@ -12,7 +12,7 @@ class TRectangleLabel:public __tBase{
 public:
    bool Create(long chartId,int subWindow,string name);
    bool Create(string name);
-   bool Show() override;
+   bool Show(int subW=0) override;
 protected:
    void Init() override;
 };
@@ -29,8 +29,8 @@ void TRectangleLabel::Init(){
    __tBase::Init();
 }
 //------------------------------------------------------
-bool TRectangleLabel::Show(void){
-   bool ret=__tBase::Show();
+bool TRectangleLabel::Show(int subW){
+   bool ret=__tBase::Show(subW);
    return ret;
 }
 

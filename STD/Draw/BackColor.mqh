@@ -7,7 +7,7 @@ class TBackColor:public Type{
 public:
    color BackColor() const {return cBackColor;}
    bool BackColor(color _color);
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override; 
 };
@@ -27,8 +27,8 @@ bool TBackColor::BackColor(color _color){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TBackColor::Show(){
-   bool ret=Type::Show();
+bool TBackColor::Show(int subW){
+   bool ret=Type::Show(subW);
    if (ret){
       BackColor(cBackColor);
    }

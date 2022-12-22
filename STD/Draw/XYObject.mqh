@@ -15,7 +15,7 @@ public:
    bool Move(int x,int y) {return XY(x,y);}
    int X() const {return cX;}
    int Y() const {return cY;}
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override; 
 };
@@ -53,8 +53,8 @@ bool TXYObject::Y(int y){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TXYObject::Show(){
-   bool ret=Type::Show();
+bool TXYObject::Show(int subW){
+   bool ret=Type::Show(subW);
    if (ret){
       Corner(cCorner);
       XY(cX,cY);

@@ -34,7 +34,7 @@ public:
    double Get(ENUM_OBJECT_PROPERTY_DOUBLE prop) const {return ObjectGetDouble(cChartId,cName,prop);}
    string Get(ENUM_OBJECT_PROPERTY_STRING prop) const {return ObjectGetString(cChartId,cName,prop);}
    bool Hide();
-   virtual bool Show();
+   virtual bool Show(int subW);
 protected:
    bool Create(long chartId,int subWindow,string name,ENUM_OBJECT type,bool isDeletable);
    bool Create(string name,ENUM_OBJECT type,bool isDeletable=true);
@@ -93,8 +93,8 @@ bool TBaseObject::Hide(){
    return ret;
 }
 //----------------------------------------------------
-bool TBaseObject::Show(){
-   bool ret=cName!=NULL&&ObjectCreate(0,cName,cType,0,0,0.0);
+bool TBaseObject::Show(int subW){
+   bool ret=cName!=NULL&&ObjectCreate(0,cName,cType,subW,0,0.0);
    if (ret){
       cIsHidden=false;
       Zorder(cZorder);

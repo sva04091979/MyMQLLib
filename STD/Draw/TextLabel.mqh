@@ -13,7 +13,7 @@ class TTextLabel:public __tBase{
 public:
    bool Create(long chartId,int subWindow,string name);
    bool Create(string name);
-   bool Show() override;
+   bool Show(int subW=0) override;
 protected:
    void Init() override;
 };
@@ -31,8 +31,8 @@ void TTextLabel::Init(){
    __tBase::Init();
 }
 //------------------------------------------------------
-bool TTextLabel::Show(void){
-   bool ret=__tBase::Show();
+bool TTextLabel::Show(int subW){
+   bool ret=__tBase::Show(subW);
    if(ret){
    }
    return ret;

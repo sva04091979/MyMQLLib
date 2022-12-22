@@ -13,7 +13,7 @@ public:
    bool YSize(int ySize);
    int XSize() const {return cXSize;}
    int YSize() const {return cYSize;}
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override;
 };
@@ -40,8 +40,8 @@ bool TRectangleObject::YSize(int ySize){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TRectangleObject::Show(){
-   bool ret=Type::Show();
+bool TRectangleObject::Show(int subW){
+   bool ret=Type::Show(subW);
    if (ret){
       XSize(cXSize);
       YSize(cYSize);

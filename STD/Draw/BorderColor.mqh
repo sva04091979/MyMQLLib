@@ -7,7 +7,7 @@ class TBorderColor:public Type{
 public:
    color BorderColor() const {return cBorderColor;}
    bool BorderColor(color _color);
-   bool Show() override;
+   bool Show(int subW) override;
 protected:
    void Init() override; 
 };
@@ -27,8 +27,8 @@ bool TBorderColor::BorderColor(color _color){
 }
 //----------------------------------------------------
 template<typename Type>
-bool TBorderColor::Show(){
-   bool ret=Type::Show();
+bool TBorderColor::Show(int subW){
+   bool ret=Type::Show(subW);
    if (ret){
       BorderColor(cBorderColor);
    }
