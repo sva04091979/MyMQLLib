@@ -1,8 +1,9 @@
 #include "BaseObject.mqh"
 #include "Color.mqh"
 #include "Price.mqh"
+#include "Width.mqh"
 
-#define __tBase TColor<TPrice<TBaseObject>>
+#define __tBase TColor<TPrice<TWidth<TBaseObject>>>
 
 class TLine:public __tBase{
 public:
