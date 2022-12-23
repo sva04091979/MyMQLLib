@@ -85,7 +85,7 @@ public:\
       while((it=Next(it))!=NULL)\
          it.func(it.it);\
    }\
-} name;
+} name
 
 #define _tEvent1(name,t1) \
 typedef void(*__##name##_func)(void*,t1);\
@@ -96,7 +96,7 @@ public:\
       while((it=Next(it))!=NULL)\
          it.func(it.it,p1);\
    }\
-} name;
+} name
 
 #define _tEvent2(name,t1,t2) \
 typedef void(*__##name##_func)(void*,t1,t2);\
@@ -107,7 +107,7 @@ public:\
       while((it=Next(it))!=NULL)\
          it.func(it.it,p1,p2);\
    }\
-} name;
+} name
 
 #define _tEvent3(name,t1,t2,t3) \
 typedef void(*__##name##_func)(void*,t1,t2,t3);\
@@ -118,7 +118,17 @@ public:\
       while((it=Next(it))!=NULL)\
          it.func(it.it,p1,p2,p3);\
    }\
-} name;
+} name
 
+#define _tEvent4(name,t1,t2,t3,t4) \
+typedef void(*__##name##_func)(void*,t1,t2,t3,t4);\
+class Event##name:public STD_EventBase<__##name##_func>{\
+public:\
+   void Invoke(t1 p1,t2 p2,t3 p3,t4 p4){\
+      STD_EventStruct<__##name##_func>* it=NULL;\
+      while((it=Next(it))!=NULL)\
+         it.func(it.it,p1,p2,p3,p4);\
+   }\
+} name
 
 #endif
