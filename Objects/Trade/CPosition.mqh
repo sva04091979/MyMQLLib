@@ -253,7 +253,6 @@ void CPosition::PositionStopsControl(void){
       double tp=OrderTakeProfit();      
       cPositionSwap=OrderSwap();
       cProfit=OrderProfit();
-      DLOG("Real: ",cProfit);
    #endif
    double price=TradePrice(_symbol,-_direct);
    if (cTral!=NULL){
