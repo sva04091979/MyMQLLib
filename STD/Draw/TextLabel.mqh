@@ -11,7 +11,7 @@
 
 class TTextLabel:public __tBase{
 public:
-   bool Create(long chartId,int subWindow,string name);
+   bool Create(long chartId,int subWindow,string name,bool isDeletable=true);
    bool Create(string name);
    bool Show(int subW=0) override;
 protected:
@@ -22,8 +22,8 @@ bool TTextLabel::Create(string name){
    return Create(0,0,name);
 }
 //----------------------------------------------------------
-bool TTextLabel::Create(long chartId,int subWindow,string name){
-   bool ret=TBaseObject::Create(chartId,subWindow,name,OBJ_LABEL,true);
+bool TTextLabel::Create(long chartId,int subWindow,string name,bool isDeletable=true){
+   bool ret=TBaseObject::Create(chartId,subWindow,name,OBJ_LABEL,isDeletable);
    return ret;
 }
 //----------------------------------------------------------
