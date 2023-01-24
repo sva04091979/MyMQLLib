@@ -35,7 +35,7 @@ public:
    string Get(ENUM_OBJECT_PROPERTY_STRING prop) const {return ObjectGetString(cChartId,cName,prop);}
    bool Hide();
    virtual bool Show(int subW);
-   void MoveSub(int subW) {Hide(); Show(subW);}
+   void MoveSub(int subW) {if (!cIsHidden) Hide(); Show(subW);}
 protected:
    bool Create(long chartId,int subWindow,string name,ENUM_OBJECT type,bool isDeletable);
    bool Create(string name,ENUM_OBJECT type,bool isDeletable=true);
