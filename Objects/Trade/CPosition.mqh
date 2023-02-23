@@ -376,7 +376,7 @@ void CPosition::NewSL(double mSL,double mPrice=0.0,bool mIsCancelIfError=true){
    #else
       mPrice=!IsOpen()?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
-   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mSL&&_sl>0.0)||ComparePrice(mSL,mPrice,_direct,_digits)<0){
+   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type<=O_T_SELL #endif)||(!mSL&&_sl>0.0)||ComparePrice(mSL,mPrice,_direct,_digits)<0){
    _sl=NormalizePrice(mSL);
    cSLControl=_sl;
    cFlag|=TRADE_SL_CHANGE_IN_PROCESS;
@@ -392,7 +392,7 @@ void CPosition::NewTP(double mTP,double mPrice=0.0,bool mIsCancelIfError=true){
    #else
       mPrice=!IsOpen()?cOrderPrice:!mPrice?TradePrice(_symbol,-_direct):mPrice;
    #endif
-   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type>O_T_SELL #endif)||(!mTP&&_tp>0.0)||ComparePrice(mTP,mPrice,_direct,_digits)>0){
+   if ((!mIsCancelIfError #ifndef __MQL5__ &&_type<=O_T_SELL #endif)||(!mTP&&_tp>0.0)||ComparePrice(mTP,mPrice,_direct,_digits)>0){
    _tp=NormalizePrice(mTP);
    cTPControl=_tp;
    cFlag|=TRADE_TP_CHANGE_IN_PROCESS;

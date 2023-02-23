@@ -1,7 +1,7 @@
 #ifndef _STD_S_UNIQUE_PTR_
 #define _STD_S_UNIQUE_PTR_
 
-#include <STD\Define\StdDefine.mqh>
+#include "../Define/StdDefine.mqh"
 
 #define _tUniquePtr __std(SUniquePtr)
 
@@ -15,9 +15,9 @@ protected:
    T* cPtr;
 public:
    _tdeclUniquePtr():cPtr(NULL){}
-   _tdeclUniquePtr(T* &obj):cPtr(obj){obj=NULL;}
+   _tdeclUniquePtr(T* obj):cPtr(obj){}
    _tdeclUniquePtr(_tdeclUniquePtr<T> &other):cPtr(other.Move()){}
-  ~_tdeclUniquePtr() {delete cPtr;}
+  ~_tdeclUniquePtr() {DEL(cPtr);}
    template<typename T1>
    _tdeclUniquePtr<T1> StaticCast() {_tdeclUniquePtr<T1> ret((T1*)cPtr); cPtr=NULL; return ret;}
    template<typename T1>

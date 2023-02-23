@@ -33,7 +33,8 @@ public:
    }
    void Add(void* it,__Func func){
       if (it!=NULL&&!Find(it)){
-         PushBack(new STD_EventStruct<__Func>(it,func));
+         STD_EventStruct<__Func>* tmp=new STD_EventStruct<__Func>(it,func);
+         PushBack(tmp);
       }
    }
 protected:  
