@@ -83,4 +83,9 @@ enum ENUM_TIME_TYPE
    TIME_GMT
   };
 
+double Ask(string fSymbol){return SymbolInfoDouble(fSymbol,SYMBOL_ASK);}
+double Bid(string fSymbol){return SymbolInfoDouble(fSymbol,SYMBOL_BID);}
+int Spread(string fSymbol=NULL){return (int)SymbolInfoInteger(fSymbol,SYMBOL_SPREAD);}
+double TradePrice(string fSymbol,int fDirect){return !fDirect?0.0:fDirect>0?Ask(fSymbol):Bid(fSymbol);}
+
 #endif
